@@ -1,0 +1,13 @@
+---
+- name: installe debconf-utils
+  apt:
+    name: debconf-utils
+    state: installed
+  when: ansible_os_family == 'Debian'
+  tags: sysutils
+
+- name: client openldap Debian
+  apt:
+    name: ldap-utils
+    state: present
+  tags: ldapclient

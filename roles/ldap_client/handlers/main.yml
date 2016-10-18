@@ -1,0 +1,14 @@
+---
+- name: restart ldap client
+  service:
+    name: nslcd
+    state: restarted
+  notify: restart nscd cache
+
+- name: restart nscd cache
+  service:
+    name: nscd
+    state: restarted
+
+- name: rebuild FreeBSD pwdb 
+  command: /usr/sbin/pwd_mkdb /etc/master.passwd

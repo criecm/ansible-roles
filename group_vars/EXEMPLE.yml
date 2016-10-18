@@ -1,0 +1,10 @@
+---
+# variables locales
+# baseDN
+ldap_base: 'dc=univ,dc=fr'
+# URIs des serveurs LDAP
+ldap_uri: 'ldaps://ldapr.univ.fr/ ldaps://ldap.univ.fr/'
+# binddn/password pour nss/pam
+ldap_binddn: 'cn=pam,ou=users,dc=univ,dc=fr'
+ldap_bindpw: 'pampass'
+

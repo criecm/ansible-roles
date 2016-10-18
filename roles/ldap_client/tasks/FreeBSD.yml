@@ -1,0 +1,56 @@
+---
+# config client ldap FreeBSD
+
+- block:
+  - name: installe client ldap FreeBSD
+    pkgng:
+      name: nss-pam-ldapd
+      state: present
+  - name: active client LDAP FreeBSD
+    lineinfile:
+      dest: '/etc/rc.conf'
+      regexp: '{{item.regexp}}'
+      line: '{{item.line}}'
+      state: present
+    with_items:
+      - { regexp: '^nscd_enable', line: 'nscd_enable="YES"' }
+      - { regexp: '^nslcd_enable', line: 'nslcd_enable="YES"' }
+      - { regexp: '^nslcd_supervisor', line: 'nslcd_supervisor="YES"' }
+  when: (ansible_os_family == 'FreeBSD')
+  tags: nssldap
+
+- name: Config nsswitch.conf FreeBSD
+  lineinfile:
+    dest: '/etc/nsswitch.conf'
+    regexp: '{{item.regexp}}'
+    line: '{{item.line}}'
+    state: present
+  with_items:
+    - { regexp: '^group_compat:', line: 'group_compat: ldap' }
+    - { regexp: '^passwd_compat:', line: 'passwd_compat: ldap' }
+  when: (ansible_os_family == 'FreeBSD')
+  tags: nssldap
+
+- block:
+  - name: Enable LDAP /etc/passwd
+    lineinfile:
+      dest: /etc/passwd
+      regexp: '^\+:'
+      line: '+:*:::::{{ldap_force_shell}}'
+      state: present
+  - name: Enable LDAP /etc/master.passwd
+    lineinfile:
+      dest: /etc/master.passwd
+      regexp: '^\+:'
+      line: '+:*::::0:0:::{{ldap_force_shell}}'
+      state: present
+    notify: rebuild FreeBSD pwdb
+  - name: Enable LDAP /etc/group
+    lineinfile:
+      dest: /etc/group
+      regexp: '^\+:'
+      line: '+:*:0:'
+      state: present
+  when: (ansible_os_family == 'FreeBSD')
+  tags: nssldap
+

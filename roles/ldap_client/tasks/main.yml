@@ -1,0 +1,41 @@
+---
+# config client ldap
+
+- include_vars: 'vars/{{ansible_os_family}}.yml'
+
+- include: 'tasks/{{ansible_os_family}}.yml'
+
+- stat: path={{nslcd_conf}}
+  register: nslcd
+
+- name: Config nslcd.conf
+  lineinfile:
+    dest: '{{nslcd_conf}}'
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+    state: present
+  with_items:
+    - { regexp: '^tls_cacert', line: 'tls_cacertfile /etc/ssl/caecm.crt' }
+    - { regexp: '^tls_reqcert', line: 'tls_reqcert demand' }
+    - { regexp: '^uri', line: 'uri {{ldap_uri}}' }
+    - { regexp: '^binddn', line: 'binddn {{ldap_binddn}}' }
+    - { regexp: '^bindpw', line: 'bindpw {{ldap_bindpw}}' }
+    - { regexp: '^base *group', line: 'base group ou=Group,{{ldap_base}}' }
+    - { regexp: '^base *passwd', line: 'base passwd ou=People,{{ldap_base}}' }
+    - { regexp: '^base *shadow', line: 'base shadow ou=People,{{ldap_base}}' }
+    - { regexp: '^idle_timelimit', line: 'idle_timelimit 300' }
+    - { regexp: '^nss_initgroups_ignoreusers', line: 'nss_initgroups_ignoreusers ALLLOCAL' }
+    - { regexp: '^nss_min_uid', line: 'nss_min_uid 10000' }
+  when: nslcd.stat.exists == True
+  notify: restart ldap client
+  tags: nssldap
+
+- name: Nologin par defaut
+  lineinfile:
+    dest: '{{nslcd_conf}}'
+    regexp: '^map *passwd *loginShell'
+    line: 'map passwd loginShell "{{ldap_force_shell}}"'
+    state: present
+  when: ( nslcd.stat.exists == True and '{{ldap_force_shell}}' != '')
+  tags: nssldap
+

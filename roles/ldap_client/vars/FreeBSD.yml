@@ -1,0 +1,4 @@
+---
+ldap_etcdir: /usr/local/etc/openldap
+nslcd_conf: /usr/local/etc/nslcd.conf
+

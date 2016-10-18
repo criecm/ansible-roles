@@ -1,0 +1,7 @@
+---
+# client openldap FreeBSD
+- name: openldap-client FreeBSD
+  pkgng:
+    name: openldap-client
+    state: present
+  tags: ldapclient

@@ -1,0 +1,4 @@
+---
+ldap_etcdir: /etc/ldap
+nslcd_conf: /etc/nslcd.conf
+

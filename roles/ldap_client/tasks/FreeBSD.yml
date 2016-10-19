@@ -28,6 +28,8 @@
   with_items:
     - { regexp: '^group_compat:', line: 'group_compat: ldap' }
     - { regexp: '^passwd_compat:', line: 'passwd_compat: ldap' }
+    - { regexp: '^group:', line: 'group: compat' }
+    - { regexp: '^passwd:', line: 'passwd: compat' }
   when: (ansible_os_family == 'FreeBSD')
   tags: nssldap
 

@@ -3,12 +3,12 @@
   service:
     name: nslcd
     state: restarted
-  notify: restart nscd cache
+  notify: stop nscd cache
 
-- name: restart nscd cache
+- name: stop nscd cache
   service:
     name: nscd
-    state: restarted
+    state: stopped
 
 - name: rebuild FreeBSD pwdb 
   command: /usr/sbin/pwd_mkdb /etc/master.passwd

@@ -13,7 +13,7 @@
       line: '{{item.line}}'
       state: present
     with_items:
-      - { regexp: '^nscd_enable', line: 'nscd_enable="YES"' }
+      - { regexp: '^nscd_enable', line: 'nscd_enable="NO"' }
       - { regexp: '^nslcd_enable', line: 'nslcd_enable="YES"' }
       - { regexp: '^nslcd_supervisor', line: 'nslcd_supervisor="YES"' }
   when: (ansible_os_family == 'FreeBSD')

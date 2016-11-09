@@ -43,19 +43,53 @@
   - name: sshd_config
     lineinfile:
       dest: /etc/ssh/sshd_config
-      regexp: '^PermitUserEnvironment'
-      line: 'PermitUserEnvironment yes'
-      insertafter: '^#[[:space:]]*PermitUserEnvironment'
+      regexp: "{{item.regexp}}"
+      line: "{{item.line}}"
+      insertafter: "{{item.lineafter}}"
       state: present
       validate: '/usr/sbin/sshd -tf %s'
     notify: restart sshd
+    with_items:
+      - { line: 'PermitUserEnvironment yes', regexp: '^PermitUserEnvironment', lineafter: '^#[[:space:]]*PermitUserEnvironment' }
+      - { line: 'PermitRootLogin without-password', regexp: '^PermitRootLogin', lineafter: '^#[[:space:]]*PermitRootLogin' }
   - name: root authorized_keys
-    copy:
-      src: files/authorized_keys
-      dest: /root/.ssh/authorized_keys
+    authorized_key:
+      key: "{{ lookup('file',item) }}"
+      user: root
+      key_options: "environment=\"DSI={{item | regex_replace('^.*/(\\w+)\\.pub','\\1')}}\""
+    with_fileglob:
+      - cles_ssh/*.pub
+
+- block:
+  - name: which zsh
+    command: which zsh
+    register: zshpath
+    ignore_errors: yes
+  - name: get root shell
+    shell: 'getent passwd root | cut -d: -f7'
+    register: rootshell
+    ignore_errors: yes
+  - name: shell root
+    shell: "chsh -s {{zshpath.stdout}}"
+    when: rootshell.stdout != zshpath.stdout and zshpath.stdout != ''
+  - name: zshrc
+    lineinfile:
+      dest: /root/.zshrc
+      line: "{{item.line}}"
+      create: True
+      mode: 600
       owner: root
-      group: 0
-      mode: 0600
+      state: present
+    with_items:
+      - { line: 'autoload -Uz compinit', regexp: '^autoload.*compinit' }
+      - { line: 'compinit', regexp: '^compinit' }
+      - { line: 'HISTFILE=~/.zsh_history', regexp: '^HISTFILE=' }
+      - { line: 'SAVEHIST=100000', regexp: '^SAVEHIST=' }
+      - { line: 'setopt APPEND_HISTORY', regexp: '^setopt[[:space:]]+APPEND_HISTORY' }
+      - { line: '[ -r /usr/local/admin/sysutils/common/rootlogin.env.sh ] && . /usr/local/admin/sysutils/common/rootlogin.env.sh', regexp: '^[^#].*/admin/.*/rootlogin\.env\.sh' }
+      - { line: '[ -f ~/.aliases ] && . ~/.aliases', regexp: '^[^#].*/\.aliases' }
+      - { line: '[ -r /usr/local/admin/sysutils/common/shell_aliases ] && . /usr/local/admin/sysutils/common/shell_aliases', regexp: '^[^#].*/shell_aliases' }
+  - debug: msg='zshpath = {{zshpath.stdout}} and rootshell = {{rootshell.stdout}}.'
 
 - block:
   - name: git sysutils/common
@@ -79,4 +113,18 @@
       accept_hostkey: yes
       key_file: /root/.ssh/id_cvs_rsa
       depth: 2
+
+- block:
+  - name: cron daily
+    cron:
+      name: cron daily ECM
+      hour: 23
+      minute: 32
+      job: '/usr/local/admin/sysutils/common/cron/daily.sh'
+  - name: cron weekly
+    cron:
+      name: weekly ECM
+      hour: 23
+      minute: 51
+      job: '/usr/local/admin/sysutils/common/cron/weekly.sh'
 

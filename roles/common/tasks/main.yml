@@ -1,6 +1,10 @@
 ---
 # taches communes ECM
 
+- include_vars: 'vars/{{ansible_os_family}}.yml'
+
+- include: 'tasks/{{ansible_os_family}}.yml'
+
 - name: Installe CA ECM
   copy:
     src: files/caecm.crt
@@ -9,10 +13,6 @@
     group: 0
     mode: 0644
   tags: sslecm
-
-- include_vars: 'vars/{{ansible_os_family}}.yml'
-
-- include: 'tasks/{{ansible_os_family}}.yml'
 
 - block:
   - name: Config ldap.conf
@@ -31,4 +31,52 @@
       path: '{{ldap_etcdir}}/ldap.conf'
       mode: 0644
   tags: ldapconf
+
+- block:
+  - name: config ssh
+    file:
+      path: /root/.ssh
+      state: directory
+      mode: 0700
+      owner: root
+      group: 0
+  - name: sshd_config
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: '^PermitUserEnvironment'
+      line: 'PermitUserEnvironment yes'
+      insertafter: '^#[[:space:]]*PermitUserEnvironment'
+      state: present
+      validate: '/usr/sbin/sshd -tf %s'
+    notify: restart sshd
+  - name: root authorized_keys
+    copy:
+      src: files/authorized_keys
+      dest: /root/.ssh/authorized_keys
+      owner: root
+      group: 0
+      mode: 0600
+
+- block:
+  - name: git sysutils/common
+    file:
+      path: /usr/local/admin/sysutils
+      state: directory
+      mode: 750
+      owner: root
+      group: 0
+  - name: cle ssh cvs
+    copy:
+      dest: /root/.ssh/id_cvs_rsa
+      src: files/id_cvs_rsa
+      owner: root
+      group: 0
+      mode: 0600
+  - name: git 'common'
+    git:
+      dest: /usr/local/admin/sysutils/common
+      repo: ssh://git@git.centrale-marseille.fr/sysutils/common.git
+      accept_hostkey: yes
+      key_file: /root/.ssh/id_cvs_rsa
+      depth: 2
 

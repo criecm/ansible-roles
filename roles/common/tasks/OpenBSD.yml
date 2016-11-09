@@ -1,11 +1,16 @@
 ---
-# client openldap OpenBSD
 - name: client openldap OpenBSD
   openbsd_pkg:
-    name: openldap-client
+    name: '{{item}}'
     state: present
-  tags: ldapclient
+  with_items:
+    - openldap-client
+    - git
+    - munin-node
+    - rsync
+    - zsh
+  tags: pkgs
 
+# config ldap globale
 - name: openldap config dir
   file: path='{{ldap_etcdir}}' state=directory owner=0 group=0 mode=0755
-  tags: ldapclient

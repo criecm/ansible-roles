@@ -1,7 +1,29 @@
 ---
-# client openldap FreeBSD
-- name: openldap-client FreeBSD
+# packages ecm
+- name: mkdir pkgrepo
+  file:
+    path: /usr/local/etc/pkg/repos
+    state: directory
+    mode: 755
+
+- name: pkg repo ecm
+  copy: src=pkgecm.conf dest=/usr/local/etc/pkg/repos/ecm.conf validate='pkg -vv -C %s' mode=644
+
+# packages standard
+- name: pkgs standard
   pkgng:
-    name: openldap-client
+    name: '{{item}}'
     state: present
-  tags: ldapclient
+  with_items:
+    - bsnmp-ucd
+    - dmidecode
+    - git
+    - ipmitool
+    - munin-node
+    - rsync
+    - smartmontools
+    - tmux
+    - vim-lite
+    - zsh
+    - openldap-client
+

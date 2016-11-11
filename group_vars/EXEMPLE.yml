@@ -1,13 +1,35 @@
 ---
-# variables locales
-# baseDN
+
+###############
+## role common
+
+# LDAP default baseDN
 ldap_base: 'dc=univ,dc=fr'
-# URIs des serveurs LDAP
+
+# adresses (URI) du/des serveur(s) LDAP
 ldap_uri: 'ldaps://ldapr.univ.fr/ ldaps://ldap.univ.fr/'
+
+# domaine mail par défaut
+maildomain: univ.fr
+
+# relai mail (sauf pour le groupe 'relaimail')
+mailrelay: smtp.local
+
+# alias mail pour root
+#rootmailto: admin@univ.fr
+
+# certificat x509 pour LDAP
+x509_ca_file: files/caecm.crt
+
+# TLS_REQCERT ldap
+#ldap_tls_reqcert: never
+
+####################
+## role ldap_client
+
 # binddn/password pour nss/pam
 ldap_binddn: 'cn=pam,ou=users,dc=univ,dc=fr'
 ldap_bindpw: 'pampass'
-# relai mail
-mailrelay: smtp.local
-# domaine mail
-maildomain: univ.fr
+
+# shell pour les users LDAP (vide pour celui de LDAP)
+#ldap_force_shell: '/usr/sbin/nologin'

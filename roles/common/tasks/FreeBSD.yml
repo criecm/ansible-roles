@@ -37,7 +37,7 @@
     line: "FEATURE(msp,[{{mailrelay}}])"
     regexp: '^FEATURE\(msp'
   register: domailrelay
-  when: "'mailrelay' not in group_names"
+  when: '"relaimail" not in group_names and "{{mailrelay}}" != ""'
   tags: mailclient
 
 - block:

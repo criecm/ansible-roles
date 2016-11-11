@@ -1,0 +1,7 @@
+---
+# playbook global - ne pas utiliser sans être sûr :)
+- hosts: all
+  roles:
+    - common
+    - ldap_client
+

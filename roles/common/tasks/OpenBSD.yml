@@ -23,5 +23,5 @@
     line: 'accept from local for any relay via {{mailrelay}}'
     regexp: '^accept .*for any relay'
   notify: restart smtpd
-  when: "'mailrelay' not in group_names"
+  when: '"relaimail" not in group_names and "{{mailrelay}}" != ""'
   tags: mailclient

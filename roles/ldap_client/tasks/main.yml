@@ -16,7 +16,7 @@
     state: present
   with_items:
     - { regexp: '^tls_cacert', line: 'tls_cacertfile /etc/ssl/caecm.crt' }
-    - { regexp: '^tls_reqcert', line: 'tls_reqcert demand' }
+    - { regexp: '^tls_reqcert', line: 'tls_reqcert {{ldap_tls_reqcert}}' }
     - { regexp: '^uri', line: 'uri {{ldap_uri}}' }
     - { regexp: '^binddn', line: 'binddn {{ldap_binddn}}' }
     - { regexp: '^bindpw', line: 'bindpw {{ldap_bindpw}}' }

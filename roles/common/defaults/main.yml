@@ -1,4 +1,7 @@
 ---
+# vars to define elsewhere (group_vars/, host_vars/, inventory, …) see 
+# http://docs.ansible.com/ansible/playbooks_variables.html#variable-precedence
+#
 # basedn LDAP
 ldap_base: 'dc=univ,dc=fr'
 # URI LDAP
@@ -13,3 +16,7 @@ mailrelay: smtp.local
 mailaliases: /etc/aliases
 # redirect mail for root to...
 rootmailto: 
+# x509 CA certificate
+x509_ca_file:
+# value for TLS_REQCERT in ldap.conf (and others)
+ldap_tls_reqcert: never

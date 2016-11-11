@@ -61,17 +61,14 @@
       - cles_ssh/*.pub
 
 - block:
-  - name: which zsh
-    command: which zsh
-    register: zshpath
-    ignore_errors: yes
-  - name: get root shell
-    shell: 'getent passwd root | cut -d: -f7'
-    register: rootshell
-    ignore_errors: yes
+  - name: zsh in /etc/shells
+    lineinfile:
+      dest: /etc/shells
+      line: "{{zshpath}}"
   - name: shell root
-    shell: "chsh -s {{zshpath.stdout}}"
-    when: rootshell.stdout != zshpath.stdout and zshpath.stdout != ''
+    user:
+      name: root
+      shell: "{{zshpath}}"
   - name: zshrc
     lineinfile:
       dest: /root/.zshrc
@@ -89,7 +86,6 @@
       - { line: '[ -r /usr/local/admin/sysutils/common/rootlogin.env.sh ] && . /usr/local/admin/sysutils/common/rootlogin.env.sh', regexp: '^[^#].*/admin/.*/rootlogin\.env\.sh' }
       - { line: '[ -f ~/.aliases ] && . ~/.aliases', regexp: '^[^#].*/\.aliases' }
       - { line: '[ -r /usr/local/admin/sysutils/common/shell_aliases ] && . /usr/local/admin/sysutils/common/shell_aliases', regexp: '^[^#].*/shell_aliases' }
-  - debug: msg='zshpath = {{zshpath.stdout}} and rootshell = {{rootshell.stdout}}.'
 
 - block:
   - name: git sysutils/common

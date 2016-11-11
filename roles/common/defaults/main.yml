@@ -2,4 +2,4 @@
 ldap_base: 'dc=univ,dc=fr'
 ldap_uri: 'ldaps://ldapr.univ.fr/ ldaps://ldap.univ.fr/'
 ldap_etcdir: /etc/ldap
-
+zshpath: /bin/zsh

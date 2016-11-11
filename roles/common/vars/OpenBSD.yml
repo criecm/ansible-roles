@@ -1,4 +1,4 @@
 ---
 ldap_etcdir: /etc/openldap
 zshpath: /usr/local/bin/zsh
-
+mailaliases: /etc/mail/aliases

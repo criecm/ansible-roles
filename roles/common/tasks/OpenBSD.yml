@@ -14,3 +14,14 @@
 # config ldap globale
 - name: openldap config dir
   file: path='{{ldap_etcdir}}' state=directory owner=0 group=0 mode=0755
+  tags: ldapconf
+
+# mailrelay
+- name: mailrelay
+  lineinfile:
+    dest: /etc/mail/smtpd.conf
+    line: 'accept from local for any relay via {{mailrelay}}'
+    regexp: '^accept .*for any relay'
+  notify: restart smtpd
+  when: "'mailrelay' not in group_names"
+  tags: mailclient

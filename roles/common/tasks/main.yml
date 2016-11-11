@@ -59,6 +59,7 @@
       key_options: "environment=\"DSI={{item | regex_replace('^.*/(\\w+)\\.pub','\\1')}}\""
     with_fileglob:
       - cles_ssh/*.pub
+  tags: sshconf
 
 - block:
   - name: zsh in /etc/shells
@@ -86,6 +87,7 @@
       - { line: '[ -r /usr/local/admin/sysutils/common/rootlogin.env.sh ] && . /usr/local/admin/sysutils/common/rootlogin.env.sh', regexp: '^[^#].*/admin/.*/rootlogin\.env\.sh' }
       - { line: '[ -f ~/.aliases ] && . ~/.aliases', regexp: '^[^#].*/\.aliases' }
       - { line: '[ -r /usr/local/admin/sysutils/common/shell_aliases ] && . /usr/local/admin/sysutils/common/shell_aliases', regexp: '^[^#].*/shell_aliases' }
+  tags: zshroot
 
 - block:
   - name: git sysutils/common
@@ -109,8 +111,22 @@
       accept_hostkey: yes
       key_file: /root/.ssh/id_cvs_rsa
       depth: 2
+  tags: gitecm
 
 - block:
+  - name: old cron daily
+    cron:
+      job: '/usr/local/admin/utils/systeme/cron_daily_serveur.sh'
+      state: absent
+  - name: old cron weekly
+    cron:
+      job: '/usr/local/admin/utils/systeme/cron_weekly_serveur.sh'
+      state: absent
+  - name: old crons daily/weekly /etc/crontab
+    lineinfile:
+      dest: /etc/crontab
+      regexp: '/usr/local/admin/utils/systeme/cron_(daily|weekly)_serveur\.sh'
+      state: absent
   - name: cron daily
     cron:
       name: cron daily ECM
@@ -123,4 +139,13 @@
       hour: 23
       minute: 51
       job: '/usr/local/admin/sysutils/common/cron/weekly.sh'
+  tags: cronecm
 
+- name: alias mail root
+  lineinfile:
+    dest: "{{mailaliases}}"
+    line: "root: {{rootmailto}}"
+    regexp: '^root:'
+  notify: newaliases
+  when: "'{{rootmailto}}' != ''"
+  tags: mailclient

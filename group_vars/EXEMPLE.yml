@@ -7,4 +7,7 @@ ldap_uri: 'ldaps://ldapr.univ.fr/ ldaps://ldap.univ.fr/'
 # binddn/password pour nss/pam
 ldap_binddn: 'cn=pam,ou=users,dc=univ,dc=fr'
 ldap_bindpw: 'pampass'
-
+# relai mail
+mailrelay: smtp.local
+# domaine mail
+maildomain: univ.fr

@@ -3,3 +3,15 @@
   service:
     name: sshd
     state: restarted
+
+- name: reconfigure postfix
+  command: 'dpkg-reconfigure --frontend noninteractive postfix'
+  when: ansible_distribution == 'Debian'
+
+- name: restart smtpd
+  service:
+    name: smtpd
+    state: restarted
+
+- name: newaliases
+  command: /usr/bin/newaliases

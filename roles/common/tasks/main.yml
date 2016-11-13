@@ -61,6 +61,13 @@
     with_fileglob:
       - cles_ssh/*.pub
   tags: sshconf
+  - name: root unauthorized keys
+    authorized_key:
+      key: "{{ lookup('file',item) }}"
+      user: root
+      state: absent
+    with_fileglob:
+      - cles_ssh/*.del
 
 - block:
   - name: zsh in /etc/shells

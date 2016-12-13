@@ -24,19 +24,19 @@ Prévus pour Debian, FreeBSD, OpenBSD
 
 ### common
 
-    * CA x509 dans /etc/ssl/caecm.ecm
-    * client OpenLDAP + config
-    * config mail relay (**sauf groupe "relaimail"**)
-      * Debian: postfix
-      * FreeBSD: sendmail
-      * OpenBSD: smtpd
-    * config sshd
-      * PermitUserEnvironment yes
-      * PermitRootLogin without-password
-    * deploiement des cles ssh `files/cles_ssh/*.pub` (+env `DSI=$user`)
-    * /usr/local/admin/sysutils/common depuis GIT
-    * cron daily/weekly ecm (et supression des anciens de CVS)
-    * zsh pour root + config + aliases
+  * CA x509 dans /etc/ssl/caecm.ecm
+  * client OpenLDAP + config
+  * config mail relay (**sauf groupe "relaimail"**)
+    * Debian: postfix
+    * FreeBSD: sendmail
+    * OpenBSD: smtpd
+  * config sshd
+    * PermitUserEnvironment yes
+    * PermitRootLogin without-password
+  * deploiement des cles ssh `files/cles_ssh/*.pub` (+env `DSI=$user`)
+  * /usr/local/admin/sysutils/common depuis GIT
+  * cron daily/weekly ecm (et supression des anciens de CVS)
+  * zsh pour root + config + aliases
     
 ### ldap_client
 
@@ -60,7 +60,7 @@ Just define {{ldap_autofs_master_map}} to auto.master with the example below:
 default values (defaults/main.yml) will work 
 with this kind of ldap records:
 
-```
+<pre><code>
 # auto.master glue
 dn: nisMapName=auto.master,ou=automount,dc=example,dc=com
 nisMapName: auto.master
@@ -86,5 +86,5 @@ objectClass: nisObject
 nisMapName: auto.users
 cn: info
 nisMapEntry: -fstype=nfs,rw filer:/srv/info
-```
+</code></pre>
 

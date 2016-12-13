@@ -1,0 +1,53 @@
+---
+# NFS services
+- name: rc conf
+  lineinfile:
+    line: '{{ item }}'
+    regexp: "^{{ item | regex_replace('=.*$','=') }}"
+    dest: /etc/rc.conf
+  with_items:
+    - 'nfs_client_enable="YES"'
+    - 'rpcbind_enable="YES"'
+    - 'rpc_lockd_enable="YES"'
+    - 'rpc_statd_enable="YES"'
+    - 'nfscbd_enable="YES"'
+    - 'nfsuserd_enable="YES"'
+    - 'rpc_lockd_flags="-p 4045"'
+    - 'rpc_statd_flags="-p 4047"'
+    - 'nfscbd_flags="-p 4048"'
+    - 'nfsuserd_flags="-domain ec-m.fr -usermax 5000"'
+  notify: freebsd restart nfs all
+
+# automount /users
+- block:
+  - name: autofs rc.conf
+    lineinfile:
+      line: 'autofs_enable="YES"'
+      regexp: '^autofs_enable='
+      dest: /etc/rc.conf
+    notify: freebsd autofs reload
+
+  - name: include_ldap_ecm
+    template:
+      src: include_ldap_users.j2
+      dest: /etc/autofs/include_ldap_users
+      mode: 700
+      owner: root
+    notify: freebsd autofs reload
+
+  - name: autofs/include link
+    file:
+      src: include_ldap_users
+      dest: /etc/autofs/include
+      owner: root
+      state: link
+    notify: freebsd autofs reload
+
+  - name: active /users dans auto_master
+    lineinfile:
+      line: '/users	auto.users'
+      dest: /etc/auto_master
+      regexp: '^/users'
+    notify: freebsd autofs reload
+
+  when: '"{{ users_home }}" != ""'

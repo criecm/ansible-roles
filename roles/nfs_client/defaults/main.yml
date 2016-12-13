@@ -1,0 +1,12 @@
+---
+# if 'yes': automount /users/* from ldap map
+users_home:
+# only /users/* if array listing them (regex friendly)
+# only_users:
+#   - promo2016
+#   - promo2[0-9]{3}
+#   - ext
+only_users:
+# automount LDAP sub ({{ldap_autofs_ou}},{{ldap_base}}
+ldap_autofs_ou: ou=automount
+

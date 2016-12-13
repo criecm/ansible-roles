@@ -50,12 +50,12 @@ ports fixes (FreeBSD,Debian)
   * statd - port 4047
   * lockd - port 4045
   * nfs client callback - port 4048
-  * idmap/nfsuserd domain {{ idmap_domain }}
+  * idmap/nfsuserd domain `{{ idmap_domain }}`
   * workaround statd port bug on Debian (patch /usr/sbin/start-statd)
 
 #### en option, automontage LDAP/autofs (FreeBSD only for now)
 
-Just define {{ldap_autofs_master_map}} to auto.master with the example below:
+Just define `{{ldap_autofs_master_map}}` to auto.master with the example below:
 
 default values (defaults/main.yml) will work 
 with this kind of ldap records:

@@ -6,11 +6,11 @@
 # Modify this to suit your needs.  The "$1" is the map name, eg. "auto_master".
 # To debug, simply run this script with map name as the only parameter.  It's
 # supposed to output map contents ("key location" pairs) to standard output.
-SEARCHBASE="nisMapName=$1,{{ldap_autofs_ou}},{{ ldap_base }}"
-ENTRY_ATTRIBUTE="cn"
-VALUE_ATTRIBUTE="nisMapEntry"
+SEARCHBASE="{{ ldap_autofs_mapname_attr }}=$1,{{ldap_autofs_ou}}{{ ldap_base }}"
+ENTRY_ATTRIBUTE="{{ ldap_autofs_entry_attr }}"
+VALUE_ATTRIBUTE="{{ ldap_autofs_value_attr }}"
 
-/usr/local/bin/ldapsearch -LLL -x -D {{ldap_binddn}} -w"{{ldap_bindpw}}" -o ldif-wrap=no -b "$SEARCHBASE" "$ENTRY_ATTRIBUTE" "$VALUE_ATTRIBUTE" | awk '
+/usr/local/bin/ldapsearch -LLL -x -D {{ ldap_binddn }} -w"{{ ldap_bindpw }}" -o ldif-wrap=no -b "$SEARCHBASE" "$ENTRY_ATTRIBUTE" "$VALUE_ATTRIBUTE" | awk '
 $1 == "'$ENTRY_ATTRIBUTE':" {
 	key = $2
 }
@@ -52,4 +52,4 @@ NF == 0 {
 	nvalues = 0
 	delete value
 }
-' | sed 's/,vers=3//' {% if only_users %}| egrep '^({{ only_users | join('|') }}) '{% endif %}
+'{% if ldap_autofs_transform %} | {{ ldap_autofs_transform }}{% endif %}{% if ldap_autofs_egrep_filter %} | egrep '^({{ ldap_autofs_egrep_filter | join('|') }}) '{% endif %}

@@ -15,7 +15,7 @@
     - 'rpc_lockd_flags="-p 4045"'
     - 'rpc_statd_flags="-p 4047"'
     - 'nfscbd_flags="-p 4048"'
-    - 'nfsuserd_flags="-domain ec-m.fr -usermax 5000"'
+    - 'nfsuserd_flags="-domain {{idmap_domain}} -usermax 5000"'
   notify: freebsd restart nfs all
 
 # automount /users
@@ -29,25 +29,25 @@
 
   - name: include_ldap_ecm
     template:
-      src: include_ldap_users.j2
-      dest: /etc/autofs/include_ldap_users
+      src: include_ldap_autofs.j2
+      dest: /etc/autofs/include_ldap_autofs
       mode: 700
       owner: root
     notify: freebsd autofs reload
 
   - name: autofs/include link
     file:
-      src: include_ldap_users
+      src: include_ldap_autofs
       dest: /etc/autofs/include
       owner: root
       state: link
     notify: freebsd autofs reload
 
-  - name: active /users dans auto_master
+  - name: "active auto_master"
     lineinfile:
-      line: '/users	auto.users'
+      line: '+{{ ldap_autofs_master_map }}'
       dest: /etc/auto_master
-      regexp: '^/users'
+      regexp: '^\+'
     notify: freebsd autofs reload
 
-  when: '"{{ users_home }}" != ""'
+  when: '"{{ ldap_autofs_master_map }}" != ""'

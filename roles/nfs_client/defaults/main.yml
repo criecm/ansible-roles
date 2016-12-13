@@ -1,12 +1,25 @@
 ---
-# if 'yes': automount /users/* from ldap map
-users_home:
-# only /users/* if array listing them (regex friendly)
-# only_users:
+# if defined, automount from ldap map
+#ldap_autofs_master_map: auto.master
+ldap_autofs_master_map:
+# limit ldap_autofs_master_map entries (egrep regex)
+# ldap_autofs_egrep_filter:
+#   - /home
 #   - promo2016
 #   - promo2[0-9]{3}
 #   - ext
-only_users:
-# automount LDAP sub ({{ldap_autofs_ou}},{{ldap_base}}
-ldap_autofs_ou: ou=automount
+ldap_autofs_egrep_filter:
+# automount LDAP sub ({{ldap_base}} from ldap_client added)
+ldap_autofs_ou: ou=automount,
+# ldap autofs value attribute
+ldap_autofs_value_attr: nisMapEntry
+# ldap autofs mapname attribute
+ldap_autofs_mapname_attr: nisMapName
+# ldap autofs entry attribute
+ldap_autofs_entry_attr: cn
+# ldap autofs transform command (if any)
+# used on ldap map values (freebsd)
+#   we have used this to remove vers=3 from mount options:
+# ldap_autofs_transform: "sed 's/,vers=3//'"
+ldap_autofs_transform:
 

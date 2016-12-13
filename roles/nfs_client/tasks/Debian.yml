@@ -25,8 +25,8 @@
       mode: 755
       owner: root
   - name: idmapd
-    copy:
-      src: :etc:idmapd.conf
+    template:
+      src: idmapd.conf.j2
       dest: /etc/idmapd.conf
       mode: 644
       owner: root

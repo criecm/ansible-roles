@@ -20,3 +20,5 @@ rootmailto:
 x509_ca_file:
 # value for TLS_REQCERT in ldap.conf (and others)
 ldap_tls_reqcert: never
+# host is a resolver
+is_resolver: False

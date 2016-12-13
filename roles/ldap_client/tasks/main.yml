@@ -20,12 +20,16 @@
     - { regexp: '^uri', line: 'uri {{ldap_uri}}' }
     - { regexp: '^binddn', line: 'binddn {{ldap_binddn}}' }
     - { regexp: '^bindpw', line: 'bindpw {{ldap_bindpw}}' }
-    - { regexp: '^base *group', line: 'base group ou=Group,{{ldap_base}}' }
-    - { regexp: '^base *passwd', line: 'base passwd ou=People,{{ldap_base}}' }
-    - { regexp: '^base *shadow', line: 'base shadow ou=People,{{ldap_base}}' }
+    - { regexp: '^base\s+[A-Za-z]+=', line: 'base {{ldap_base}}' }
+    - { regexp: '^base\s+group', line: 'base group {{ldap_group_ou}},{{ldap_base}}' }
+    - { regexp: '^base\s+passwd', line: 'base passwd {{ldap_passwd_ou}},{{ldap_base}}' }
+    - { regexp: '^base\s+shadow', line: 'base shadow {{ldap_passwd_ou}},{{ldap_base}}' }
+    - { regexp: '^filter\s+passwd', line: 'filter passwd {{ldap_passwd_filter}}' }
+    - { regexp: '^pam_authz_search', line: 'pam_authz_search {{ldap_authz_filter}}' }
+    - { regexp: '^filter\s+group', line: 'filter group {{ldap_group_filter}}' }
     - { regexp: '^idle_timelimit', line: 'idle_timelimit 300' }
     - { regexp: '^nss_initgroups_ignoreusers', line: 'nss_initgroups_ignoreusers ALLLOCAL' }
-    - { regexp: '^nss_min_uid', line: 'nss_min_uid 10000' }
+    - { regexp: '^nss_min_uid', line: 'nss_min_uid {{ldap_min_uid}}' }
   when: nslcd.stat.exists == True
   notify: restart ldap client
   tags: nssldap
@@ -39,3 +43,11 @@
   when: ( nslcd.stat.exists == True and '{{ldap_force_shell}}' != '')
   tags: nssldap
 
+- name: ssh allowed groups
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '^AllowGroups'
+    line: 'AllowGroups	{{sshd_allow_groups}}'
+    insertafter: '.*PermitTunnel'
+  notify: restart sshd
+  when: ("{{sshd_allow_groups}}" != "")

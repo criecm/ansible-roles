@@ -5,6 +5,14 @@
 
 - include: 'tasks/{{ansible_os_family}}.yml'
 
+- name: resolv.conf
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    owner: root
+    mode: 644
+  tags: resolver
+
 - name: Installe CA ECM
   copy:
     src: '{{x509_ca_file}}'
@@ -60,7 +68,6 @@
       key_options: "environment=\"DSI={{item | regex_replace('^.*/(\\w+)\\.pub','\\1')}}\""
     with_fileglob:
       - cles_ssh/*.pub
-  tags: sshconf
   - name: root unauthorized keys
     authorized_key:
       key: "{{ lookup('file',item) }}"
@@ -68,6 +75,7 @@
       state: absent
     with_fileglob:
       - cles_ssh/*.del
+  tags: sshconf
 
 - block:
   - name: zsh in /etc/shells

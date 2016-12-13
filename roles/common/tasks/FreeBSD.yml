@@ -58,3 +58,22 @@
       regexp: '^sendmail_submit_enable='
 
   when: domailrelay.changed == True
+
+# hardening freebsd
+- block:
+  - name: rc.conf
+    lineinfile:
+      dest: /etc/rc.conf
+      regexp: '{{item.regexp}}'
+      line: '{{item.line}}'
+    with_items:
+      - { regexp: '^clear_tmp_enable=', line: 'clear_tmp_enable="YES"' }
+
+  - name:
+    lineinfile:
+      dest: /etc/sysctl.conf
+      regexp: '{{item.regexp}}'
+      line: '{{item.line}}'
+    with_items:
+      - { regexp: '^security.bsd.see_other_uids=', line: 'security.bsd.see_other_uids=0' }
+

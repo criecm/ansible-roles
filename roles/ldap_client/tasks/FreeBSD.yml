@@ -44,7 +44,7 @@
     lineinfile:
       dest: /etc/master.passwd
       regexp: '^\+:'
-      line: '+:*::::0:0:::{{ldap_force_shell}}'
+      line: '+:*:::{{ldap_force_homedir_by_class}}:0:0:::{{ldap_force_shell}}'
       state: present
     notify: rebuild FreeBSD pwdb
   - name: Enable LDAP /etc/group
@@ -55,4 +55,39 @@
       state: present
   when: (ansible_os_family == 'FreeBSD')
   tags: nssldap
+
+# verifie l'existence de {{ldap_force_homedir_by_class}}
+- name: check ldap_force_homedir_by_class
+  lineinfile:
+    dest: /etc/login.conf
+    regexp: '^{{ldap_force_homedir_by_class}}:'
+    state: absent
+  check_mode: yes
+  failed_when: false
+  changed_when: false
+  register: ldapUserClassInLoginConf
+
+# verifie qu'on l'a bien mis nous-memes
+- name: check ldap_force_homedir_by_class by ansible
+  lineinfile:
+    dest: /etc/login.conf
+    regexp: '^# BEGIN ANSIBLE MANAGED ldap_force_homedir_by_class #$'
+    state: absent
+  check_mode: yes
+  failed_when: false
+  changed_when: false
+  register: ldapUserClassByAnsible
+
+# place ou modifie le block SI il manque ou qu'on l'a mis ici-meme
+- name: login.conf
+  blockinfile:
+    dest: /etc/login.conf
+    marker: '# {mark} ANSIBLE MANAGED ldap_force_homedir_by_class #'
+    block: |
+      {{ldap_force_homedir_by_class}}:\
+      	:requirehome:\
+      	:tc=default:
+    validate: cap_mkdb %s
+  notify: rebuild login.conf database
+  when: ("{{ldap_force_homedir_by_class}}" != "") and ((ldapUserClassInLoginConf.found == 0) or (ldapUserClassByAnsible.found == 1))
 

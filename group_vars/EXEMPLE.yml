@@ -33,3 +33,10 @@ ldap_bindpw: 'pampass'
 
 # shell pour les users LDAP (vide pour celui de LDAP)
 #ldap_force_shell: '/usr/sbin/nologin'
+
+###################
+## role nfs_client
+
+# idmap domain (NFSv4)
+idmap_domain: univ.fr
+

@@ -1,11 +1,12 @@
-.h1 NFS client with fixed ports (FreeBSD and Debian)
+# NFS client with fixed ports (FreeBSD and Debian)
 
   * statd on port 4047
   * lockd on 4045
   * nfs client callback on 4048
-  * idmap/nfsuserd domain to {{idmap_domain}}
+  * idmap/nfsuserd domain to {{ idmap_domain }}
+  * workaround statd port bug on Debian (patch /usr/sbin/start-statd)
 
-.h2 As an option, can use ldap autofs nis map (FreeBSD only for now)
+## optionnaly, can use ldap autofs nis map (FreeBSD only for now)
 
 Just define {{ldap_autofs_master_map}} to auto.master with the example below:
 

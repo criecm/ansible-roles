@@ -20,7 +20,11 @@ Prévus pour Debian, FreeBSD, OpenBSD
     * zsh pour root + config + aliases
     
   * **ldap_client**
-    * Comptes UNIX via LDAP (nslcd) (Debian/FreeBSD)
+    * Comptes UNIX via LDAP (nslcd) (Debian,FreeBSD)
+
+  * **nfs_client**
+    * ports client NFS fixes (Debian,FreeBSD)
+    * **en option** automontage LDAP (FreeBSD)
 
 ## Prérequis
 
@@ -37,3 +41,4 @@ Prévus pour Debian, FreeBSD, OpenBSD
 1. definir les variables necessaires (voir `group_vars/EXEMPLE.yml`)
 2. copier *playbook-all.yml* et y définir les rôles par groupe (si necessaire)
 3. lancer `ansible-playbook playbook-my.yml`
+

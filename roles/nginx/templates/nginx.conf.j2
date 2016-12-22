@@ -1,0 +1,35 @@
+# {{ ansible_managed }}
+user	{{ wwwuser }};
+worker_processes	{{nginx_processes}};
+error_log	/var/log/nginx-error.log info;
+
+include modules.d/*.conf;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+	include	mime.types;
+	default_type	application/octet-stream;
+
+	log_format	main	'$remote_addr $host $remote_user [$time_local] "$request" '
+			'$status $body_bytes_sent "$http_referer" '
+			'"$http_user_agent" "$http_x_forwarded_for"';
+
+	server_tokens	off;
+	sendfile	on;
+	tcp_nopush	on;
+
+	keepalive_timeout	65;
+
+	gzip on;
+	gzip_min_length	1100;
+	gzip_buffers	4 8k;
+	gzip_types	text/plain text/css application/javascript;
+	types {
+		text/plain	log;
+	}
+	include conf.d/*.inc;
+	include servers.d/*.conf;
+}

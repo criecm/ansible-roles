@@ -1,0 +1,3 @@
+---
+wwwuser: www
+www_default_root: '/usr/local/www/nginx'

@@ -1,0 +1,16 @@
+server {
+	server_name {{ netmagis_http_host }};
+	listen 80;
+	root {{ www_default_root }};
+	location /netmagis/css {
+	        alias /usr/local/lib/netmagis/htg/models/default/css;
+	}
+	location ~* ^/netmagis/([a-z]+)$ {
+	        include fastcgi_params;
+	        fastcgi_param SCRIPT_FILENAME /usr/local/www/netmagis/$1;
+	        fastcgi_pass {{ netmagis_socket }};
+	}
+	location ~* ^/netmagis/$ {
+	        rewrite .* /netmagis/index;
+	}
+}

@@ -1,0 +1,51 @@
+---
+- include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - 'vars/{{ ansible_os_family }}.yml'
+      skip: true
+  tags: dhcpd
+
+- include: '{{ item }}'
+  with_first_found:
+    - files:
+        - 'tasks/{{ ansible_os_family }}.yml'
+      skip: true
+  tags: dhcpd
+
+- debug: var=dhcpd_configdir
+
+- name: enable dhcpd
+  service:
+    name: '{{ dhcpd_service_name }}'
+    enabled: yes
+  tags: rc, dhcpd
+
+- name: dhcpd.local.conf exists
+  file:
+    dest: '{{ dhcpd_configdir }}/dhcpd.local.conf'
+    state: touch
+    mode: 640
+    owner: root
+    group: dhcpd
+  tags: config, dhcpd
+  changed_when: False
+
+- name: dir conf.d
+  file:
+    dest: '{{ dhcpd_configdir }}/dhcpd.conf.d'
+    state: directory
+    mode: 750
+    owner: root
+    group: dhcpd
+  tags: dhcpd, config
+
+- name: config dhcpd.conf
+  template:
+    src: dhcpd.conf.j2
+    dest: '{{ dhcpd_configdir }}/dhcpd.conf'
+    mode: 750
+    owner: root
+    group: dhcpd
+  tags: dhcpd, config
+  notify: restart dhcpd

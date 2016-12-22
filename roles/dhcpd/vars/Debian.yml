@@ -1,0 +1,3 @@
+---
+dhcpd_service_name: isc-dhcp-server
+dhcpd_leases_dir: /var/lib/dhcpd

@@ -1,0 +1,7 @@
+---
+- name: install nsd
+  pkgng:
+    name: nsd
+    state: present
+  tags: pkg, nsd
+

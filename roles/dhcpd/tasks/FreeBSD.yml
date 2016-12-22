@@ -1,0 +1,14 @@
+---
+- name: install dhcpd
+  pkgng:
+    name: isc-dhcp43-server
+    state: present
+  tags: pkg, dhcpd
+
+- name: dhcpd rc
+  template:
+    src: dhcpd_rc.j2
+    dest: '/etc/rc.conf.d/{{ dhcpd_service_name }}'
+    owner: root
+    mode: 644
+  tags: pkg, dhcpd

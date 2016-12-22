@@ -1,0 +1,55 @@
+---
+- include: '{{ item }}'
+  with_first_found:
+    - files:
+        - 'tasks/{{ ansible_os_family }}.yml'
+      skip: true
+
+- include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+        - 'vars/{{ ansible_os_family }}.yml'
+      skip: true
+
+- name: enable nsd
+  service:
+    name: nsd
+    enabled: yes
+  tags: rc, nsd
+
+- name: dir conf.d
+  file:
+    dest: '{{ nsd_configdir }}/conf.d'
+    state: directory
+    mode: 755
+    owner: root
+    group: 0
+  tags: config, nsd
+
+- name: zonesdir
+  file:
+    dest: '{{ item }}'
+    state: directory
+    mode: 750
+    owner: root
+    group: nsd
+  with_items:
+    - '{{ nsd_zonesdir }}'
+    - '{{ nsd_zonesdir }}/master'
+  tags: config, nsd
+
+- name: zonesdir slaves
+  file:
+    dest: '{{ nsd_zonesdir }}/slave'
+    state: directory
+    mode: 750
+    owner: root
+    group: nsd
+  tags: config, nsd
+
+- name: config nsd
+  template:
+    src: nsd.conf.j2
+    dest: '{{ nsd_configdir }}/nsd.conf'
+  tags: config, nsd
+  notify: restart nsd

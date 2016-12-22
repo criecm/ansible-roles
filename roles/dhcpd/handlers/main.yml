@@ -1,0 +1,8 @@
+---
+- name: restart dhcpd
+  service:
+    name: '{{ dhcpd_service_name }}'
+    state: restarted
+  failed_when: False
+  tags: rc
+

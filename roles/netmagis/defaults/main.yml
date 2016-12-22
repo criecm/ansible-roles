@@ -1,0 +1,12 @@
+---
+pgsql: {
+  host: 'localhost',
+  port: '5432',
+  user: 'magis',
+  passwd: 'PGSQL_pass',
+}
+netmagis_default_domain: 'localdomain'
+netmagis_rootusers:
+  - 'admin'
+netmagis_http_host: 'netmagis.localdomain'
+netmagis_socket: 'unix:/var/run/fcgiwrap/netmagis.sock'

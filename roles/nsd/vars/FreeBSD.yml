@@ -1,0 +1,3 @@
+---
+nsd_configdir: /usr/local/etc/nsd
+nsd_dbdir: /var/db/nsd

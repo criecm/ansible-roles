@@ -1,0 +1,9 @@
+---
+dhcpd_default_domain: '{{ ansible_domain }}'
+dhcpd_service_name: isc-dhcpd
+dhcpd_default_dns: '{{ nameservers[0].ip }}'
+dhcpd_default_lease_time: 1200
+dhcpd_max_lease_time: 7200
+dhcpd_log_facility: local7
+dhcpd_leases_dir: /var/db/dhcpd
+dhcpd_configdir: /etc/dhcpd

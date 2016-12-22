@@ -1,0 +1,43 @@
+---
+- include_vars: '{{ item }}'
+  with_first_found:
+    - '{{ ansible_os_family }}.yml'
+
+- name: installe nginx
+  pkgng:
+    name: nginx
+    state: present
+  tags: pkg
+
+- name: enable nginx
+  service:
+    name: nginx
+    enabled: yes
+    state: started
+
+- block:
+  - name: default config
+    template:
+      src: nginx.conf.j2
+      dest: '{{ etcprefix }}/etc/nginx/nginx.conf'
+    notify: restart nginx
+  - name: servers.d dir
+    file:
+      dest: '{{ etcprefix }}/etc/nginx/{{ item }}'
+      state: directory
+      mode: 0750
+      owner: root
+    with_items:
+      - servers.d
+      - modules.d
+      - conf.d
+    tags: config
+    notify: restart nginx
+  - name: default config parts
+    template:
+      src: 'nginx/{{ item }}.j2'
+      dest: '{{ etcprefix }}/etc/nginx/{{ item }}'
+    with_items:
+      - servers.d/0default.conf
+    notify: restart nginx
+      

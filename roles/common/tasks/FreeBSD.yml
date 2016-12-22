@@ -9,7 +9,7 @@
   
   - name: pkg repo ecm
     copy: src=pkgecm.conf dest=/usr/local/etc/pkg/repos/ecm.conf validate='pkg -vv -C %s' mode=644
-  tags: pkgconf
+  tags: baseconf, pkg
 
 # packages standard
 - name: pkgs standard
@@ -28,7 +28,7 @@
     - vim-lite
     - zsh
     - openldap-client
-  tags: pkgs
+  tags: baseconf, pkg
 
 # mail via relay
 - name: mailrelay
@@ -58,6 +58,19 @@
       regexp: '^sendmail_submit_enable='
 
   when: domailrelay.changed == True
+  tags: mailclient
+
+# timezone
+- block:
+  - name: get timezone
+    command: cat /var/db/zoneinfo
+    register: zoneinfo
+    changed_when: False
+    ignore_errors: True
+  - name: set timezone
+    command: 'tzsetup {{ host_timezone }}'
+    when: zoneinfo.stdout != host_timezone
+  tags: timezone
 
 # hardening freebsd
 - block:
@@ -68,7 +81,6 @@
       line: '{{item.line}}'
     with_items:
       - { regexp: '^clear_tmp_enable=', line: 'clear_tmp_enable="YES"' }
-
   - name:
     lineinfile:
       dest: /etc/sysctl.conf
@@ -76,4 +88,4 @@
       line: '{{item.line}}'
     with_items:
       - { regexp: '^security.bsd.see_other_uids=', line: 'security.bsd.see_other_uids=0' }
-
+  tags: security

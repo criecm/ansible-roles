@@ -1,7 +1,14 @@
 # {{ ansible_managed }}
 domain {{ ansible_domain }}
 {% if is_resolver | bool() %}nameserver 127.0.0.1
-{% endif %}{% if ansible_all_ipv4_addresses | join(',') | match('10.3.0.') %}nameserver 10.3.0.52
-{% else %}nameserver 147.94.19.141
-{% endif %}{% if ansible_all_ipv6_addresses | join(',') | match('2001:660:5404:') %}nameserver 2001:660:5404:193::53
 {% endif %}
+{% for ns in nameservers %}
+{% if ns.ip | ipv4 %}
+{% if ansible_all_ipv4_addresses | join(',') | match(ns.match) %}nameserver {{ns.ip}}
+{% endif %}
+{% endif %}
+{% if ns.ip | ipv6 %}
+{% if ansible_all_ipv6_addresses | join(',') | match(ns.match) %}nameserver {{ns.ip}}
+{% endif %}
+{% endif %}
+{% endfor %}

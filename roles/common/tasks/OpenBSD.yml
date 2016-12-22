@@ -13,7 +13,7 @@
     - vim--no_x11
     - mtr--
     - zsh
-  tags: pkgs
+  tags: baseconf, pkg
 
 # config ldap globale
 - name: openldap config dir
@@ -29,3 +29,12 @@
   notify: restart smtpd
   when: '"relaimail" not in group_names and "{{mailrelay}}" != ""'
   tags: mailclient
+
+# timezone
+- file: timezone
+  src: '/usr/share/zoneinfo/{{ host_timezone }}'
+  dest: '/etc/localtime'
+  state: link
+  force: yes
+  tags: timezone
+

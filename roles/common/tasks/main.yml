@@ -42,7 +42,7 @@
   tags: ldapconf
 
 - block:
-  - name: config ssh
+  - name: config ssh root
     file:
       path: /root/.ssh
       state: directory
@@ -87,22 +87,11 @@
       name: root
       shell: "{{zshpath}}"
   - name: zshrc
-    lineinfile:
+    template:
       dest: /root/.zshrc
-      line: "{{item.line}}"
-      create: True
-      mode: 600
+      src: zshrc.j2
+      mode: 0600
       owner: root
-      state: present
-    with_items:
-      - { line: 'autoload -Uz compinit', regexp: '^autoload.*compinit' }
-      - { line: 'compinit', regexp: '^compinit' }
-      - { line: 'HISTFILE=~/.zsh_history', regexp: '^HISTFILE=' }
-      - { line: 'SAVEHIST=100000', regexp: '^SAVEHIST=' }
-      - { line: 'setopt APPEND_HISTORY', regexp: '^setopt[[:space:]]+APPEND_HISTORY' }
-      - { line: '[ -r /usr/local/admin/sysutils/common/rootlogin.env.sh ] && . /usr/local/admin/sysutils/common/rootlogin.env.sh', regexp: '^[^#].*/admin/.*/rootlogin\.env\.sh' }
-      - { line: '[ -f ~/.aliases ] && . ~/.aliases', regexp: '^[^#].*/\.aliases' }
-      - { line: '[ -r /usr/local/admin/sysutils/common/shell_aliases ] && . /usr/local/admin/sysutils/common/shell_aliases', regexp: '^[^#].*/shell_aliases' }
   tags: zshroot
 
 - block:

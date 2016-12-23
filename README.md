@@ -88,3 +88,24 @@ cn: info
 nisMapEntry: -fstype=nfs,rw filer:/srv/info
 </code></pre>
 
+### nginx
+
+Serveur nginx, un vhost par défaut
+
+  * rep `conf.d/` ready
+  * rep `modules.d/*.conf` pour les eventuels modules
+  * variable `proxified_by` si reverse-proxy
+
+### dhcpd
+
+Serveur isc-dhcpd, config a faire dans dhcpd.conf.local
+
+### nsd
+
+Serveur dns 'nsd', avec un/des patterns pour gérer les zones
+avec `nsd-control (add|delete)zone $ZONE $PATTERN`
+
+### netmagis
+
+Installe netmagis, en utilisant les rôles précédents
+

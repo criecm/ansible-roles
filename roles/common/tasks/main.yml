@@ -10,7 +10,7 @@
     src: resolv.conf.j2
     dest: /etc/resolv.conf
     owner: root
-    mode: 644
+    mode: 0644
   tags: resolver
 
 - name: Installe CA ECM
@@ -110,7 +110,7 @@
     file:
       path: /usr/local/admin/sysutils
       state: directory
-      mode: 750
+      mode: 0750
       owner: root
       group: 0
   - name: cle ssh cvs

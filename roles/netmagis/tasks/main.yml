@@ -28,19 +28,24 @@
     state: present
   tags: user, netmagis
 
+- name: /var/netmagis
+  file:
+    dest: '/var/netmagis'
+    state: directory
+    owner: root
+    group: netmagis
+    mode: '2771'
 - name: reps netmagis
   file:
     dest: '/var/netmagis/{{ item }}'
     state: directory
-    mode: 2770
+    mode: '2770'
     owner: root
     group: netmagis
   with_items:
-    - ''
     - metro
     - eqvirt
     - eqgen
-    - dnsmaster
     - dbdump
   tags: config, netmagis
     
@@ -48,7 +53,7 @@
   template:
     src: netmagis.conf.j2
     dest: '{{ etcprefix }}/etc/netmagis.conf'
-    mode: 0640
+    mode: '0640'
     owner: root
     group: netmagis
   tags: config, netmagis
@@ -57,7 +62,7 @@
   template:
     src: netmagis_fastcgi.rc.j2
     dest: /etc/rc.conf.d/fcgiwrap
-    mode: 0640
+    mode: '0640'
     owner: root
     group: 0
   tags: config, netmagis
@@ -67,8 +72,53 @@
   template:
     src: nginx_netmagis.conf.j2
     dest: '{{ etcprefix }}/etc/nginx/servers.d/netmagis.conf'
-    mode: 0644
+    mode: '0644'
     owner: root
     group: 0
-  tags: config, netmagis, nginx
   notify: restart nginx
+  tags: config, netmagis, nginx
+
+- name: config dhcpd-netmagis
+  lineinfile:
+    dest: '{{ dhcpd_configdir }}/dhcpd.local.conf'
+    line: 'include {{ netmagis_dhcpd_file }};'
+  notify: restart dhcpd
+  tags: dhcpd, netmagis
+
+- block:
+  - cron:
+      name: generate zones
+      minute: '*/1'
+      job: '{{ prefix }}/sbin/mkzones'
+      user: root
+  - cron:
+      name: generate dhcp
+      minute: '*/1'
+      job: '{{ prefix }}/sbin/mkdhcp'
+      user: root
+  - cron:
+      name: daily maintenance (backup, ...)
+      job: '{{ prefix }}/sbin/netmagis-dbmaint daily'
+      user: netmagis
+      hour: '2'
+      minute: '10'
+  - cron:
+      name: hourly database dump on working days
+      job: '{{ prefix }}/sbin/netmagis-dbmaint hourly'
+      user: netmagis
+      minute: '0'
+      hour: '8-18'
+  - cron:
+      name: daily database dump on week-end
+      job: '{{ prefix }}/sbin/netmagis-dbmaint hourly'
+      user: netmagis
+      minute: '0'
+      hour: '12'
+  - cron:
+      name: Refresh OUI table every 1st of month at 03:05
+      job: '{{ prefix }}/sbin/netmagis-getoui'
+      user: netmagis
+      minute: '5'
+      hour: '3'
+      day: '1'
+  tags: netmagis, cron

@@ -10,5 +10,26 @@ server:
 remote-control:
 	control-enable: yes
 	control-port: 8952
+{% if is_jail %}
+	control-interface: {{ ansible_all_ipv4_addresses[0] }}
+{% endif %}
+
+{% if nsd_keys %}{% for key in nsd_keys %}
+key:
+{% for key, value in key.items() %}
+	{{ key }}: "{{ value }}"
+{% endfor %}
+
+{% endfor %}
+{% endif %}
+{% if nsd_patterns %}{% for pattern in nsd_patterns %}
+pattern:
+{% for key, value in pattern.items() %}
+	{{ key }}: {{ value }}
+{% endfor %}
+
+{% endfor %}
+{% endif %}
 
 include: {{ nsd_configdir }}/conf.d/*.conf
+

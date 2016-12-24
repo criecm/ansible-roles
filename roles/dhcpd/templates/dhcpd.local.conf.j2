@@ -1,0 +1,6 @@
+# default config
+{% if ansible_default_ipv4 | count() > 0 %}
+subnet {{ ansible_default_ipv4.network }} netmask {{ ansible_default_ipv4.netmask }} {
+	
+}
+{% endif %}

@@ -25,7 +25,7 @@
     file:
       dest: '{{ etcprefix }}/etc/nginx/{{ item }}'
       state: directory
-      mode: 0750
+      mode: '0750'
       owner: root
     with_items:
       - servers.d

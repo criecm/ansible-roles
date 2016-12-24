@@ -1,15 +1,22 @@
 ---
-- include: '{{ item }}'
-  with_first_found:
-    - files:
-        - 'tasks/{{ ansible_os_family }}.yml'
-      skip: true
 
-- include_vars: '{{ item }}'
+- include_vars: '{{ includefile }}'
   with_first_found:
     - files:
-        - 'vars/{{ ansible_os_family }}.yml'
-      skip: true
+        - '{{ ansible_os_family }}.yml'
+      skip: True
+  loop_control:
+    loop_var: includefile
+  tags: nsd
+
+- include: '{{ includefile }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+      skip: True
+  loop_control:
+    loop_var: includefile
+  tags: nsd
 
 - name: enable nsd
   service:
@@ -21,7 +28,7 @@
   file:
     dest: '{{ nsd_configdir }}/conf.d'
     state: directory
-    mode: 0755
+    mode: '0755'
     owner: root
     group: 0
   tags: config, nsd
@@ -30,8 +37,8 @@
   file:
     dest: '{{ item }}'
     state: directory
-    mode: 0750
-    owner: root
+    mode: '0750'
+    owner: '{{ nsd_zonesdir_owner | default("root") }}'
     group: nsd
   with_items:
     - '{{ nsd_zonesdir }}'
@@ -42,14 +49,17 @@
   file:
     dest: '{{ nsd_zonesdir }}/slave'
     state: directory
-    mode: 2770
+    mode: '2770'
     owner: root
     group: nsd
   tags: config, nsd
 
-- name: config nsd
+- name: nsd.conf
   template:
     src: nsd.conf.j2
     dest: '{{ nsd_configdir }}/nsd.conf'
+    validate: nsd-checkconf %s
   tags: config, nsd
-  notify: restart nsd
+  notify: 
+    - restart nsd
+    - reconfig nsd

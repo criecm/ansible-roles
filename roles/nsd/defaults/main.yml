@@ -4,3 +4,5 @@ nsd_zonesdir: '{{ nsd_configdir }}/zones'
 nsd_port: 53
 nsd_adresses: '{{ ansible_all_ipv4_addresses + ansible_all_ipv6_addresses }}'
 nsd_dbdir: /var/db/nsd
+nsd_keys: []
+nsd_patterns: []

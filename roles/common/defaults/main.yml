@@ -25,11 +25,13 @@ ldap_tls_reqcert: never
 # host is a resolver
 is_resolver: False
 # nameserver
-#  match: regex to restrict host ip ('.'=all)
+#  network: restrict host ip ('0.0.0.0/0'=all)
 #  ip: nameserver
 nameservers:
-  - { match: '.', ip: "8.8.8.8" }
-#  - { match: '^10\.3\.0\.', ip: "10.3.0.52" }
-#  - { match: '^2001:660:5404:', ip: "2001:660:5404:b0b::53" }
-#  - { match: '^10\.3\.0\.', ip: "147.94.19.254" }
-
+  - { network: '0.0.0.0/0', ip: "8.8.8.8" }
+#  - { network: '^10\.3\.0\.', ip: "10.3.0.52" }
+#  - { network: '^2001:660:5404:', ip: "2001:660:5404:b0b::53" }
+#  - { network: '^10\.3\.0\.', ip: "147.94.19.254" }
+host_timezone: 'Europe/Paris'
+# default prefix for commands
+prefix: /usr

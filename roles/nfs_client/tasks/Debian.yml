@@ -8,7 +8,7 @@
     copy:
       src: :etc:modprobe.d:nfs.conf
       dest: /etc/modprobe.d/nfs.conf
-      mode: 0600
+      mode: '0600'
       owner: root
   - name: statd port
     lineinfile:
@@ -22,13 +22,13 @@
     copy:
       src: :usr:sbin:start-statd
       dest: /usr/sbin/start-statd
-      mode: 0755
+      mode: '0755'
       owner: root
   - name: idmapd
     template:
       src: idmapd.conf.j2
       dest: /etc/idmapd.conf
-      mode: 0644
+      mode: '0644'
       owner: root
   notify: debian restart nfs all
 

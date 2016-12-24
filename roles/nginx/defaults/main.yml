@@ -3,3 +3,4 @@ wwwuser: 'www'
 nginx_processes: 1
 error_loglevel: 'info'
 www_default_root: '/var/www/default'
+proxified_by: False

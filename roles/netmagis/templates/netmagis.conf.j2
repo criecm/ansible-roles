@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 #
 # Standard netmagis.conf file
 #
@@ -59,7 +60,7 @@ diff		"diff --unified=0 %s -"
 ########################################
 
 # where BIND daemon expects to find zone files
-zonedir		/var/netmagis/dnsmaster
+zonedir		{{ nsd_zonesdir }}/master
 
 # tell BIND to reload files
 #zonecmd		"/usr/sbin/rndc reload"
@@ -106,7 +107,7 @@ mroutecmd	"cd /etc/mail ; /usr/sbin/makemap -N hash mailertable < mailertable"
 ########################################
 
 # where dhcpd expects to find generated config file (pointed to by dhcpd.conf)
-dhcpfile	/var/netmagis/dhcpd-gen.conf
+dhcpfile	{{ netmagis_dhcpd_file }}
 
 # dhcp failover text to add to generated pools. Keep empty if you don't
 # have any DHCP failover configuration.

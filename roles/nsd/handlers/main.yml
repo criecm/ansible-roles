@@ -4,3 +4,5 @@
     name: nsd
     state: restarted
 
+- name: reconfig nsd
+  command: nsd-control reconfig

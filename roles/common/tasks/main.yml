@@ -1,25 +1,41 @@
 ---
 # taches communes ECM
 
-- include_vars: 'vars/{{ansible_os_family}}.yml'
+- include_vars: '{{ includefile }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+      skip: True
+  loop_control:
+    loop_var: includefile
+  tags: vars
 
-- include: 'tasks/{{ansible_os_family}}.yml'
+- debug: var=nsd_configdir
+  tags: nsd
+
+- include: '{{ includefile }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+      skip: True
+  loop_control:
+    loop_var: includefile
 
 - name: resolv.conf
   template:
     src: resolv.conf.j2
     dest: /etc/resolv.conf
     owner: root
-    mode: 0644
+    mode: '0644'
   tags: resolver
 
-- name: Installe CA ECM
+- name: Installe CA local
   copy:
     src: '{{x509_ca_file}}'
     dest: /etc/ssl/caecm.crt
     owner: root
     group: 0
-    mode: 0644
+    mode: '0644'
   tags: sslecm
   when: '"{{x509_ca_file}}" != ""'
 
@@ -38,7 +54,7 @@
   - name: chmod 644 ldap.conf
     file:
       path: '{{ldap_etcdir}}/ldap.conf'
-      mode: 0644
+      mode: '0644'
   tags: ldapconf
 
 - block:
@@ -46,7 +62,7 @@
     file:
       path: /root/.ssh
       state: directory
-      mode: 0700
+      mode: '0700'
       owner: root
       group: 0
   - name: sshd_config
@@ -90,7 +106,7 @@
     template:
       dest: /root/.zshrc
       src: zshrc.j2
-      mode: 0600
+      mode: '0600'
       owner: root
   tags: zshroot
 
@@ -99,7 +115,7 @@
     file:
       path: /usr/local/admin/sysutils
       state: directory
-      mode: 0750
+      mode: '0750'
       owner: root
       group: 0
   - name: cle ssh cvs
@@ -108,14 +124,15 @@
       src: files/id_cvs_rsa
       owner: root
       group: 0
-      mode: 0600
-  - name: git 'common'
+      mode: '0600'
+  - name: repos git sysadm_gits
     git:
-      dest: /usr/local/admin/sysutils/common
-      repo: ssh://git@git.centrale-marseille.fr/sysutils/common.git
+      dest: '/usr/local/admin/sysutils/{{ item.name }}'
+      repo: '{{ item.giturl }}'
       accept_hostkey: yes
       key_file: /root/.ssh/id_cvs_rsa
       depth: 2
+    with_items: '{{ sysadm_gits }}'
   tags: gitecm
 
 - block:
@@ -130,19 +147,23 @@
   - name: old crons daily/weekly /etc/crontab
     lineinfile:
       dest: /etc/crontab
-      regexp: '/usr/local/admin/utils/systeme/cron_(daily|weekly)_serveur\.sh'
+      regexp: '{{ item }}'
       state: absent
+    with_items:
+      - '/usr/local/admin/utils/systeme/cron_(daily|weekly)_serveur\.sh'
+      - '/usr/local/admin/sysutils/common/cron/(daily|weekly)\.sh'
+      - '^# mises a jour auto du CVS du CRI'
   - name: cron daily
     cron:
       name: cron daily ECM
       hour: 23
-      minute: 32
+      minute: 53
       job: '/usr/local/admin/sysutils/common/cron/daily.sh'
   - name: cron weekly
     cron:
       name: weekly ECM
       hour: 23
-      minute: 51
+      minute: 32
       job: '/usr/local/admin/sysutils/common/cron/weekly.sh'
   tags: cronecm
 

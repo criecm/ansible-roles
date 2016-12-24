@@ -3,12 +3,8 @@ domain {{ ansible_domain }}
 {% if is_resolver | bool() %}nameserver 127.0.0.1
 {% endif %}
 {% for ns in nameservers %}
-{% if ns.ip | ipv4 %}
-{% if ansible_all_ipv4_addresses | join(',') | match(ns.match) %}nameserver {{ns.ip}}
-{% endif %}
-{% endif %}
-{% if ns.ip | ipv6 %}
-{% if ansible_all_ipv6_addresses | join(',') | match(ns.match) %}nameserver {{ns.ip}}
-{% endif %}
+{% if ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) | ipaddr(ns.network) %}
+nameserver {{ns.ip}}
 {% endif %}
 {% endfor %}
+

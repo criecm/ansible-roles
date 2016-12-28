@@ -1,0 +1,6 @@
+---
+- name: restart openvpn
+  service:
+    name: 'openvpn{{ item }}'
+    state: restarted
+  with_items: '{{ openvpn_configs }}'

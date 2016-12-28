@@ -16,7 +16,6 @@
       - { regexp: '^nscd_enable', line: 'nscd_enable="NO"' }
       - { regexp: '^nslcd_enable', line: 'nslcd_enable="YES"' }
       - { regexp: '^nslcd_supervisor', line: 'nslcd_supervisor="YES"' }
-  when: (ansible_os_family == 'FreeBSD')
   tags: nssldap
 
 - name: Config nsswitch.conf FreeBSD
@@ -30,7 +29,6 @@
     - { regexp: '^passwd_compat:', line: 'passwd_compat: ldap' }
     - { regexp: '^group:', line: 'group: compat' }
     - { regexp: '^passwd:', line: 'passwd: compat' }
-  when: (ansible_os_family == 'FreeBSD')
   tags: nssldap
 
 - block:
@@ -40,6 +38,12 @@
       regexp: '^\+:'
       line: '+:*:::::{{ldap_force_shell}}'
       state: present
+  - name: Enable LDAP /etc/group
+    lineinfile:
+      dest: /etc/group
+      regexp: '^\+:'
+      line: '+:*:0:'
+      state: present
   - name: Enable LDAP /etc/master.passwd
     lineinfile:
       dest: /etc/master.passwd
@@ -47,13 +51,6 @@
       line: '+:*:::{{ldap_force_homedir_by_class}}:0:0:::{{ldap_force_shell}}'
       state: present
     notify: rebuild FreeBSD pwdb
-  - name: Enable LDAP /etc/group
-    lineinfile:
-      dest: /etc/group
-      regexp: '^\+:'
-      line: '+:*:0:'
-      state: present
-  when: (ansible_os_family == 'FreeBSD')
   tags: nssldap
 
 # verifie l'existence de {{ldap_force_homedir_by_class}}
@@ -91,3 +88,13 @@
   notify: rebuild login.conf database
   when: ("{{ldap_force_homedir_by_class}}" != "") and ((ldapUserClassInLoginConf.found == 0) or (ldapUserClassByAnsible.found == 1))
 
+# config PAM: ssh ou tout
+- name: pam config
+  lineinfile:
+    dest: '/etc/pam.d/{{ service }}'
+    line: 'auth	sufficient	/usr/local/lib/pam_ldap.so	try_first_pass'
+    insertbefore: '^auth\s+required.*pam_unix'
+    regexp: '^auth\s.*pam_ldap.so'
+  with_items: '{{ pam_ldap_services | default([]) }}'
+  loop_control:
+    loop_var: service

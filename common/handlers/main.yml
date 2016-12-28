@@ -15,3 +15,9 @@
 
 - name: newaliases
   command: /usr/bin/newaliases
+
+- name: restart bsnmpd
+  service:
+    name: bsnmpd
+    state: restarted
+

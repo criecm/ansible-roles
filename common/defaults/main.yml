@@ -20,6 +20,8 @@ mailaliases: /etc/aliases
 rootmailto: 
 # x509 CA certificate
 x509_ca_file:
+# ans its place on filesystem
+x509_ca_path: /etc/ssl/ca.crt
 # value for TLS_REQCERT in ldap.conf (and others)
 ldap_tls_reqcert: never
 # host is a resolver
@@ -35,3 +37,5 @@ nameservers:
 host_timezone: 'Europe/Paris'
 # default prefix for commands
 prefix: /usr
+#
+is_jail: False

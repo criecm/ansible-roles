@@ -24,7 +24,7 @@ Prévus pour Debian, FreeBSD, OpenBSD
 
 ### common
 
-  * CA x509 dans /etc/ssl/caecm.ecm
+  * CA x509
   * client OpenLDAP + config
   * config mail relay (**sauf groupe "relaimail"**)
     * Debian: postfix
@@ -41,6 +41,8 @@ Prévus pour Debian, FreeBSD, OpenBSD
 ### ldap_client
 
 Comptes UNIX via LDAP (nslcd) (Debian,FreeBSD)
+
+  * pam_ldap_services: les services pour lesquels activer PAM
 
 ### nfs_client
 

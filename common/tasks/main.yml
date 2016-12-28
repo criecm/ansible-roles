@@ -32,7 +32,7 @@
 - name: Installe CA local
   copy:
     src: '{{x509_ca_file}}'
-    dest: /etc/ssl/caecm.crt
+    dest: '{{x509_ca_path}}'
     owner: root
     group: 0
     mode: '0644'
@@ -50,7 +50,7 @@
       - { regexp: '^BASE', line: 'BASE {{ldap_base}}' }
       - { regexp: '^URI', line: 'URI {{ldap_uri}}' }
       - { regexp: '^TLS_REQCERT', line: 'TLS_REQCERT {{ldap_tls_reqcert}}' }
-      - { regexp: '^TLS_CACERT', line: 'TLS_CACERT /etc/ssl/caecm.crt' }
+      - { regexp: '^TLS_CACERT', line: 'TLS_CACERT {{x509_ca_path}}' }
   - name: chmod 644 ldap.conf
     file:
       path: '{{ldap_etcdir}}/ldap.conf'

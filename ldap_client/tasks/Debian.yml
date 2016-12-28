@@ -14,8 +14,8 @@
       - { name: 'nslcd', question: 'nslcd/ldap-binddn', vtype: 'string', value: '{{ldap_binddn}}' }
       - { name: 'nslcd', question: 'nslcd/ldap-bindpw', vtype: 'string', value: '{{ldap_bindpw}}' }
       - { name: 'nslcd', question: 'nslcd/ldap-auth-type', vtype: 'select', value: 'simple' }
-      - { name: 'nslcd', question: 'nslcd/ldap-cacertfile', vtype: 'string', value: '/etc/ssl/caecm.crt' }
-      - { name: 'nslcd', question: 'nslcd/ldap-reqcert', vtype: 'string', value: 'demand' }
+      - { name: 'nslcd', question: 'nslcd/ldap-cacertfile', vtype: 'string', value: '{{ldap_tls_cacert}}' }
+      - { name: 'nslcd', question: 'nslcd/ldap-reqcert', vtype: 'string', value: '{{ldap_tls_reqcert}}' }
       - { name: 'nslcd', question: 'nslcd/ldap-starttls', vtype: 'boolean', value: 'true' }
       - { name: 'libnss-ldapd', question: 'libnss-ldapd/nsswitch', vtype: 'multiselect', value: 'passwd, group, shadow, automount' }
       - { name: 'libpam-ldapd', question: 'libpam-ldapd/enable_shadow', vtype: 'boolean', value: 'true' }

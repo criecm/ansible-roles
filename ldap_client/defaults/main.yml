@@ -14,3 +14,5 @@ nslcd_conf: /etc/nslcd.conf
 ldap_force_shell: /usr/sbin/nologin
 ldap_force_homedir_by_class: ''
 sshd_allow_groups: ''
+ldap_tls_cacert: ''
+pam_ldap_services: []

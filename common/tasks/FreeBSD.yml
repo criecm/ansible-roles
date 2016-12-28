@@ -89,3 +89,24 @@
     with_items:
       - { regexp: '^security.bsd.see_other_uids=', line: 'security.bsd.see_other_uids=0' }
   tags: security
+
+# snmp
+- name: config snmpd
+  lineinfile:
+    line: '{{ item.line }}'
+    regexp: '{{ item.regexp }}'
+    dest: /etc/snmpd.config
+  with_items:
+    - { line: 'begemotSnmpdModulePath."ucd" = "/usr/local/lib/snmp_ucd.so"', regexp: '^begemotSnmpdModulePath.*snmp_ucd' }
+#    - { line: 'begemotSnmpdModulePath."hostres" = "/usr/lib/snmp_hostres.so"', regexp: '^begemotSnmpdModulePath.*snmp_hostres' }
+  notify: restart bsnmpd
+  when: '{{ is_jail }} == False'
+  tags: baseconf, snmpd
+
+- name: enable bsnmpd
+  service:
+    name: bsnmpd
+    state: started
+    enabled: yes
+  when: '{{ is_jail }} == False'
+  tags: baseconf, snmpd

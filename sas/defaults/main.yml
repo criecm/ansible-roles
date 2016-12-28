@@ -1,0 +1,10 @@
+---
+sas_users: []
+default_user:
+  shell: /bin/sh
+  createhome: yes
+  login_class: sasuser
+  update_password: always
+  groups: sasusers
+  comment: sas user Ansible
+  homesrc: False

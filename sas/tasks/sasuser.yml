@@ -1,0 +1,31 @@
+---
+- name: create user
+  user:
+    name: '{{ user.name }}'
+    home: '{{ user.home }}'
+    createhome: '{% if user.homesrc == False %}{{ user.createhome }}{% else %}no{% endif %}'
+    comment: '{{ user.comment }}'
+    login_class: '{{ user.login_class }}'
+    uid: '{{ user.uid | default(False) }}'
+    password: '{{ user.password }}'
+    update_password: '{{ user.update_password | default("on_create") }}'
+  register: moduser
+
+- name: sync user home
+  synchronize:
+    src: '{{ user.homesrc }}/'
+    dest: '{{ user.home }}/'
+    archive: no
+    perms: yes
+    compress: no
+    recursive: yes
+  register: rsync
+#  when: '{{ user.homesrc }} != False and moduser.changed == True'
+
+- name: chown user home
+  file:
+    owner: '{{ user.name }}'
+    recurse: yes
+    path: '{{ user.home }}'
+  when: rsync.changed == True
+

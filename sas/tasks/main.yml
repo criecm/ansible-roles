@@ -1,0 +1,45 @@
+---
+- name: packages
+  pkgng:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - xauth
+    - mutt
+    - bash
+    - zsh
+  tags: sas, pkg
+
+- name: config files
+  copy:
+    src: sas/Muttrc
+    dest: /usr/local/etc/Muttrc
+  tags: sas, muttrc
+
+- name: bash & zsh dans /bin
+  file:
+    dest: '/bin/{{ item }}'
+    src: '/usr/local/bin/{{ item }}'
+    state: link
+  with_items:
+    - bash
+    - zsh
+  tags: sas, loginshell
+
+- name: bash et zsh dans /etc/shells
+  lineinfile:
+    dest: /etc/shells
+    line: '{{ item }}'
+  with_items:
+    - /bin/bash
+    - /bin/zsh
+  tags: sas, loginshell
+
+- include: sasuser.yml
+  vars:
+    user: '{{ default_user | combine(sasuser) }}'
+  with_items:
+    - '{{ sas_users }}'
+  loop_control:
+    loop_var: sasuser
+  tags: sas, sasusers

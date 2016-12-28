@@ -1,0 +1,72 @@
+---
+- name: iocage pkg
+  pkgng:
+    name: iocage
+    state: present
+  tags: iocage,hostinit,pkg
+
+- command: zfs list -H -o name /iocage
+  register: zfs_list_iocage
+  failed_when: False
+  changed_when: False
+  tags: iocage, hostinit
+  
+- debug: var=zfs_list_iocage
+  tags: iocage, hostinit
+
+- name: mark zpool for iocage
+  command: "/usr/local/sbin/iocage activate {{ iocage_zpool }}"
+  when: "{{ zfs_list_iocage.stdout_lines | length }} == 0"
+  tags: iocage, hostinit
+
+- name: initialize iocage
+  iocage:
+    state: fetched
+    properties: ftpfiles="base.txz doc.txz" ftphost="http://ftp.ec-m.fr"
+    release: "11.0-RELEASE"
+  tags: iocage, hostinit
+#  shell: /usr/local/sbin/iocage fetch release=11.0-RELEASE ftpfiles="base.txz doc.txz"
+#  tags: iocage, hostinit
+
+- name: Enable iocage service
+  service:
+    name: iocage
+    enabled: True
+  tags: iocage, hostinit
+
+- name: enable racct/rctl
+  lineinfile:
+    dest: /boot/loader.conf
+    line: 'kern.racct.enable=1'
+  tags: iocage, hostinit
+
+#- name: get iocage current jails
+#  shell: "/usr/local/sbin/iocage list |grep '^[0-9]' | awk '{print $5}'"
+#  register: iocage_jails
+#  failed_when: False
+#  changed_when: False
+#  tags: iocage, newjails
+
+# creer un/des jails
+- name: pkglist.txt
+  copy:
+    src: pkglist.txt
+    dest: /iocage/pkglist.txt
+  tags: iocage, newjails
+
+- name: create basejail
+  iocage:
+    tag: "basejail"
+    release: "11.0-RELEASE"
+    state: basejail
+  tags: iocage, hostinit
+
+- include_vars: vars/jail.yml
+  tags: jails
+
+- include: jail.yml
+  vars:
+    jail: '{{ jail_defaults | combine(item) }}'
+  with_items: '{{ jail_list }}'
+  tags: jails
+

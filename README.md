@@ -42,7 +42,7 @@ Prévus pour Debian, FreeBSD, OpenBSD
 
 Comptes UNIX via LDAP (nslcd) (Debian,FreeBSD)
 
-  * pam_ldap_services: les services pour lesquels activer PAM
+  * pam_ldap_services: les services pour lesquels activer PAM (aucun par defaut)
 
 ### nfs_client
 
@@ -111,3 +111,16 @@ avec `nsd-control (add|delete)zone $ZONE $PATTERN`
 
 Installe netmagis, en utilisant les rôles précédents
 
+### iocage
+
+Installe une "machine a jails"
+
+Installe aussi des jails iocage :)
+
+### sas
+
+Quelques finesses pour les sas:
+  * users locaux
+  * shells '/bin/bash' et '/bin/zsh'
+  * config muttrc
+  * xauth

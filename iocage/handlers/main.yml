@@ -1,0 +1,5 @@
+---
+- name: restart jail
+  iocage:
+    uuid: '{{ iocage_jail.uuid }}'
+    state: restarted

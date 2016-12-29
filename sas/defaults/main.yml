@@ -4,7 +4,7 @@ default_user:
   shell: /bin/sh
   createhome: yes
   login_class: sasuser
-  update_password: always
+  update_password: on_create
   groups: sasusers
   comment: sas user Ansible
   homesrc: False

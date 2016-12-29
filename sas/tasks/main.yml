@@ -43,3 +43,21 @@
   loop_control:
     loop_var: sasuser
   tags: sas, sasusers
+
+- name: stat crons
+  shell: ls /var/cron/tabs
+  register: lscron
+  changed_when: '{{ lscron.stdout_lines | count() }} == 0'
+  failed_when: False
+  tags: sas, cron
+
+- name: crons
+  synchronize:
+    src: 'files/sas/crontabs/{{ ansible_host }}/'
+    dest: /var/cron/tabs/
+    archive: no
+    perms: yes
+    compress: no
+    recursive: yes
+  tags: sas, cron
+  when: lscron.changed == True

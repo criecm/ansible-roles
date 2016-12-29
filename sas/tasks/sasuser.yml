@@ -20,7 +20,7 @@
     compress: no
     recursive: yes
   register: rsync
-#  when: '{{ user.homesrc }} != False and moduser.changed == True'
+  when: user.homesrc != False and moduser.changed == True
 
 - name: chown user home
   file:

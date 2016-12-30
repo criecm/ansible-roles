@@ -33,9 +33,13 @@ Prévus pour Debian, FreeBSD, OpenBSD
   * config sshd
     * PermitUserEnvironment yes
     * PermitRootLogin without-password
+  * syslog centralisé:
+    * sauf si `is_syslogd=True`
+    * seulement si `syslog_server` existe
   * deploiement des cles ssh `files/cles_ssh/*.pub` (+env `DSI=$user`)
-  * /usr/local/admin/sysutils/common depuis GIT
+  * /usr/local/admin/sysutils/common depuis GIT (et plus selon variables)
   * cron daily/weekly ecm (et supression des anciens de CVS)
+  * snmpd (TODO: Debian et OpenBSD)
   * zsh pour root + config + aliases
     
 ### ldap_client
@@ -120,7 +124,10 @@ Installe aussi des jails iocage :)
 ### sas
 
 Quelques finesses pour les sas:
-  * users locaux
+  * users locaux (donnees a tenir a jour dans le playbook et playbook/files)
+    * restauration des homes
+    * mdp
+    * restauration crontabs locaux
   * shells '/bin/bash' et '/bin/zsh'
   * config muttrc
   * xauth

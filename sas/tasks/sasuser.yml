@@ -22,10 +22,24 @@
   register: rsync
   when: user.homesrc != False and moduser.changed == True
 
+- name: list installed crons
+  command: ls -1 /var/cron/tabs
+  register: crons
+  failed_when: False
+  changed_when: False
+
+- name: restore user cron
+  copy:
+    src: '{{ item }}'
+    dest: '/var/cron/tabs/{{ item | regex_replace("^.*/([^/]+)$","\1") }}'
+  when: '"{{ item | regex_replace("^.*/([^/]+)$","\1") }}" not in crons.stdout_lines'
+  with_fileglob: 
+    - 'files/sas/crontabs/{{ ansible_hostname }}/*'
+
 - name: chown user home
   file:
     owner: '{{ user.name }}'
     recurse: yes
     path: '{{ user.home }}'
-  when: rsync.changed == True
+  when: user.homesrc != False and rsync.changed == True
 

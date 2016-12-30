@@ -21,3 +21,12 @@
     name: bsnmpd
     state: restarted
 
+- name: restart BSD syslogd
+  service:
+    name: syslogd
+    state: restarted
+
+- name: restart Debian rsyslog
+  service:
+    name: rsyslog
+    state: restarted

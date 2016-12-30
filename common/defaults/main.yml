@@ -37,5 +37,15 @@ nameservers:
 host_timezone: 'Europe/Paris'
 # default prefix for commands
 prefix: /usr
-#
+# for jails ONLY
 is_jail: False
+# syslog server to send syslogs
+syslog_server: False
+# for syslog SERVER
+is_syslogd: False
+# default sshd lines
+#ex:  - { line: 'PermitUserEnvironment yes', regexp: '^PermitUserEnvironment', lineafter: '^#[[:space:]]*PermitUserEnvironment' }
+default_sshd_lines: []
+  - { line: 'PermitRootLogin without-password', regexp: '^PermitRootLogin', lineafter: '^#[[:space:]]*PermitRootLogin' }
+# host specific lines
+sshd_lines: []

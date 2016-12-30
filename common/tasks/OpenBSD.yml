@@ -38,3 +38,12 @@
   force: yes
   tags: timezone
 
+- name: syslog central
+  lineinfile:
+    dest: /etc/syslog.conf
+    insertbefore: '^!'
+    regexp: '^[^#]+@.*'
+    line: '*.notice;auth,authpriv,cron,ftp,kern,lpr,mail,user.none	@{{ syslog_server }}'
+  when: '{{ syslog_server | default(False) | bool() }} and not {{ is_syslogd | default(False) }}'
+  notify: restart BSD syslogd
+  tags: syslog

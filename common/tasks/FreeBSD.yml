@@ -72,6 +72,16 @@
     when: zoneinfo.stdout != host_timezone
   tags: timezone
 
+# syslog
+- name: syslog central
+  lineinfile:
+    dest: /etc/syslog.conf
+    line: '*.*			@{{ syslog_server }}'
+    regexp: '^\*.\*@.*'
+  when: '{{ syslog_server | default(False) | bool() }} and not {{ is_syslogd | default(False) }}'
+  tags: syslog
+  notify: restart BSD syslogd
+
 # hardening freebsd
 - block:
   - name: rc.conf

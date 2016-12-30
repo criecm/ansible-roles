@@ -74,9 +74,10 @@
       state: present
       validate: '/usr/sbin/sshd -tf %s'
     notify: restart sshd
-    with_items:
-      - { line: 'PermitUserEnvironment yes', regexp: '^PermitUserEnvironment', lineafter: '^#[[:space:]]*PermitUserEnvironment' }
-      - { line: 'PermitRootLogin without-password', regexp: '^PermitRootLogin', lineafter: '^#[[:space:]]*PermitRootLogin' }
+    with_items: 
+      - '{{ default_sshd_lines }}'
+      - '{{ sshd_lines }}'
+
   - name: root authorized_keys
     authorized_key:
       key: "{{ lookup('file',item) }}"

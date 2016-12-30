@@ -52,3 +52,12 @@
 
   when: '"relaimail" not in group_names and "{{mailrelay}}" != ""'
   tags: mailclient
+
+- name: syslog central
+  template:
+    src: rsyslog_ecm.conf.j2
+    dest: /etc/rsyslog.d/ecm.conf
+    mode: 600
+  when: '{{ syslog_server | default(False) | bool() }} and not {{ is_syslogd | default(False) }}'
+  tags: syslog
+  notify: restart Debian rsyslog

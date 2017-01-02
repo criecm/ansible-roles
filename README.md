@@ -8,10 +8,10 @@ Prévus pour Debian, FreeBSD, OpenBSD
 
 [lire la doc](http://docs.ansible.com/ansible/intro_getting_started.html "getting started")
 
-  * un 'inventory' ([/usr/local]/etc/ansible/hosts, voir ~/.ansible.cfg ou [/usr/local]/etc/ansible/ansible.cfg)
+* un 'inventory' ([/usr/local]/etc/ansible/hosts, voir ~/.ansible.cfg ou [/usr/local]/etc/ansible/ansible.cfg)
 > machine1
 > machine2
-  * **une cle ssh** permettant de se connecter a chaque machine de l'inventory
+* **une cle ssh** permettant de se connecter a chaque machine de l'inventory
     (en root ou en --ansible-user=\* avec --become=[sudo|su|pbrun|pfexec|runas|doas|dzdo])
 
 ## Usage
@@ -24,39 +24,39 @@ Prévus pour Debian, FreeBSD, OpenBSD
 
 ### common
 
-  * CA x509
-  * client OpenLDAP + config
-  * config mail relay (**sauf groupe "relaimail"**)
-    * Debian: postfix
-    * FreeBSD: sendmail
-    * OpenBSD: smtpd
-  * lignes de config sshd (en variables, voir defaults/main.yml)
-  * syslog centralisé:
-    * sauf si `is_syslogd=True`
-    * seulement si `syslog_server` existe
-  * deploiement des cles ssh `files/cles_ssh/*.pub` (+env `DSI=$user`)
-  * /usr/local/admin/sysutils/common depuis GIT (et plus selon variables)
-  * cron daily/weekly ecm (et supression des anciens de CVS)
-  * snmpd (TODO: Debian et OpenBSD)
-  * zsh pour root + config + aliases
-  * packages supplementaires (variable pkgs)
+* CA x509
+* client OpenLDAP + config
+* config mail relay (**sauf groupe "relaimail"**)
+  * Debian: postfix
+  * FreeBSD: sendmail
+  * OpenBSD: smtpd
+* lignes de config sshd (en variables, voir defaults/main.yml)
+* syslog centralisé:
+  * sauf si `is_syslogd=True`
+  * seulement si `syslog_server` existe
+* deploiement des cles ssh `files/cles_ssh/*.pub` (+env `DSI=$user`)
+* /usr/local/admin/sysutils/common depuis GIT (et plus selon variables)
+* cron daily/weekly ecm (et supression des anciens de CVS)
+* snmpd (TODO: Debian et OpenBSD)
+* zsh pour root + config + aliases
+* packages supplementaires (variable pkgs)
     
 ### ldap_client
 
 Comptes UNIX via LDAP (nslcd) (Debian,FreeBSD)
 
-  * pam_ldap_services: les services pour lesquels activer PAM (aucun par defaut)
+* pam_ldap_services: les services pour lesquels activer PAM (aucun par defaut)
 
 ### nfs_client
 
 NFS (v3+v4) client
 ports fixes (FreeBSD,Debian)
 
-  * statd - port 4047
-  * lockd - port 4045
-  * nfs client callback - port 4048
-  * idmap/nfsuserd domain `{{ idmap_domain }}`
-  * workaround statd port bug on Debian (patch /usr/sbin/start-statd)
+* statd - port 4047
+* lockd - port 4045
+* nfs client callback - port 4048
+* idmap/nfsuserd domain `{{ idmap_domain }}`
+* workaround statd port bug on Debian (patch /usr/sbin/start-statd)
 
 #### en option, automontage LDAP/autofs (FreeBSD only for now)
 
@@ -123,10 +123,10 @@ Installe aussi des jails iocage :)
 ### sas
 
 Quelques finesses pour les sas:
-  * users locaux (donnees a tenir a jour dans le playbook et playbook/files)
-    * restauration des homes
-    * mdp
-    * restauration crontabs locaux
-  * shells '/bin/bash' et '/bin/zsh'
-  * config muttrc
-  * xauth
+* users locaux (donnees a tenir a jour dans le playbook et playbook/files)
+  * restauration des homes
+  * mdp
+  * restauration crontabs locaux
+* shells '/bin/bash' et '/bin/zsh'
+* config muttrc
+* xauth

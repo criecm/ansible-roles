@@ -52,8 +52,7 @@
       - { name: 'postfix', question: 'postfix/main_mailer_type', vtype: 'select', value: 'Satellite system' }
       - { name: 'postfix', question: 'postfix/procmail', vtype: 'boolean', value: 'false' }
     notify: reconfigure postfix
-
-  when: '"relaimail" not in group_names and "{{mailrelay}}" != ""'
+  when: 'is_mailrelay != True and "{{mailrelay}}" != ""'
   tags: mailclient
 
 - name: syslog central

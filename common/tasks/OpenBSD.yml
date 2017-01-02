@@ -28,7 +28,7 @@
     line: 'accept from local for any relay via {{mailrelay}}'
     regexp: '^accept .*for any relay'
   notify: restart smtpd
-  when: '"relaimail" not in group_names and "{{mailrelay}}" != ""'
+  when: 'is_mailrelay != True and "{{mailrelay}}" != ""'
   tags: mailclient
 
 # timezone

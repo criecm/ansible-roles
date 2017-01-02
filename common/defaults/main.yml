@@ -14,6 +14,8 @@ zshpath: /bin/zsh
 etcprefix: ''
 # mail relay to configure
 mailrelay: smtp.local
+# is mail relay ? (host var)
+is_mailrelay: False
 # mail aliases file
 mailaliases: /etc/aliases
 # redirect mail for root to...

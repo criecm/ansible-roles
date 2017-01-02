@@ -9,8 +9,10 @@ Prévus pour Debian, FreeBSD, OpenBSD
 [lire la doc](http://docs.ansible.com/ansible/intro_getting_started.html "getting started")
 
 * un 'inventory' ([/usr/local]/etc/ansible/hosts, voir ~/.ansible.cfg ou [/usr/local]/etc/ansible/ansible.cfg)
+
 > machine1
 > machine2
+
 * **une cle ssh** permettant de se connecter a chaque machine de l'inventory
     (en root ou en --ansible-user=\* avec --become=[sudo|su|pbrun|pfexec|runas|doas|dzdo])
 

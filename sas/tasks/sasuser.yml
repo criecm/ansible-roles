@@ -11,6 +11,12 @@
     update_password: '{{ user.update_password | default("on_create") }}'
   register: moduser
 
+- name: mkdir home dir
+  file:
+    dest: '{{ user.home }}'
+    state: directory
+  when: user.homesrc != False
+
 - name: sync user home
   synchronize:
     src: '{{ user.homesrc }}/'

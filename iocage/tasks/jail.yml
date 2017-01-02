@@ -17,8 +17,6 @@
 #    state: exists
 #  register: iocage_jail
 
-- debug: var=iocage_jail
-
 - name: set hostnames
   shell: '/usr/local/sbin/iocage set hostname="{{ jail.hostname }}" {{ jail.tag }}'
   when: '{{ iocage_jail.changed }}'
@@ -87,8 +85,6 @@
   changed_when: False
   failed_when: False
   when: '"{{ jail.fstab }}" != ""'
-
-- debug: var=mntdirs
 
 - name: mkdir fstab mountpoints
   file:

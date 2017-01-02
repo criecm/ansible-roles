@@ -30,9 +30,7 @@ Prévus pour Debian, FreeBSD, OpenBSD
     * Debian: postfix
     * FreeBSD: sendmail
     * OpenBSD: smtpd
-  * config sshd
-    * PermitUserEnvironment yes
-    * PermitRootLogin without-password
+  * lignes de config sshd (en variables, voir defaults/main.yml)
   * syslog centralisé:
     * sauf si `is_syslogd=True`
     * seulement si `syslog_server` existe
@@ -41,6 +39,7 @@ Prévus pour Debian, FreeBSD, OpenBSD
   * cron daily/weekly ecm (et supression des anciens de CVS)
   * snmpd (TODO: Debian et OpenBSD)
   * zsh pour root + config + aliases
+  * packages supplementaires (variable pkgs)
     
 ### ldap_client
 

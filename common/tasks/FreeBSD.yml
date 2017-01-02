@@ -28,6 +28,7 @@
     - vim-lite
     - zsh
     - openldap-client
+    - '{{ pkgs }}'
   tags: baseconf, pkg
 
 # mail via relay

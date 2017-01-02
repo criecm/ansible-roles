@@ -3,7 +3,6 @@
   apt:
     name: debconf-utils
     state: installed
-  when: ansible_os_family == 'Debian'
   tags: baseconf, pkg
 
 # timezone
@@ -18,11 +17,15 @@
     when: zoneinfo.stdout != host_timezone
   tags: timezone
 
-- name: client openldap Debian
+# packages
+- name: packages
   apt:
-    name: ldap-utils
+    name: '{{ item }}'
     state: present
-  tags: ldapconf
+  with_items:
+    - ldap-utils
+    - '{{ pkgs }}'
+  tags: pkg
 
 # mailrelay
 - block:

@@ -44,8 +44,9 @@ syslog_server: False
 # for syslog SERVER
 is_syslogd: False
 # default sshd lines
-#ex:  - { line: 'PermitUserEnvironment yes', regexp: '^PermitUserEnvironment', lineafter: '^#[[:space:]]*PermitUserEnvironment' }
+#ex:  - { line: 'PermitUserEnvironment yes', regexp: '^PermitUserEnvironment', insertafter: '^#[[:space:]]*PermitUserEnvironment' }
 default_sshd_lines: []
-  - { line: 'PermitRootLogin without-password', regexp: '^PermitRootLogin', lineafter: '^#[[:space:]]*PermitRootLogin' }
 # host specific lines
 sshd_lines: []
+# host specific pkgs 
+pkgs: []

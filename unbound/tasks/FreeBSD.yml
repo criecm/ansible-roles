@@ -1,0 +1,4 @@
+---
+- name: install unbound from pkgs
+  pkgng: name=unbound state=present
+

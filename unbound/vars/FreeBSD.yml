@@ -1,0 +1,5 @@
+---
+unbound_ctl: /usr/local/sbin/unbound-control
+unbound_cfg: /usr/local/etc/unbound/unbound.conf
+unbound_trust_anchor: /var/unbound/root.key
+

@@ -1,0 +1,23 @@
+---
+- include_vars: "{{ item }}"
+  with_first_found:
+    - '{{ansible_os_family}}.yml'
+
+- include: '{{ item }}'
+  with_first_found:
+    - '{{ansible_os_family}}.yml'
+
+- name: active unbound
+  service:
+    name: unbound
+    enabled: yes
+  tags: rc
+
+- name: unbound.conf
+  template:
+    src: unbound.conf.j2
+    dest: '{{ unbound_cfg }}'
+    mode: '0644'
+    owner: root
+  tags: config
+  notify: restart unbound

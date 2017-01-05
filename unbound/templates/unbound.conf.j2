@@ -1,0 +1,54 @@
+# {{ ansible_managed }}
+server:
+	extended-statistics: yes
+	num-threads: 4
+	do-not-query-localhost: yes
+	interface: 127.0.0.1
+	interface: ::1
+{% if unbound_interfaces | count() > 0 %}
+  {% for ip in unbound_interfaces %}
+	interface: {{ ip }}
+  {% endfor %}
+{% else %}
+  {% for ip in ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) %}
+	interface: {{ ip }}
+  {% endfor %}
+{% endif %}
+	auto-trust-anchor-file: "{{ unbound_trust_anchor }}"
+{% if net in our_nets | intersect(private_nets) | count > 0 %}
+	access-control: 127.0.0.0/8 allow
+	access-control: ::1 allow
+  {% for net in our_nets | intersect(private_nets) %}
+	access-control: {{ net }}
+  {% endfor %}
+{% endif %}
+
+{% for priv_reverse in unbound_nodefault %}
+	local-zone: "{{ priv_reverse }}" nodefault
+{% endfor %}
+
+{% for net in private_nets %}
+	private-address: {{ net }}
+{% endfor %}
+
+{% for dom in private_domains %}
+	domain-insecure: "{{ dom }}"
+  {% if not dom | match(".*\.arpa\.?") %}
+	private-domain: "{{ dom }}"
+  {% endif %}
+{% endfor %}
+
+remote-control:
+	control-enable: yes
+{% if unbound_control_interface != '' %}
+	control-interface: {{ unbound_control_interface }}
+{% endif %}
+
+{% for dom in our_domains | intersect(private_domains) %}
+
+forward-zone:
+	name: "{{ dom.name }}"
+  {% for master in dom.masters %}
+	forward-addr: {{ master }}
+  {% endfor %}
+{% endfor %}

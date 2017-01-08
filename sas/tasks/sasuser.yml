@@ -33,6 +33,7 @@
   register: crons
   failed_when: False
   changed_when: False
+  check_mode: False
 
 - name: restore user cron
   copy:

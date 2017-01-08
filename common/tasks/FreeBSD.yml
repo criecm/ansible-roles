@@ -68,6 +68,7 @@
     register: zoneinfo
     changed_when: False
     ignore_errors: True
+    check_mode: False
   - name: set timezone
     command: 'tzsetup {{ host_timezone }}'
     when: zoneinfo.stdout != host_timezone

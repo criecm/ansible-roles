@@ -59,6 +59,7 @@
     - 'ssh/{{ jail.tag }}/ssh_host*'
   loop_control:
     loop_var: sshkey
+  when: '{{ iocage_jail.changed }} == True'
 
 - name: initial permit root login
   lineinfile:
@@ -72,19 +73,20 @@
     dest: '/iocage/jails/{{ iocage_jail.uuid }}/root/etc/rc.conf'
     line: 'sshd_enable="YES"'
   notify: restart jail
+  when: '{{ iocage_jail.changed }} == True'
 
 - name: copy fstab
   template:
     src: '{{ jail.fstab }}'
     dest: '/iocage/jails/{{ iocage_jail.uuid }}/fstab'
-  when: '"{{ jail.fstab }}" != ""'
+  when: '{{ iocage_jail.changed }} == True and "{{ jail.fstab }}" != ""'
 
 - name: get fstab mountpoints
   shell: "awk '{print $2}' /iocage/jails/{{ iocage_jail.uuid }}/fstab"
   register: mntdirs
   changed_when: False
   failed_when: False
-  when: '"{{ jail.fstab }}" != ""'
+  when: '{{ iocage_jail.changed }} == True and "{{ jail.fstab }}" != ""'
 
 - name: mkdir fstab mountpoints
   file:
@@ -100,6 +102,7 @@
   shell: /usr/local/sbin/iocage start {{ jail.tag }}
   register: iocstart
   failed_when: iocstart.rc > 1
+  when: '{{ iocage_jail.changed }} == True'
 #- name: start jail
 #  iocage:
 #    tag: '{{ jail.tag }}'
@@ -110,5 +113,6 @@
   iocage:
     tag: '{{ jail.tag }}'
     cmd: "env ASSUME_ALWAYS_YES=yes pkg -y install python"
+  when: '{{ iocage_jail.changed }} == True'
 #  when: '{{ iocage_jail.changed }}'
 

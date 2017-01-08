@@ -119,19 +119,21 @@
       mode: '0750'
       owner: root
       group: 0
-  - name: cle ssh cvs
+    when: '{{ sysadm_gits | count() > 0 }}'
+  - name: cle ssh depoiement
     copy:
-      dest: /root/.ssh/id_cvs_rsa
-      src: files/id_cvs_rsa
+      dest: '/root/.ssh/{{ git_ssh_key }}'
+      src: 'files/{{ git_ssh_key }}'
       owner: root
       group: 0
       mode: '0600'
+    when: git_ssh_key != ''
   - name: repos git sysadm_gits
     git:
       dest: '/usr/local/admin/sysutils/{{ item.name }}'
       repo: '{{ item.giturl }}'
       accept_hostkey: yes
-      key_file: /root/.ssh/id_cvs_rsa
+      key_file: '/root/.ssh/{{ git_ssh_key }}'
       depth: 2
     with_items: '{{ sysadm_gits }}'
   tags: gitecm

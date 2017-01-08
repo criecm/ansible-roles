@@ -77,3 +77,9 @@ sshd_lines: []
 
 # host specific pkgs 
 pkgs: []
+
+# sysadm_gits: git repos to deploy in /usr/local/admin/sysutils
+sysadm_gits: []
+
+# ssh key for above git repos (fiole name in files/, copied to /root/.ssh/)
+git_ssh_key:

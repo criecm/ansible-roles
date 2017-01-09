@@ -11,13 +11,26 @@
   service:
     name: unbound
     enabled: yes
-  tags: rc
+  tags: unbound,rc
 
+- name: check control keys
+  stat:
+    path: '{{ unbound_dir }}/unbound_server.key'
+  register: unbound_key
+  tags: unbound,config
+
+- name: unbound-control-setup
+  command: '{{ unbound_base }}-control-setup'
+  when: unbound_key.stat.exists == False
+  tags: unbound,config
+  
 - name: unbound.conf
   template:
     src: unbound.conf.j2
-    dest: '{{ unbound_cfg }}'
+    dest: '{{ unbound_dir }}/unbound.conf'
     mode: '0644'
     owner: root
-  tags: config
+#    validate: '{{ unbound_base }}-checkconf %s'
+    backup: yes
+  tags: unbound,config
   notify: restart unbound

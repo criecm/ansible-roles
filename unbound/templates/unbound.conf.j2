@@ -15,11 +15,11 @@ server:
   {% endfor %}
 {% endif %}
 	auto-trust-anchor-file: "{{ unbound_trust_anchor }}"
-{% if net in our_nets | intersect(private_nets) | count > 0 %}
+{% if our_nets | union(private_nets) | count > 0 %}
 	access-control: 127.0.0.0/8 allow
 	access-control: ::1 allow
-  {% for net in our_nets | intersect(private_nets) %}
-	access-control: {{ net }}
+  {% for net in our_nets | union(private_nets) %}
+	access-control: {{ net }} allow
   {% endfor %}
 {% endif %}
 
@@ -27,14 +27,16 @@ server:
 	local-zone: "{{ priv_reverse }}" nodefault
 {% endfor %}
 
+
 {% for net in private_nets %}
 	private-address: {{ net }}
 {% endfor %}
 
+
 {% for dom in private_domains %}
-	domain-insecure: "{{ dom }}"
-  {% if not dom | match(".*\.arpa\.?") %}
-	private-domain: "{{ dom }}"
+	domain-insecure: "{{ dom.name }}"
+  {% if not dom.name | match(".*\.arpa\.?") %}
+	private-domain: "{{ dom.name }}"
   {% endif %}
 {% endfor %}
 
@@ -44,7 +46,16 @@ remote-control:
 	control-interface: {{ unbound_control_interface }}
 {% endif %}
 
-{% for dom in our_domains | intersect(private_domains) %}
+
+{% for dom in our_domains | union(private_domains) %}
+
+stub-zone:
+	name: "{{ dom.name }}"
+  {% for master in dom.masters %}
+	stub-addr: {{ master }}
+  {% endfor %}
+{% endfor %}
+{% for dom in unbound_forward_domains %}
 
 forward-zone:
 	name: "{{ dom.name }}"
@@ -52,3 +63,11 @@ forward-zone:
 	forward-addr: {{ master }}
   {% endfor %}
 {% endfor %}
+{% if unbound_forwarders | count() > 0 %}
+
+forward-zone:
+	name: "."
+  {% for resolver in unbound_forwarders %}
+	forward-addr: {{ resolver }}
+  {% endfor %}
+{% endif %}

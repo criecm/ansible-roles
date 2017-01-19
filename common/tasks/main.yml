@@ -10,9 +10,6 @@
     loop_var: includefile
   tags: vars
 
-- debug: var=nsd_configdir
-  tags: nsd
-
 - include: '{{ includefile }}'
   with_first_found:
     - files:
@@ -119,7 +116,7 @@
       mode: '0750'
       owner: root
       group: 0
-    when: '{{ sysadm_gits | count() > 0 }}'
+    when: '{{ sysadm_gits | union(host_sysadm_gits) | count() > 0 }}'
   - name: cle ssh depoiement
     copy:
       dest: '/root/.ssh/{{ git_ssh_key }}'
@@ -127,7 +124,7 @@
       owner: root
       group: 0
       mode: '0600'
-    when: git_ssh_key != ''
+    when: git_ssh_key != ""
   - name: repos git sysadm_gits
     git:
       dest: '/usr/local/admin/sysutils/{{ item.name }}'
@@ -135,7 +132,7 @@
       accept_hostkey: yes
       key_file: '/root/.ssh/{{ git_ssh_key }}'
       depth: 2
-    with_items: '{{ sysadm_gits }}'
+    with_items: '{{ sysadm_gits | union(host_sysadm_gits) }}'
   tags: gitecm
 
 - block:

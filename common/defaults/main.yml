@@ -39,6 +39,9 @@ ldap_tls_reqcert: never
 # host is a resolver
 is_resolver: False
 
+# specific FreeBSD repo
+pkg_repo_conf: pkgecm.conf
+
 # nameserver
 #  network: restrict host ip ('0.0.0.0/0'=all)
 #  ip: nameserver
@@ -80,6 +83,9 @@ pkgs: []
 
 # sysadm_gits: git repos to deploy in /usr/local/admin/sysutils
 sysadm_gits: []
+
+# idem, for use in host vars
+host_sysadm_gits: []
 
 # ssh key for above git repos (fiole name in files/, copied to /root/.ssh/)
 git_ssh_key:

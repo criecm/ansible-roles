@@ -8,7 +8,12 @@
       mode: '0755'
   
   - name: pkg repo ecm
-    copy: src=pkgecm.conf dest=/usr/local/etc/pkg/repos/ecm.conf validate='pkg -vv -C %s' mode=644
+    copy:
+      src: '{{ pkg_repo_conf }}'
+      dest: '/usr/local/etc/pkg/repos/{{ pkg_repo_conf | regex_replace(".*/", "") }}'
+      validate: 'pkg -vv -C %s'
+      mode: '0644'
+  when: pkg_repo_conf != ''
   tags: baseconf, pkg
 
 # packages standard
@@ -27,7 +32,7 @@
     - tmux
     - vim-lite
     - zsh
-    - openldap-client
+    - openldap-sasl-client
     - '{{ pkgs }}'
   tags: baseconf, pkg
 
@@ -36,7 +41,7 @@
   lineinfile:
     dest: /etc/mail/freebsd.submit.mc
     line: "FEATURE(msp,[{{mailrelay}}])"
-    regexp: '^FEATURE\(msp'
+    regexp: '^FEATURE\(.?msp'
   register: domailrelay
   when: 'is_mailrelay != True and "{{mailrelay}}" != ""'
   tags: mailclient

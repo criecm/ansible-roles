@@ -139,3 +139,7 @@ Serveur DNS recursif
 * autorise `our_nets` et `private_nets`
 * ecoute sur `unbound_interfaces` (ou toutes les adresses par défaut)
 * redirige les requetes vers `unbound_forwarders` s'ils existent
+
+### iocage
+
+Role pour gérer/créer des jails et leur hôte

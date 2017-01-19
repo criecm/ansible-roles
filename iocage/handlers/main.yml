@@ -1,3 +1,7 @@
 ---
 - name: restart jail
-  shell: '/usr/local/sbin/iocage restart {{ iocage_jail.uuid }}'
+  iocage:
+    tag: '{{ iocage_jail.uuid }}'
+    state: restarted
+
+#shell: '/usr/local/sbin/iocage restart {{ iocage_jail.uuid }}'

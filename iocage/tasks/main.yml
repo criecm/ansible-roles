@@ -12,19 +12,16 @@
   tags: iocage, hostinit
   check_mode: False
   
-- debug: var=zfs_list_iocage
-  tags: iocage, hostinit
-
 - name: mark zpool for iocage
-  command: "/usr/local/sbin/iocage activate {{ iocage_zpool }}"
-  when: "{{ zfs_list_iocage.stdout_lines | length }} == 0"
+  command: '/usr/local/sbin/iocage activate {{ iocage_zpool }}'
+  when: '{{ zfs_list_iocage.stdout_lines | length }} == 0'
   tags: iocage, hostinit
 
 - name: initialize iocage
   iocage:
     state: fetched
-    properties: ftpfiles="base.txz doc.txz" ftphost="http://ftp.ec-m.fr"
-    release: "11.0-RELEASE"
+    properties: '{{ fetch_properties }}'
+    release: '11.0-RELEASE'
   tags: iocage, hostinit
 #  shell: /usr/local/sbin/iocage fetch release=11.0-RELEASE ftpfiles="base.txz doc.txz"
 #  tags: iocage, hostinit
@@ -61,6 +58,7 @@
     release: "11.0-RELEASE"
     state: basejail
   tags: iocage, hostinit
+  when: '{{jail_list}}'
 
 - include_vars: vars/jail.yml
   tags: jails

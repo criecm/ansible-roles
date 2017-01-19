@@ -1,7 +1,8 @@
 ---
 jail_defaults:
-  ip6: False
-  ip4: False
+  ip6: 'none'
+  ip4: 'none'
   tag: ''
   hostname: ''
   fstab: ''
+

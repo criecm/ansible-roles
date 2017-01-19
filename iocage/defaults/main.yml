@@ -1,3 +1,6 @@
 ---
 jail_list: []
 iocage_zpool: zroot
+fetch_properties:
+  ftpfiles: base.txz doc.txz
+  ftphost: ftp.ec-m.fr

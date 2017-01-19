@@ -1,7 +1,10 @@
 # {{ ansible_managed }}
 server:
+{% if unbound_pidfile %}
+	pidfile: {{ unbound_pidfile }}
+{% endif %}
 	extended-statistics: yes
-	num-threads: 4
+	num-threads: {{ [ ansible_processor_count|int/2, 1 ] | max | int }}
 	do-not-query-localhost: yes
 	interface: 127.0.0.1
 	interface: ::1

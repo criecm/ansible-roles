@@ -2,4 +2,4 @@
 unbound_base: /usr/local/sbin/unbound
 unbound_dir: /usr/local/etc/unbound
 unbound_trust_anchor: /usr/local/etc/unbound/root.key
-
+unbound_pidfile: /var/run/unbound.pid

@@ -9,6 +9,9 @@ unbound_control_interface: ''
 # all interfaces if none here
 unbound_interfaces: []
 
+# unbound pidfile
+unbound_pidfile: ''
+
 # allowed public networks
 # ex:
 #   - 1.2.3.4/24

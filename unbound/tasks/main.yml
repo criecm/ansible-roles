@@ -2,10 +2,14 @@
 - include_vars: "{{ item }}"
   with_first_found:
     - '{{ansible_os_family}}.yml'
+  tags: unbound
 
 - include: '{{ item }}'
   with_first_found:
-    - '{{ansible_os_family}}.yml'
+    - files:
+      - '{{ansible_os_family}}.yml'
+      skip: True
+  tags: unbound, pkg
 
 - name: active unbound
   service:

@@ -55,13 +55,26 @@
   tags: ldapconf
 
 - block:
-  - name: config ssh root
-    file:
-      path: /root/.ssh
-      state: directory
-      mode: '0700'
+  - name: ssh host keys
+    copy:
+      src: '{{ item }}'
+      dest: '{{ item | regex_replace(".*/","") }}'
       owner: root
       group: 0
+      mode: '0600'
+    notify: restart sshd
+    with_fileglob:
+      - '{{ playbook_dir }}/ssh/{{ inventory_hostname }}/ssh_host*_key'
+  - name: ssh host pub keys
+    copy:
+      src: '{{ item }}'
+      dest: '{{ item | regex_replace(".*/","") }}'
+      owner: root
+      group: 0
+      mode: '0644'
+    notify: restart sshd
+    with_fileglob:
+      - '{{ playbook_dir }}/ssh/{{ inventory_hostname }}/ssh_host*_key.pub'
   - name: sshd_config
     lineinfile:
       dest: /etc/ssh/sshd_config
@@ -74,7 +87,16 @@
     with_items: 
       - '{{ default_sshd_lines }}'
       - '{{ sshd_lines }}'
+  tags: sshdconf
 
+- block:
+  - name: config ssh root
+    file:
+      path: /root/.ssh
+      state: directory
+      mode: '0700'
+      owner: root
+      group: 0
   - name: root authorized_keys
     authorized_key:
       key: "{{ lookup('file',item) }}"
@@ -89,7 +111,7 @@
       state: absent
     with_fileglob:
       - cles_ssh/*.del
-  tags: sshconf
+  tags: rootsshconf
 
 - block:
   - name: zsh in /etc/shells

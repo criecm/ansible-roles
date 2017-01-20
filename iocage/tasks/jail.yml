@@ -35,7 +35,7 @@
     dest: '/iocage/jails/{{ iocage_jail.uuid }}/root/etc/ssh/{{ sshkey | regex_replace(".*/","") }}'
     mode: '0600'
   with_fileglob:
-    - 'ssh/{{ jail.tag }}/ssh_host*'
+    - '{{ playbook_dir }}/files/ssh/{{ inventory_hostname }}/ssh_host*_key'
   loop_control:
     loop_var: sshkey
   when: iocage_jail.changed == True

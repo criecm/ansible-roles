@@ -28,7 +28,7 @@
     line: 'accept from local for any relay via {{mailrelay}}'
     regexp: '^accept .*for any relay'
   notify: restart smtpd
-  when: 'is_mailrelay != True and "{{mailrelay}}" != ""'
+  when: mailrelay != '' and not is_mailrelay
   tags: mailclient
 
 # timezone
@@ -40,12 +40,20 @@
     force: yes
   tags: timezone
 
-- name: syslog central
-  lineinfile:
-    dest: /etc/syslog.conf
-    insertbefore: '^!'
-    regexp: '^[^#]+@.*'
-    line: '*.notice;auth,authpriv,cron,ftp,kern,lpr,mail,user.none	@{{ syslog_server }}'
-  when: '{{ syslog_server | default(False) | bool() }} and not {{ is_syslogd | default(False) }}'
-  notify: restart BSD syslogd
+- block:
+  - name: syslog central
+    lineinfile:
+      dest: /etc/syslog.conf
+      insertbefore: '^!'
+      regexp: '^[^#]+@.*'
+      line: '*.notice;cron,ftp,kern,lpr,mail,user.none	@{{ syslog_server }}'
+    notify: restart BSD syslogd
+  - name: syslog central / auth
+    lineinfile:
+      dest: /etc/syslog.conf
+      insertbefore: '^!'
+      regexp: '^auth.*@.*'
+      line: 'auth.info;authpriv.info					@{{ syslog_auth_server | default(syslog_server) }}'
+    notify: restart BSD syslogd
+  when: syslog_server != '' and not is_syslogd
   tags: syslog

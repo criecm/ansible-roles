@@ -66,7 +66,10 @@ prefix: /usr
 is_jail: False
 
 # syslog server to send syslogs
-syslog_server: False
+syslog_server: ''
+
+# syslog server for auth
+syslog_auth_server: ''
 
 # for syslog SERVER
 is_syslogd: False

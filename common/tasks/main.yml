@@ -34,7 +34,7 @@
     group: 0
     mode: '0644'
   tags: sslecm
-  when: '"{{x509_ca_file}}" != ""'
+  when: x509_ca_file != ''
 
 - block:
   - name: Config ldap.conf
@@ -58,23 +58,23 @@
   - name: ssh host keys
     copy:
       src: '{{ item }}'
-      dest: '{{ item | regex_replace(".*/","") }}'
+      dest: '/etc/ssh/{{ item | regex_replace(".*/","") }}'
       owner: root
       group: 0
       mode: '0600'
     notify: restart sshd
     with_fileglob:
-      - '{{ playbook_dir }}/ssh/{{ inventory_hostname }}/ssh_host*_key'
+      - '{{ playbook_dir }}/files/ssh/{{ inventory_hostname }}/ssh_host*_key'
   - name: ssh host pub keys
     copy:
       src: '{{ item }}'
-      dest: '{{ item | regex_replace(".*/","") }}'
+      dest: '/etc/ssh/{{ item | regex_replace(".*/","") }}'
       owner: root
       group: 0
       mode: '0644'
     notify: restart sshd
     with_fileglob:
-      - '{{ playbook_dir }}/ssh/{{ inventory_hostname }}/ssh_host*_key.pub'
+      - '{{ playbook_dir }}/files/ssh/{{ inventory_hostname }}/ssh_host*_key.pub'
   - name: sshd_config
     lineinfile:
       dest: /etc/ssh/sshd_config
@@ -195,5 +195,5 @@
     line: "root: {{rootmailto}}"
     regexp: '^root:'
   notify: newaliases
-  when: "'{{rootmailto}}' != ''"
+  when: rootmailto != ''
   tags: mailclient

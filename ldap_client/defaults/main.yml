@@ -16,3 +16,4 @@ ldap_force_homedir_by_class: ''
 sshd_allow_groups: ''
 ldap_tls_cacert: ''
 pam_ldap_services: []
+ldap_validnames: ''

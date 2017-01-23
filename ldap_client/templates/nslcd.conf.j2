@@ -21,3 +21,6 @@ nss_min_uid	{{ ldap_min_uid }}
 {% if ldap_force_shell %}
 map passwd loginShell "{{ ldap_force_shell }}"
 {% endif %}
+{% if ldap_validnames %}
+validnames	{{ ldap_validnames }}
+{% endif %}

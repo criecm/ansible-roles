@@ -1,0 +1,120 @@
+---
+# backend or rproxy
+apache_role: backend
+
+# modules packages to install
+apache_freebsd_modules: []
+apache_debian_modules: []
+
+apache_enabled_modules: []
+
+default_enabled_modules:
+  - access_compat
+  - authn_file
+  - authn_anon
+  - authz_host
+  - authz_groupfile
+  - authz_user
+  - authz_owner
+  - auth_basic
+  - auth_digest
+  - reqtimeout
+  - filter
+  - mime
+  - env
+  - setenvif
+  - expires
+  - headers
+  - version
+  - autoindex
+  - status
+  - dir
+  - alias
+  - unixd
+  - rewrite
+  - info
+
+apache_disabled_modules: []
+
+default_disabled_modules:
+  - authn_dbm
+  - authn_anon
+  - authn_dbd
+  - authn_socache
+  - authz_dbm
+  - authz_owner
+  - authz_dbd
+  - authnz_ldap
+  - authnz_fcgi
+  - auth_form
+  - auth_digest
+  - allowmethods
+  - file_cache
+  - cache
+  - cache_disk
+  - cache_socache
+  - socache_shmcb
+  - socache_dbm
+  - socache_memcache
+  - watchdog
+  - macro
+  - dbd
+  - dumpio
+  - buffer
+  - ratelimit
+  - ext_filter
+  - request
+  - include
+  - substitute
+  - sed
+  - deflate
+  - proxy_html
+  - ldap
+  - log_debug
+  - logio
+  - mime_magic
+  - expires
+  - unique_id
+  - remoteip
+  - proxy
+  - proxy_connect
+  - proxy_ftp
+  - proxy_http
+  - proxy_fcgi
+  - proxy_scgi
+  - proxy_fdpass
+  - proxy_wstunnel
+  - proxy_ajp
+  - proxy_balancer
+  - proxy_express
+  - proxy_hcheck
+  - session
+  - session_cookie
+  - session_crypto
+  - session_dbd
+  - slotmem_shm
+  - ssl
+  - http2
+  - lbmethod_byrequests
+  - lbmethod_bytraffic
+  - lbmethod_bybusyness
+  - dav
+  - asis
+  - suexec
+  - dav_fs
+  - vhost_alias
+  - negotiation
+  - imagemap
+  - actions
+  - speling
+  - userdir
+
+apache_sites: []
+
+# site par defaut
+default_site:
+  key: default
+  name: ''
+  includes: []
+  rootdir: ''
+  rootsrc: ''

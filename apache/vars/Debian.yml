@@ -1,0 +1,9 @@
+---
+# defaults for debian
+apache_etcdir: /etc/apache2
+apache_includesdir: conf.d
+apache_sitesdir: sites-enabled
+apache_modsconfdir: mods-enabled
+
+apache_rootbase: /var/www
+

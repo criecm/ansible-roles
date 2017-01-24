@@ -1,0 +1,59 @@
+---
+- name: os vars
+  include_vars: '{{ ansible_os_family }}.yml'
+  tags: apache
+
+- name: install and enable apache
+  include: '{{ ansible_os_family }}.yml'
+  tags: apache, pkg
+
+# conf standard
+- block:
+  - name: default confs
+    file:
+      dest: '{{ apache_etcdir }}/{{ item }}'
+      state: directory
+      mode: '0755'
+    with_items:
+      - '{{ apache_modsconfdir }}'
+      - '{{ apache_sitesdir }}'
+      - '{{ apache_includesdir }}'
+    tags: apache, config
+  - name: conf includes
+    copy:
+      src: '{{ item }}'
+      dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
+      mode: '0644'
+    with_fileglob:
+      - 'apache_{{ apache_type }}/{{ apache_includesdir }}/*.conf'
+    tags: apache, config
+  - name: conf modules
+    copy:
+      src: '{{ item }}'
+      dest: '{{ apache_etcdir }}/{{ apache_modsconfdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
+      mode: '0644'
+    with_fileglob:
+      - 'apache_{{ apache_type }}/{{ apache_modsconfdir }}/*.conf'
+    tags: apache, config
+  - name: conf .inc's
+    copy:
+      src: '{{ item }}'
+      dest: '{{ apache_etcdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
+      mode: '0644'
+    with_fileglob:
+      - 'apache_{{ apache_type }}/*.inc'
+    tags: apache, config
+
+- name: sites
+  include: site.yml
+  with_items: '{{ apache_sites }}'
+  loop_control:
+    loop_var: onesite
+  notify: restart apache
+  tags: apache, sites
+
+- name: start apache
+  service:
+    name: '{{ apache_service }}'
+    state: started
+  tags: apache, sites

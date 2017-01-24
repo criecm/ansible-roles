@@ -1,0 +1,59 @@
+# config pour un site apache
+# 
+# Exemple sur une debian avec site: { key: sitexemple, includes: [ file1.inc, file2.inc ] }
+# 
+# Le fichier de conf sera copié (si .j2 c'est un template):
+#   dans /etc/apache2/sites-enables/sitexmple.conf
+#   depuis (first match wins) {{ siteconf_locations }} dans vars/site.yml:
+#     playbooks/templates/apache/sitexemple/sitexemple.conf.j2
+#     playbooks/files/apache/sitexemple/sitexemple.conf
+#     playbooks/templates/apache/site.conf.j2
+#     templates/apache/site.conf.j2
+# 
+# les 'includes' seront copiés: (ex. pour 'file1.inc'):
+#   dans /etc/apache2/file1.inc
+#   depuis (first match wins) {{ include_locations }} dans vars/site.yml:
+#     playbooks/templates/apache/sitexemple/file1.inc.j2
+#     playbooks/files/apache/sitexemple/file1.inc
+#     playbooks/templates/apache/file1.inc.j2
+#     playbooks/files/apache/file1.inc
+#     
+---
+- include_vars: site.yml
+
+- name: site includes
+  template:
+    dest: '{{ apache_etcdir }}/{{ item }}'
+    src: '{{ lookup("first_found", include_locations) }}'
+  with_items: '{{ apache_site.includes }}'
+  when: '"includes" in apache_site'
+
+- name: conf includes
+  copy:
+    src: '{{ item }}'
+    dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
+    mode: '0644'
+  with_fileglob:
+    - 'apache/{{ apache_site.key }}/{{ apache_includesdir }}/*.conf'
+
+- debug: var=apache_site
+
+- debug: var=onesite
+
+- debug: var=default_site
+
+- debug: 'msg={{ apache_site.rootdir }}/'
+
+- name: root dir
+  copy:
+    dest: '{{ onesite.rootdir }}/'
+    src: '{{ onesite.rootsrc }}/'
+    mode: a=rX,u+w
+    owner: root
+  when: '"rootsrc" in onesite'
+
+- name: site config
+  template:
+    dest: '{{ apache_etcdir }}/{{ apache_sitesdir }}/{{ apache_site.key }}.conf'
+    src: '{{ lookup("first_found", siteconf_locations) }}'
+

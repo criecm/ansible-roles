@@ -1,6 +1,6 @@
 ---
-# backend or rproxy
-apache_role: backend
+# backend or rproxy or whatever
+apache_type: backend
 
 # modules packages to install
 apache_freebsd_modules: []
@@ -9,7 +9,6 @@ apache_debian_modules: []
 apache_enabled_modules: []
 
 default_enabled_modules:
-  - access_compat
   - authn_file
   - authn_anon
   - authz_host
@@ -37,6 +36,7 @@ default_enabled_modules:
 apache_disabled_modules: []
 
 default_disabled_modules:
+  - access_compat
   - authn_dbm
   - authn_anon
   - authn_dbd
@@ -111,10 +111,4 @@ default_disabled_modules:
 
 apache_sites: []
 
-# site par defaut
-default_site:
-  key: default
-  name: ''
-  includes: []
-  rootdir: ''
-  rootsrc: ''
+

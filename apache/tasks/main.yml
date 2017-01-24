@@ -18,31 +18,38 @@
       - '{{ apache_modsconfdir }}'
       - '{{ apache_sitesdir }}'
       - '{{ apache_includesdir }}'
-    tags: apache, config
   - name: conf includes
     copy:
       src: '{{ item }}'
       dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
       mode: '0644'
     with_fileglob:
-      - 'apache_{{ apache_type }}/{{ apache_includesdir }}/*.conf'
-    tags: apache, config
+      - 'apache/{{ apache_includesdir }}/*.conf'
+      - 'apache/{{ apache_type }}/{{ apache_includesdir }}/*.conf'
   - name: conf modules
     copy:
       src: '{{ item }}'
       dest: '{{ apache_etcdir }}/{{ apache_modsconfdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
       mode: '0644'
     with_fileglob:
-      - 'apache_{{ apache_type }}/{{ apache_modsconfdir }}/*.conf'
-    tags: apache, config
+      - 'apache/{{ apache_modsconfdir }}/*.conf'
+      - 'apache/{{ apache_type }}/{{ apache_modsconfdir }}/*.conf'
   - name: conf .inc's
     copy:
       src: '{{ item }}'
       dest: '{{ apache_etcdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
       mode: '0644'
     with_fileglob:
-      - 'apache_{{ apache_type }}/*.inc'
-    tags: apache, config
+      - 'apache/*.inc'
+      - 'apache/{{ apache_type }}/*.inc'
+  - name: apache default files
+    copy:
+      dest: '{{ apache_rootbase }}/default/'
+      src: '{{ item }}/'
+    with_first_found:
+      - 'apache/{{ apache_type }}/default_root'
+      - 'apache/default_root'
+  tags: apache, config
 
 - name: sites
   include: site.yml

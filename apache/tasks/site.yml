@@ -36,21 +36,20 @@
   with_fileglob:
     - 'apache/{{ apache_site.key }}/{{ apache_includesdir }}/*.conf'
 
-- debug: var=apache_site
-
-- debug: var=onesite
-
-- debug: var=default_site
-
-- debug: 'msg={{ apache_site.rootdir }}/'
-
 - name: root dir
   copy:
-    dest: '{{ onesite.rootdir }}/'
-    src: '{{ onesite.rootsrc }}/'
+    dest: '{{ apache_site.rootdir }}/'
+    src: '{{ apache_site.rootsrc }}/'
     mode: a=rX,u+w
     owner: root
   when: '"rootsrc" in onesite'
+- name: mkdir root dir
+  file:
+    dest: '{{ apache_site.rootdir }}'
+    state: directory
+    mode: '0755'
+    owner: root
+  when: '"rootsrc" not in onesite and "rootdir" in onesite'
 
 - name: site config
   template:

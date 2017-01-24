@@ -26,8 +26,11 @@
 - name: enable apache24
   lineinfile:
     dest: /etc/rc.conf
-    line: 'apache24_enable="YES"'
+    line: '{{ item }}'
     state: present
+  with_items:
+    - 'apache24_enable="YES"'
+    - 'apache24_http_accept_enable="YES"'
 
 - name: logrotate
   copy:

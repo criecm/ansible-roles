@@ -22,19 +22,26 @@
     name: '{{item}}'
     state: present
   with_items:
-    - bsnmp-ucd
-    - dmidecode
     - git
-    - ipmitool
-    - munin-node
     - rsync
-    - smartmontools
     - tmux
     - vim-lite
     - zsh
     - openldap-sasl-client
     - '{{ pkgs }}'
   tags: baseconf, pkg
+
+- name: pkgs pkg machine physique
+  pkgng:
+    name: '{{item}}'
+    state: present
+  with_items:
+    - bsnmp-ucd
+    - dmidecode
+    - ipmitool
+    - munin-node
+    - smartmontools
+  when: not is_jail
 
 # mail via relay
 - name: mailrelay

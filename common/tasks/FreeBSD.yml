@@ -92,13 +92,15 @@
     lineinfile:
       dest: /etc/syslog.conf
       line: '*.*			@{{ syslog_server }}'
-      regexp: '^\*.\*@.*'
+      regexp: '^\*.\*\s+@.*'
+      insertafter: '^#\*\.\*'
     notify: restart BSD syslogd
   - name: syslog centrale auth
     lineinfile:
       dest: /etc/syslog.conf
-      line: 'authpriv.info			@{{ syslog_auth_server | default(syslog_server) }}'
-      regexp: '^authpriv.info.*@.*'
+      line: 'auth.info;authpriv.info			@{{ syslog_auth_server }}'
+      regexp: '^auth.*@.*'
+      insertafter: '^\*.\*\s+@.*'
     notify: restart BSD syslogd
   when: syslog_server != '' and not is_syslogd
   tags: syslog

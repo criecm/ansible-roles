@@ -16,4 +16,8 @@ ldap_force_homedir_by_class: ''
 sshd_allow_groups: ''
 ldap_tls_cacert: ''
 pam_ldap_services: []
+pam_config_dirs: [ /etc/pam.d ]
+pam_config_dir: /etc/pam.d
 ldap_validnames: ''
+ldap_nss: True
+ldap_autofs: False

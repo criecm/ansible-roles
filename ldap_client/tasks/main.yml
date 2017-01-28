@@ -2,8 +2,10 @@
 # config client ldap
 
 - include_vars: 'vars/{{ansible_os_family}}.yml'
+  tags: nssldap
 
 - include: 'tasks/{{ansible_os_family}}.yml'
+  tags: nssldap
 
 - name: Config nslcd.conf
   template:
@@ -26,3 +28,4 @@
     insertafter: '.*PermitTunnel'
   notify: restart sshd
   when: ("{{sshd_allow_groups}}" != "")
+  tags: sshdconf

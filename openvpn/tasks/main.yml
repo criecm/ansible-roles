@@ -2,7 +2,7 @@
 
 - name: installe openvpn 2.4
   pkgng:
-    name: openvpn-devel
+    name: openvpn
     state: present
   tags: openvpn
 

@@ -18,20 +18,18 @@
       - { regexp: '^nslcd_supervisor', line: 'nslcd_supervisor="YES"' }
   tags: nssldap
 
-- name: Config nsswitch.conf FreeBSD
-  lineinfile:
-    dest: '/etc/nsswitch.conf'
-    regexp: '{{item.regexp}}'
-    line: '{{item.line}}'
-    state: present
-  with_items:
-    - { regexp: '^group_compat:', line: 'group_compat: ldap' }
-    - { regexp: '^passwd_compat:', line: 'passwd_compat: ldap' }
-    - { regexp: '^group:', line: 'group: compat' }
-    - { regexp: '^passwd:', line: 'passwd: compat' }
-  tags: nssldap
-
 - block:
+  - name: Config nsswitch.conf FreeBSD
+    lineinfile:
+      dest: '/etc/nsswitch.conf'
+      regexp: '{{item.regexp}}'
+      line: '{{item.line}}'
+      state: present
+    with_items:
+      - { regexp: '^group_compat:', line: 'group_compat: ldap' }
+      - { regexp: '^passwd_compat:', line: 'passwd_compat: ldap' }
+      - { regexp: '^group:', line: 'group: compat' }
+      - { regexp: '^passwd:', line: 'passwd: compat' }
   - name: Enable LDAP /etc/passwd
     lineinfile:
       dest: /etc/passwd
@@ -52,6 +50,7 @@
       state: present
     notify: rebuild FreeBSD pwdb
   tags: nssldap
+  when: ldap_nss == True
 
 # verifie l'existence de {{ldap_force_homedir_by_class}}
 - name: check ldap_force_homedir_by_class
@@ -86,15 +85,33 @@
       	:tc=default:
     validate: cap_mkdb %s
   notify: rebuild login.conf database
-  when: ("{{ldap_force_homedir_by_class}}" != "") and ((ldapUserClassInLoginConf.found == 0) or (ldapUserClassByAnsible.found == 1))
+  when: ldap_force_homedir_by_class != '' and ((ldapUserClassInLoginConf.found == 0) or (ldapUserClassByAnsible.found == 1)) and ldap_nss == True
 
 # config PAM: ssh ou tout
-- name: pam config
+- name: stat pam config
+  stat:
+    path: '{{ item[0] }}/{{ item[1] }}'
+  with_nested:
+    - '{{ pam_config_dirs }}'
+    - '{{ pam_ldap_services }}'
+  when: '{{ pam_ldap_services | count }} > 0'
+  register: statpam
+
+- name: modify pam configs
   lineinfile:
-    dest: '/etc/pam.d/{{ service }}'
-    line: 'auth	sufficient	/usr/local/lib/pam_ldap.so	try_first_pass'
-    insertbefore: '^auth\s+required.*pam_unix'
-    regexp: '^auth\s.*pam_ldap.so'
-  with_items: '{{ pam_ldap_services | default([]) }}'
-  loop_control:
-    loop_var: service
+    dest: '{{ item }}'
+    line: 'auth sufficient  {{ pam_ldap_module_path }}  try_first_pass'
+    insertbefore: '^auth\s+required\s+pam_unix'
+    regexp: '^auth\s.*pam_ldap.*$'
+  with_items:
+    - '{{ statpam["results"] | map(attribute="stat") | selectattr("path", "defined") | map(attribute="path") | list }}'
+  register: pamlines
+
+- name: pam new configs
+  template:
+    src: pam_service.j2
+    dest: '{{ pam_config_dir }}/{{ item }}'
+  with_items: '{{ pam_ldap_services }}'
+  when: 'item not in statpam["results"] | map(attribute="stat") | selectattr("path", "defined") | map(attribute="path") | join(" ")'
+
+- debug: var=pamlines

@@ -15,8 +15,14 @@ zshpath: /bin/zsh
 # etcprefix (/usr/local or not)
 etcprefix: ''
 
-# mail relay to configure
-mailrelay: smtp.local
+# mailrelays selected by network
+# ex: - { network: 10.0.0.0/24, relay: smtp.internal }
+#     - { network: 192.168.0.0/24, relay: smtp.special }
+#     - { network: 0.0.0.0/0, relay: smtp.default }
+mailrelays: []
+
+# mail relay to configure (force over mailrelays)
+host_mailrelay: ''
 
 # is mail relay ? (host var)
 is_mailrelay: False

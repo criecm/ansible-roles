@@ -51,6 +51,13 @@
   failed_when: False
   tags: sas, cron
 
+- name: ssh_config
+  copy:
+    src: sas/ssh_config
+    dest: /etc/ssh/ssh_config
+    mode: '0644'
+  tags: sas, ssh_config
+
 - name: crons
   synchronize:
     src: 'files/sas/crontabs/{{ ansible_host }}/'

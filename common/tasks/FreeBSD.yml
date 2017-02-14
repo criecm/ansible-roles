@@ -47,7 +47,7 @@
 - name: mailrelay
   lineinfile:
     dest: /etc/mail/freebsd.submit.mc
-    line: "FEATURE(msp,[{{mailrelay}}])"
+    line: "FEATURE(`msp', `[{{mailrelay}}]')"
     regexp: '^FEATURE\(.?msp'
   register: domailrelay
   when: mailrelay != '' and not is_mailrelay

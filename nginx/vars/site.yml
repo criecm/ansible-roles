@@ -1,0 +1,24 @@
+---
+siteconf_locations:
+  - '{{ playbook_dir }}/templates/nginx/{{ nginx_site.key }}/{{ nginx_site.key }}.conf.j2'
+  - '{{ playbook_dir }}/files/nginx/{{ nginx_site.key }}/{{ nginx_site.key }}.conf'
+  - 'templates/{{ nginx_type }}/site.conf.j2'
+  - templates/site.conf.j2
+
+include_locations:
+  - '{{ playbook_dir }}/templates/nginx/{{ nginx_site.key }}/{{ item }}.j2'
+  - '{{ playbook_dir }}/files/nginx/{{ nginx_site.key }}/{{ item }}'
+  - 'templates/nginx/{{ nginx_type }}/{{ item }}.j2'
+  - 'templates/nginx/{{ item }}.j2'
+  - '{{ playbook_dir }}/files/nginx/{{ item }}'
+
+# site par defaut
+default_site:
+  key: default
+  name: ''
+  includes: []
+  rootdir: '{{ nginx_rootbase }}/{{ onesite.key }}'
+  rootsrc: ''
+
+nginx_site: '{{ default_site | combine(onesite) }}'
+

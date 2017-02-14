@@ -7,13 +7,14 @@
   pkgng:
     name: nginx
     state: present
-  tags: pkg
+  tags: nginx, pkg
 
 - name: enable nginx
   service:
     name: nginx
     enabled: yes
     state: started
+  tags: nginx, rc
 
 - block:
   - name: default config
@@ -31,7 +32,6 @@
       - servers.d
       - modules.d
       - conf.d
-    tags: config
     notify: restart nginx
   - name: default config parts
     template:
@@ -40,4 +40,8 @@
     with_items:
       - servers.d/0default.conf
     notify: restart nginx
-      
+  tags: nginx, config
+
+- name: sites
+  include: site.yml
+  with_items: '{{ nginx_sites }}'

@@ -25,7 +25,13 @@ key:
 {% if nsd_patterns %}{% for pattern in nsd_patterns %}
 pattern:
 {% for key, value in pattern.items() %}
+{% if value is string %}
 	{{ key }}: {{ value }}
+{% else %}
+{% for v in value %}
+	{{ key }}: {{ v }}
+{% endfor %}
+{% endif %}
 {% endfor %}
 
 {% endfor %}

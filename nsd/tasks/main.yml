@@ -24,6 +24,17 @@
     enabled: yes
   tags: rc, nsd
 
+- name: check nsd-control
+  stat:
+    path: '{{ nsd_configdir }}/nsd_control.key'
+  register: nsdcontrolkey
+  tags: config, nsd
+
+- name: init nsd-control
+  shell: 'nsd-control-setup'
+  when: not nsdcontrolkey.stat.exists
+  tags: config, nsd
+ 
 - name: dir conf.d
   file:
     dest: '{{ nsd_configdir }}/conf.d'
@@ -63,3 +74,9 @@
   notify: 
     - restart nsd
     - reconfig nsd
+
+- name: start nsd
+  service:
+    name: nsd
+    state: started
+  tags: rc, nsd

@@ -23,6 +23,7 @@
   user:
     home: /home/netmagis
     name: netmagis
+    uid: 1001
     createhome: yes
     shell: /bin/sh
     state: present
@@ -35,6 +36,7 @@
     owner: root
     group: netmagis
     mode: '2771'
+
 - name: reps netmagis
   file:
     dest: '/var/netmagis/{{ item }}'
@@ -68,6 +70,19 @@
   tags: config, netmagis
   notify: restart fcgiwrap
 
+- name: start fcgiwrap
+  service:
+    name: fcgiwrap
+    state: started
+  tags: netmagis
+
+- name: https_fastcgi_params nginx
+  copy:
+    src: https_fastcgi_params
+    dest: '{{ etcprefix }}/etc/nginx/https_fastcgi_params'
+    mode: '0644'
+  tags: config, netmagis, nginx
+
 - name: config nginx
   template:
     src: nginx_netmagis.conf.j2
@@ -78,10 +93,17 @@
   notify: restart nginx
   tags: config, netmagis, nginx
 
+- name: netmagis dhcpd config
+  file:
+    dest: "{{ netmagis_dhcpd_file }}"
+    state: touch
+    owner: netmagis
+  tags: dhcpd, netmagis
+
 - name: config dhcpd-netmagis
   lineinfile:
     dest: '{{ dhcpd_configdir }}/dhcpd.local.conf'
-    line: 'include {{ netmagis_dhcpd_file }};'
+    line: 'include "{{ netmagis_dhcpd_file }}";'
   notify: restart dhcpd
   tags: dhcpd, netmagis
 

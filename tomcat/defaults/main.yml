@@ -1,0 +1,12 @@
+---
+memcached_session_manager_version: '2.1.1'
+spymemcached_version: '2.11.1'
+memcached_nodes: []
+proxies_ips_regex: ''
+classpath_adds: ''
+keystore: ''
+storepass: ''
+tomcat_service: tomcat8
+freebsd_jdk_pkg: openjdk8-jre
+tomcat_http_port: 8080
+tomcat_ajp_port: 8009

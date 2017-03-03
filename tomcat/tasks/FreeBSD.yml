@@ -1,0 +1,72 @@
+---
+
+- name: install java & tomcat
+  pkgng:
+    name: '{{ item }}'
+    state: present
+  with_items:
+    - tomcat8
+    - '{{ freebsd_jdk_pkg }}'
+    - tomcat-native
+    - py27-lxml
+
+- name: _tomcat group
+  group:
+    name: '_tomcat'
+    state: present
+
+- name: _tomcat user
+  user:
+    name: '_tomcat'
+    group: '_tomcat'
+    home: /nonexistent
+    shell: /usr/sbin/nologin
+    createhome: False
+    login_class: daemon
+    state: present
+
+- name: mkdir
+  file:
+    path: /var/log/tomcat
+    state: directory
+    group: _tomcat
+    mode: '0770'
+
+- name: chown :_tomcat dirs
+  file:
+    path: '{{ item }}'
+    mode: u=rwX,g=rX,o-rwx
+    group: '_tomcat'
+    recurse: yes
+  with_items:
+    - '{{ tomcat_config_dir }}'
+
+- name: chown _tomcat dirs
+  file:
+    path: '{{ item }}'
+    mode: u=rwX,g=rwX,o-rwx
+    owner: '_tomcat'
+    recurse: yes
+  with_items:
+    - /var/log/tomcat
+    - '{{ tomcat_webapps_dir }}'
+
+- name: newsyslog
+  template:
+    src: newsyslog_tomcat.conf
+    dest: /usr/local/etc/newsyslog.conf.d/tomcat.conf
+
+- name: enable tomcat
+  lineinfile:
+      dest: /etc/rc.conf
+      line: '{{ item.key }}="{{ item.value }}"'
+      regexp: '^{{ item.key }}='
+  with_dict:
+      tomcat8_enable: YES
+      tomcat8_catalina_user: _tomcat
+      tomcat8_stdout: /var/log/tomcat/catalina.out
+      tomcat8_stderr: /var/log/tomcat/catalina.err
+      tomcat8_java_opts: "{% if keystore != '' %}-Djavax.net.ssl.trustStore=/etc/ssl/{{ keystore }} -Djavax.net.ssl.trustStorePassword='{{ storepass }}' {% endif %}"
+      tomcat8_java_home: '{{ tomcat_jre_dir }}'
+      tomcat8_classpath: "{% if classpath_adds != '' %}:{{ classpath_adds }}{% endif %}"
+      tomcat8_wait: '90'

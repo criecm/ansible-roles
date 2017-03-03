@@ -17,4 +17,8 @@ types d'installation (`apache_type`):
   * copie (template) le premier trouvé de la liste `include_location`
     (voir vars/site.yml)
 
-
+* droits:
+  * chown -R root par defaut
+  * les fichiers listes dans grwfiles sont 'chown g+w'
+  * les reps listes dans grwdirs sont 'chown -R g+w'
+  * tout est 'chown -R root:groupe' (groupe vaut `apache_user` si non défini)

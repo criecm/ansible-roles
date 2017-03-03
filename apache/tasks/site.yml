@@ -36,22 +36,50 @@
   with_fileglob:
     - 'apache/{{ apache_site.key }}/{{ apache_includesdir }}/*.conf'
 
-- name: root dir
-  copy:
-    dest: '{{ apache_site.rootdir }}/'
-    src: '{{ apache_site.rootsrc }}/'
-    mode: a=rX,u+w
-    owner: root
-  when: '"rootsrc" in onesite'
-- name: mkdir root dir
-  file:
-    dest: '{{ apache_site.rootdir }}'
-    state: directory
-    mode: '0755'
-    owner: root
-  when: '"rootsrc" not in onesite and "rootdir" in onesite'
+# app root dir
+- block:
+  - name: root dir
+    copy:
+      dest: '{{ apache_site.rootdir }}/'
+      src: '{{ apache_site.rootsrc }}/'
+      mode: a=rX,u+w
+      owner: root
+      group: '{{ apache_site.group }}'
+    when: '"rootsrc" in onesite'
+  - name: root git
+    git:
+      clone: yes
+      depth: 2
+      repo: '{{ apache_site.gitroot }}'
+      dest: '{{ apache_site.rootdir }}'
+    when: '"gitroot" in onesite'
+  - name: mkdir root dir
+    file:
+      dest: '{{ apache_site.rootdir }}'
+      state: directory
+      mode: '0751'
+      owner: root
+      group: '{{ apache_site.group }}'
+    when: '"rootdir" in onesite'
+  - name: grwfiles
+    file:
+      dest: '{{ item }}'
+      state: file
+      mode: g+w
+      group: '{{ apache_site.group }}'
+    with_items: '{{ apache_site.grwfiles }}'
+    when: '"grwfiles" in onesite'
+  - name: grwdirs
+    file:
+      dest: '{{ item }}'
+      state: directory
+      mode: g+w
+      recurse: yes
+      group: '{{ apache_site.group }}'
+    with_items: '{{ apache_site.grwdirs }}'
+    when: '"grwdirs" in onesite'
 
-- name: site config
+- name: site apache config
   template:
     dest: '{{ apache_etcdir }}/{{ apache_sitesdir }}/{{ apache_site.key }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'

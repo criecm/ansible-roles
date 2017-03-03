@@ -1,7 +1,7 @@
 ---
 - name: os vars
   include_vars: '{{ ansible_os_family }}.yml'
-  tags: apache
+  tags: apache, vars
 
 - name: install and enable apache
   include: '{{ ansible_os_family }}.yml'

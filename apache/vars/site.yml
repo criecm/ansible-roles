@@ -19,5 +19,10 @@ default_site:
   includes: []
   rootdir: '{{ apache_rootbase }}/{{ onesite.key }}'
   rootsrc: ''
+  gitroot: ''
+  group: '{{ apache_group }}'
+  user: '{{ apache_user }}'
+  grwfiles: []
+  grwdirs: []
 
 apache_site: '{{ default_site | combine(onesite) }}'

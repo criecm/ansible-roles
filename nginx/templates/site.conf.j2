@@ -1,0 +1,17 @@
+server {
+	listen	{{ listen }}{% if x509_cert %} ssl{% endif %};
+	{% if x509_cert %}
+	ssl_certificate {{ x509_cert }};
+	ssl_certificate_key {{ x509_key }};
+	include ssl_ca_terena3.inc;
+	{% endif %}
+
+	server_name	{{ nginx_site.name }};
+	location / {
+		root	{{ nginx_site.rootdir }};
+		index	index.html index.htm;
+	}
+	include status.inc;
+
+	error_page	500 502 503 504	/50x.html;
+}

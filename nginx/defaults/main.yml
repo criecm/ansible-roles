@@ -1,9 +1,15 @@
 ---
-wwwuser: 'www'
+nginx_user: 'www'
 nginx_processes: 1
 error_loglevel: 'info'
 www_default_root: '/var/www/default'
-proxified_by: False
+nginx_log_dir: '/var/log/nginx'
+do_tls: False
+# eg:
+# proxified_by:
+#   - 192.168.0.1/32
+#   - ...
+proxified_by: []
 
 nginx_modules: []
 

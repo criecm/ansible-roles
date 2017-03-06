@@ -19,6 +19,10 @@ default_site:
   includes: []
   rootdir: '{{ nginx_rootbase }}/{{ onesite.key }}'
   rootsrc: ''
+  listen: '80'
+  x509_cert: ''
+  x509_key: ''
+  x509_chain: ''
 
 nginx_site: '{{ default_site | combine(onesite) }}'
 

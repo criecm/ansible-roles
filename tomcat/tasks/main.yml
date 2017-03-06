@@ -32,7 +32,7 @@
     src: context.xml.j2
     dest: '{{ tomcat_config_dir }}/context.xml'
     owner: root
-    group: _tomcat
+    group: '{{ tomcat_group }}'
     mode: '0640'
   notify: restart tomcat
   tags: tomcat, config
@@ -42,7 +42,24 @@
     src: server.xml.j2
     dest: '{{ tomcat_config_dir }}/server.xml'
     owner: root
-    group: _tomcat
+    group: '{{ tomcat_group }}'
     mode: '0640' 
   notify: restart tomcat
   tags: tomcat, config
+
+- name: logging.properties
+  template:
+    src: logging.properties.j2
+    dest: '{{ tomcat_config_dir }}/logging.properties'
+    owner: root
+    group: '{{ tomcat_group }}'
+    mode: '0640'
+  notify: restart tomcat
+  tags: tomcat, config
+
+- name: deploy tomcat_webapps
+  include: webapp.yml
+  with_items: '{{ tomcat_webapps }}'
+  loop_control:
+    loop_var: onewebapp
+  tags: tomcat, webapps

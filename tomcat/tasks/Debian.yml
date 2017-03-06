@@ -1,14 +1,13 @@
 ---
 
 - name: install java & tomcat
-  pkgng:
+  apt:
     name: '{{ item }}'
     state: present
   with_items:
     - tomcat8
-    - '{{ freebsd_jdk_pkg }}'
-    - tomcat-native
-    - py27-lxml
+    - '{{ debian_jdk_pkg }}'
+    - libtcnative-1
 
 - name: tomcat group
   group:
@@ -51,23 +50,14 @@
     - /var/log/tomcat
     - '{{ tomcat_webapps_dir }}'
 
-- name: newsyslog
-  template:
-    src: newsyslog_tomcat.conf
-    dest: /usr/local/etc/newsyslog.conf.d/tomcat.conf
-
-- name: enable tomcat
+- name: tomcat defaults vars
   lineinfile:
-      dest: /etc/rc.conf
+      dest: /etc/default/tomcat8
       line: '{{ item.key }}="{{ item.value }}"'
       regexp: '^{{ item.key }}='
   with_dict:
-      tomcat8_enable: YES
-      tomcat8_catalina_user: '{{ tomcat_user }}'
-      tomcat8_stdout: '{{ tomcat_log_dir }}/catalina.out'
-      tomcat8_stderr: '{{ tomcat_log_dir }}/catalina.err'
-      tomcat8_java_opts: "{{ tomcat_java_opts }}{% if keystore != '' %} -Djavax.net.ssl.trustStore=/etc/ssl/{{ keystore }} -Djavax.net.ssl.trustStorePassword='{{ storepass }}'{% endif %}"
-      tomcat8_java_home: '{{ tomcat_jre_dir }}'
-      tomcat8_classpath: "{% if classpath_adds != '' %}:{{ classpath_adds }}{% endif %}"
-      tomcat8_tmp_dir: "{% if tomcat_tmp_dir != '' %}{{ tomcat_tmp_dir }}{% else %}/var/tmp/{{ tomcat_service }}{% endif %}"
-      tomcat8_wait: '90'
+      TOMCAT8_USER: '{{ tomcat_user }}'
+      TOMCAT8_GROUP: '{{ tomcat_group }}'
+      JAVA_HOME: '{{ tomcat_jre_dir }}'
+      JAVA_OPTS: "{{ tomcat_java_opts }}{% if keystore != '' %}-Djavax.net.ssl.trustStore=/etc/ssl/{{ keystore }} -Djavax.net.ssl.trustStorePassword='{{ storepass }}'{% endif %}{% if classpath_adds != '' %} -cp {{ classpath_adds }}{% endif %}"
+      JVM_TMP: '{% if tomcat_tmp_dir != "" %}{{ tomcat_tmp_dir }}{% else %}/var/tmp/{{ tomcat_service }}{% endif %}'

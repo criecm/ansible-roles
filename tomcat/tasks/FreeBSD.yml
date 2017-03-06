@@ -8,7 +8,6 @@
     - tomcat8
     - '{{ freebsd_jdk_pkg }}'
     - tomcat-native
-    - py27-lxml
 
 - name: tomcat group
   group:

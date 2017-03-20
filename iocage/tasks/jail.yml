@@ -85,7 +85,7 @@
 
 - name: check for pkg
   stat:
-    path: '/iocage/jails/{{ iocage_jail.uuid }}/root/usr/local/bin/pkg'
+    path: '/iocage/jails/{{ iocage_jail.uuid }}/root/usr/local/sbin/pkg'
   register: pkg_installed
 
 - name: install python

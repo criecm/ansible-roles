@@ -1,5 +1,6 @@
 ---
-nginx_user: 'www'
+www_user: 'www'
+www_group: 'www'
 nginx_processes: 1
 error_loglevel: 'info'
 www_default_root: '/var/www/default'

@@ -50,7 +50,7 @@
 - name: log dir
   file:
     dest: '{{ nginx_log_dir }}'
-    owner: '{{ nginx_user }}'
+    owner: '{{ www_user }}'
     mode: '0750'
     state: directory
   when: 'nginx_log_dir != ""'

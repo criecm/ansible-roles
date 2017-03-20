@@ -20,8 +20,8 @@ default_site:
   rootdir: '{{ apache_rootbase }}/{{ onesite.key }}'
   rootsrc: ''
   gitroot: ''
-  group: '{{ apache_group }}'
-  user: '{{ apache_user }}'
+  group: '{{ www_group }}'
+  user: '{{ www_user }}'
   grwfiles: []
   grwdirs: []
 

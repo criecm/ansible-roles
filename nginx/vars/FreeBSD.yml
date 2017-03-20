@@ -1,4 +1,5 @@
 ---
-nginx_user: www
+www_user: www
+www_group: www
 www_default_root: '/usr/local/www/nginx'
 nginx_etcdir: '/usr/local/etc/nginx'

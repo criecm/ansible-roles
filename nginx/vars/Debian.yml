@@ -1,3 +1,4 @@
 ---
-nginx_user: 'www-data'
+www_user: 'www-data'
+www_group: 'www-data'
 www_default_root: '/var/www/html'

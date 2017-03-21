@@ -1,3 +1,0 @@
-[submodule "iocage/library/src/iocage"]
-	path = iocage/library/src/iocage
-	url = git@github.com:criecm/ansible-iocage.git

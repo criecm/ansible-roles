@@ -1,7 +1,0 @@
----
-- name: restart jail
-  iocage:
-    uuid: '{{ iocage_jail.uuid }}'
-    state: restarted
-
-#shell: '/usr/local/sbin/iocage restart {{ iocage_jail.uuid }}'

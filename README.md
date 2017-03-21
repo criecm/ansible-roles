@@ -1,20 +1,18 @@
-# Ansible @ ECM
+# nginx
 
-## Roles ansible Centrale Marseille:
+Serveur nginx, un vhost par défaut
 
-Prévus pour Debian, FreeBSD, OpenBSD
+* rep `conf.d/` ready
+* rep `modules.d/*.conf` pour les eventuels modules
+* list of networks `proxified_by` will be trusted as reverse-proxy
+  * include HTTPS support for fastcgi
 
-## Prérequis
+## ssl/TLS support:
 
-[lire la doc](http://docs.ansible.com/ansible/intro_getting_started.html "getting started")
+* `x509_cachain` for stapling - complete ca chain (from root to last CA before certs)
 
-* un 'inventory' ([/usr/local]/etc/ansible/hosts, voir ~/.ansible.cfg ou [/usr/local]/etc/ansible/ansible.cfg)
-* **une cle ssh** permettant de se connecter a chaque machine de l'inventory
-    (en root ou en --ansible-user=\* avec --become=[sudo|su|pbrun|pfexec|runas|doas|dzdo])
+### per site:
 
-## Usage
-
-1. definir les variables necessaires (voir `<role>/defaults/main.yml` les variables disponibles)
-2. ecrire un playbook qui utilise les roles voulus
-3. lancer `ansible-playbook playbook-my.yml`
-
+* TLS si `do_tls` == True
+  * `x509_cert` par site
+  * `x509_key` par site

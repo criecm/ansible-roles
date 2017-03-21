@@ -1,6 +1,0 @@
----
-- name: install dhcpd
-  apt:
-    name: isc-dhcp-server
-    state: present
-  tags: pkg

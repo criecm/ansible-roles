@@ -1,6 +1,0 @@
----
-- name: install nsd
-  apt:
-    name: nsd
-    state: present
-  tags: pkg, nsd

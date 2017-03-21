@@ -1,20 +1,20 @@
-# Ansible @ ECM
+# common - role ECM de base
 
-## Roles ansible Centrale Marseille:
-
-Prévus pour Debian, FreeBSD, OpenBSD
-
-## Prérequis
-
-[lire la doc](http://docs.ansible.com/ansible/intro_getting_started.html "getting started")
-
-* un 'inventory' ([/usr/local]/etc/ansible/hosts, voir ~/.ansible.cfg ou [/usr/local]/etc/ansible/ansible.cfg)
-* **une cle ssh** permettant de se connecter a chaque machine de l'inventory
-    (en root ou en --ansible-user=\* avec --become=[sudo|su|pbrun|pfexec|runas|doas|dzdo])
-
-## Usage
-
-1. definir les variables necessaires (voir `<role>/defaults/main.yml` les variables disponibles)
-2. ecrire un playbook qui utilise les roles voulus
-3. lancer `ansible-playbook playbook-my.yml`
+* CA x509
+* client OpenLDAP + config
+* config mail relay (only `is_mailrelay == False and mailrelay != ''`)
+  * Debian: postfix
+  * FreeBSD: sendmail
+  * OpenBSD: smtpd
+* lignes de config sshd (en variables, voir defaults/main.yml)
+* syslog centralisé:
+  * sauf si `is_syslogd=True`
+  * seulement si `syslog_server` existe
+* deploiement des cles ssh `files/cles_ssh/*.pub` (+env `DSI=$user`)
+* /usr/local/admin/sysutils/common depuis GIT (et plus selon variables)
+* cron daily/weekly ecm (et supression des anciens de CVS)
+* snmpd (TODO: Debian et OpenBSD)
+* zsh pour root + config + aliases
+* packages supplementaires (variable pkgs)
+    
 

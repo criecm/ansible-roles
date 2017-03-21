@@ -1,9 +1,0 @@
-# {{ ansible_managed }}
-autoload -Uz compinit
-compinit
-[ -r /usr/local/admin/sysutils/common/rootlogin.env.sh ] && . /usr/local/admin/sysutils/common/rootlogin.env.sh
-[ -r /usr/local/admin/sysutils/common/shell_aliases ] && . /usr/local/admin/sysutils/common/shell_aliases
-HISTFILE=~/.zsh_history
-SAVEHIST=100000
-setopt APPEND_HISTORY
-[ -f ~/.aliases ] && . ~/.aliases

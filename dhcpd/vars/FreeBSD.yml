@@ -1,3 +1,0 @@
----
-dhcpd_service_name: isc-dhcpd
-dhcpd_configdir: /usr/local/etc

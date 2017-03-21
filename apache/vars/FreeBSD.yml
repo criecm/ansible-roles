@@ -1,9 +1,0 @@
----
-apache_etcdir: /usr/local/etc/apache24
-apache_includesdir: Includes
-apache_sitesdir: sites
-apache_service: apache24
-apache_modsconfdir: modules.d
-apache_rootbase: /usr/local/www
-www_user: www
-www_group: www

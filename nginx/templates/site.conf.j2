@@ -1,8 +1,8 @@
 server {
-	listen	{{ listen }}{% if x509_cert %} ssl{% endif %};
-	{% if x509_cert %}
-	ssl_certificate {{ x509_cert }};
-	ssl_certificate_key {{ x509_key }};
+	listen	{{ nginx_site.listen }}{% if nginx_site.x509_cert %} ssl{% endif %};
+	{% if "x509_cert" in nginx_site %}
+	ssl_certificate {{ nginx_site.x509_cert }};
+	ssl_certificate_key {{ nginx_site.x509_key }};
 	include ssl_ca_terena3.inc;
 	{% endif %}
 

@@ -1,20 +1,21 @@
 ---
+
 - include_vars: site.yml
 
 - name: site includes
   template:
     dest: '{{ nginx_etcdir }}/{{ item }}'
-    src: '{{ lookup("first_found", include_locations) }}'
+    src: '{{ lookup("first_found", include_locations) }}/{{ item }}'
   with_items: '{{ nginx_site.includes }}'
   when: '"includes" in nginx_site'
 
 - name: conf includes
   copy:
     src: '{{ item }}'
-    dest: '{{ nginx_etcdir }}/{{ nginx_includesdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
+    dest: '{{ nginx_etcdir }}/conf.d/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
     mode: '0644'
   with_fileglob:
-    - 'nginx/{{ nginx_site.key }}/{{ nginx_includesdir }}/*.conf'
+    - 'nginx/{{ nginx_site.id }}/conf.d/*.conf'
 
 - name: root dir
   copy:
@@ -34,6 +35,13 @@
 
 - name: site config
   template:
-    dest: '{{ nginx_etcdir }}/{{ nginx_sitesdir }}/{{ nginx_site.key }}.conf'
+    dest: '{{ nginx_etcdir }}/servers.d/{{ nginx_site.id }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'
 
+- name: backend
+  include_role:
+    name: '{{ nginx_site.backend_role }}'
+    vars:
+      phpapps: 
+        - '{{ nginx_site }}'
+  when: '"backend_role" in nginx_site'

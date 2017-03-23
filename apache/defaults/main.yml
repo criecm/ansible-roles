@@ -109,6 +109,6 @@ default_disabled_modules:
   - speling
   - userdir
 
-apache_sites: []
+sites: []
 
 

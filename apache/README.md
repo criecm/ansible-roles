@@ -9,7 +9,7 @@ types d'installation (`apache_type`):
 
 * configure la rotation des logs
 
-* pour chaque site dans `apache_sites`:
+* pour chaque site dans `sites`:
   * copie la conf (template) depuis le premier trouvé dans la liste `siteconf_locations`
     (voir vars/site.yml)
 

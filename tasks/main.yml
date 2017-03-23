@@ -59,13 +59,6 @@
   when: 'nginx_log_dir != ""'
   tags: nginx, config
 
-- name: freebsd newsyslog
-  template:
-    src: newsyslog_nginx.conf.j2
-    dest: '{{ etcprefix }}/etc/newsyslog.conf.d/nginx.conf'
-  when: 'ansible_distribution == "FreeBSD"'
-  tags: nginx, config
-
 # reverse-proxy if any
 - block:
   - name: config reverse-proxy
@@ -111,7 +104,7 @@
 
 - name: sites
   include: site.yml
-  with_items: '{{ nginx_sites }}'
+  with_items: '{{ sites }}'
   loop_control:
     loop_var: onesite
   tags: nginx, sites

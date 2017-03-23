@@ -10,3 +10,14 @@
     line: 'nginx_enable="YES"'
     regexp: '^nginx_enable'
     state: present
+
+- name: newsyslog.conf.d dir
+  file:
+    dest: '{{ etcprefix }}/etc/newsyslog.conf.d'
+    state: directory
+
+- name: freebsd newsyslog
+  template:
+    src: newsyslog_nginx.conf.j2
+    dest: '{{ etcprefix }}/etc/newsyslog.conf.d/nginx.conf'
+

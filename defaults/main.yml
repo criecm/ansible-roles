@@ -14,5 +14,5 @@ proxified_by: []
 
 nginx_modules: []
 
-nginx_sites: []
+sites: []
 

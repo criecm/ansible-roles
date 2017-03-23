@@ -3,3 +3,8 @@
   pkgng:
     name: nginx
     state: present
+
+- name: enable nginx
+  service:
+    name: nginx
+    state: enabled

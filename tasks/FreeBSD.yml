@@ -5,6 +5,8 @@
     state: present
 
 - name: enable nginx
-  service:
-    name: nginx
-    state: enabled
+  lineinfile:
+    dest: /etc/rc.conf
+    line: 'nginx_enable="YES"'
+    regexp: '^nginx_enable'
+    state: present

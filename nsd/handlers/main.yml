@@ -2,7 +2,10 @@
 - name: restart nsd
   service:
     name: nsd
-    state: restarted
+    state: '{{ item }}'
+  with_items:
+    - started
+    - restarted
 
 - name: reconfig nsd
   command: nsd-control reconfig

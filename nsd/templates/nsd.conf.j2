@@ -1,5 +1,8 @@
+# {{ ansible_managed }}
 server:
-{% for ip in nsd_adresses %}	ip-address: {{ip}}
+{% for ip in nsd_adresses %}
+{% if not ip | match("fe80") %}	ip-address: {{ip}}
+{% endif %}
 {% endfor %}
 {% if nsd_port != 53 %}	port {{ nsd_port }}{% endif %}
 	verbosity: 1

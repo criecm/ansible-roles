@@ -1,0 +1,3 @@
+---
+nsd_configdir: /etc/nsd
+nsd_dbdir: /var/lib/nsd

@@ -75,8 +75,3 @@
     - restart nsd
     - reconfig nsd
 
-- name: start nsd
-  service:
-    name: nsd
-    state: started
-  tags: rc, nsd

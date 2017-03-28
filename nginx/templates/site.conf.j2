@@ -1,17 +1,48 @@
+{% if nginx_site.tls_redirect %}
+server {
+	listen 80;
+	server_name	{{ nginx_site.name }};
+	redirect permanent / https://{{ nginx_site.name }}/;
+}
+{% endif %}
+
+{% if nginx_site.listen %}
 server {
 	listen	{{ nginx_site.listen }}{% if nginx_site.x509_cert %} ssl{% endif %};
-	{% if "x509_cert" in nginx_site %}
+{% if nginx_site.x509_cert %}
 	ssl_certificate {{ nginx_site.x509_cert }};
 	ssl_certificate_key {{ nginx_site.x509_key }};
-	include ssl_ca_terena3.inc;
-	{% endif %}
+{% if nginx_site.x509_stapling_chain %}
+	ssl_trusted_certificate {{ nginx_site.x509_stapling_chain }};
+	ssl_stapling    on;
+	ssl_stapling_verify     on;
+{% if nginx_site.tls_hsts %}
+	add_header Strict-Transport-Security "max-age={{ tls_hsts }}";
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% if proxified_by %}
+{% for net in proxified_by %}
+	set_real_ip_from {{ net }};
+{% endfor %}
+	real_ip_header X-Forwarded-For;
+{% endif %}
 
 	server_name	{{ nginx_site.name }};
+{% if not nginx_site.nginx_includes %}
 	location / {
 		root	{{ nginx_site.rootdir }};
 		index	index.html index.htm;
 	}
-	include status.inc;
+{% endif %}
+
+{% include "status.inc.j2" %}
+
+{% for inc in nginx_site.nginx_includes %}
+	include {{ inc }};
+{% endfor %}
 
 	error_page	500 502 503 504	/50x.html;
 }
+{% endif %}

@@ -4,12 +4,7 @@ ssl_prefer_server_ciphers	on;
 ssl_session_cache shared:SSL:30m;
 ssl_session_tickets	off;
 ssl_session_timeout	1d;
-{% if x509_cachain %}
-ssl_trusted_certificate	/etc/ssl/stapling.crt;
-ssl_stapling	on;
-ssl_stapling_verify	on;
-{% endif %}
 ssl_dhparam	/etc/ssl/dhparam4096.pem;
 resolver_timeout	3s;
-
+resolver {% for ns in nameservers %}{% if ansible_all_ipv4_addresses | union(ansible_all_ipv6_addresses) | ipaddr(ns.network) %}{{ns.ip}} {% endif %}{% endfor %};
 

@@ -6,6 +6,7 @@ error_loglevel: 'info'
 www_default_root: '/var/www/default'
 nginx_log_dir: '/var/log/nginx'
 do_tls: False
+nginx_status_path: /nginx_status
 # eg:
 # proxified_by:
 #   - 192.168.0.1/32
@@ -16,3 +17,5 @@ nginx_modules: []
 
 sites: []
 
+monitoring_from:
+  - 127.0.0.1

@@ -27,12 +27,18 @@ http {
 	access_log	{{ nginx_log_dir }}/access.log combined;
 	{% endif %}
 
+	sendfile_max_chunk 512k;
 	server_tokens	off;
 	aio on;
 	sendfile	on;
 	tcp_nopush	on;
 
 	keepalive_timeout	65;
+
+	# "zone" pour le traitement des progressions d'uploads
+	upload_progress uploads 1m;
+
+	log_not_found off;
 
 	gzip on;
 	gzip_min_length	1100;
@@ -41,7 +47,7 @@ http {
 	types {
 		text/plain	log;
 	}
-	include conf.d/*.inc;
+	include conf.d/*.conf;
 
 	include servers.d/*.conf;
 }

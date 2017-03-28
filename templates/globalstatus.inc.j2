@@ -1,0 +1,10 @@
+# nginx status
+location = {{ nginx_status_path }} {
+	stub_status on;
+{% for net in monitoring_from %}
+	allow {{ net }};
+{% endfor %}
+	deny all;
+}
+
+

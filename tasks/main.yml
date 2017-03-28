@@ -41,11 +41,10 @@
     notify: restart nginx
   - name: default config parts
     template:
-      src: 'nginx/{{ item }}.j2'
+      src: '{{ item }}.j2'
       dest: '{{ nginx_etcdir }}/{{ item }}'
     with_items:
       - servers.d/0default.conf
-      - status.inc
     notify: restart nginx
   tags: nginx, config
 
@@ -73,33 +72,26 @@
     notify: restart nginx
   - name:
     template:
-      src: nginx/modules.d/realip.conf.j2
-      dest: '{{ nginx_etcdir }}/modules.d/realip.conf'
+      src: realip.conf.j2
+      dest: '{{ nginx_etcdir }}/conf.d/realip.conf'
     notify: restart nginx
   when: '{{ proxified_by | count() }} > 0'
   tags: nginx, config
 
-# x509 if needed
+# x509 - global part
 - block:
-  - name: copie cachain
-    copy:
-      src: '{{ x509_cachain }}'
-      dest: /etc/ssl/stapling.crt;
-      mode: '0644'
-    when: 'x509_cachain != ""'
   - name: x509 global config
     template:
-      src: tls.inc.j2
-      dest: '{{ nginx_etcdir }}/conf.d/tls.inc'
+      src: tls.conf.j2
+      dest: '{{ nginx_etcdir }}/conf.d/tls.conf'
       mode: '0644'
   - name: check dhparam
     stat:
-      path: /etc/ssh/dhparam4096.pem
-      register: stat_dh
+      path: /etc/ssl/dhparam4096.pem
+    register: stat_dh
   - name: create dhparam
-    command: 'openssl dhparam -out /etc/ssh/dhparam4096.pem 4096'
+    command: 'openssl dhparam -out /etc/ssl/dhparam4096.pem 4096'
     when: not stat_dh.stat.exists
-  when: 'do_tls == True'
   tags: nginx, config
 
 - name: sites
@@ -109,3 +101,17 @@
     loop_var: onesite
   tags: nginx, sites
 
+- name: monitor tmp var
+  set_fact:
+    tmpmon:
+      proto: http
+      name: '{{ ansible_fqdn }}'
+      path: /nginx_status
+
+- name: register to_monitor
+  set_fact:
+    to_monitor: '{{ to_monitor | default({}) | combine(tmpmon) }}'
+
+- name: debug monitor
+  debug:
+    var: to_monitor

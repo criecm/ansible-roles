@@ -1,0 +1,11 @@
+{% if "fcgi_status_path" in nginx_site and "fcgisocket" in nginx_site %}
+# fastcgi status
+location = {{ nginx_site.fcgi_status_path }} {
+{% for net in monitoring_from %}
+	allow {{ net }};
+{% endfor %}
+	deny all;
+	include fastcgi_params;
+	fastcgi_pass {% if nginx_site.fcgisocket | match("\/.*") %}unix:{% endif %}{{ nginx_site.fcgisocket }};
+}
+{% endif %}

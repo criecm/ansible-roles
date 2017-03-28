@@ -6,8 +6,8 @@
   template:
     dest: '{{ nginx_etcdir }}/{{ item }}'
     src: '{{ lookup("first_found", include_locations) }}/{{ item }}'
-  with_items: '{{ nginx_site.includes }}'
-  when: '"includes" in nginx_site'
+  with_items: '{{ nginx_site.nginx_includes }}'
+  when: '"nginx_includes" in nginx_site'
 
 - name: conf includes
   copy:
@@ -15,7 +15,15 @@
     dest: '{{ nginx_etcdir }}/conf.d/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
     mode: '0644'
   with_fileglob:
-    - 'nginx/{{ nginx_site.id }}/conf.d/*.conf'
+    - '{{ nginx_site.id }}/nginx/conf.d/*.conf'
+
+- name: conf includes (templates)
+  template:
+    src: '{{ item }}'
+    dest: '{{ nginx_etcdir }}/conf.d/{{ item | regex_replace(".*/([^/]+)\.j2$","\1") }}'
+    mode: '0644'
+  with_fileglob:
+    - '{{ nginx_site.id }}/nginx/conf.d/*.conf.j2'
 
 - name: root dir
   copy:
@@ -33,15 +41,45 @@
     owner: root
   when: '"rootsrc" not in onesite and "rootdir" in onesite'
 
+- block:
+  - name: x509 cert
+    copy:
+      src: '{{ nginx_site.x509_cert }}'
+      dest: '/etc/ssl/{{ nginx_site.name }}.crt'
+      mode: '0400'
+  - name: x509 key
+    copy:
+      src: '{{ nginx_site.x509_key }}'
+      dest: '/etc/ssl/private/{{ nginx_site.name }}.key'
+      mode: '0400'
+  - name: x509 chain
+    copy:
+      src: '{{ nginx_site.x509_stapling_chain }}'
+      dest: '/etc/ssl/{{ nginx_site.name }}_stapling.pem'
+      mode: '0644'
+  when: 'nginx_site.x509_cert != ""'
+
 - name: site config
   template:
     dest: '{{ nginx_etcdir }}/servers.d/{{ nginx_site.id }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'
 
-- name: backend
-  include_role:
-    name: '{{ nginx_site.backend_role }}'
-    vars:
-      phpapps: 
-        - '{{ nginx_site }}'
-  when: '"backend_role" in nginx_site'
+- block:
+  - name: monitor tmp var
+    set_fact:
+      tmpmon:
+        proto: '{% if nginx_site.x509_cert %}https{% else %}http{% endif %}'
+        name: '{{ nginx_site.name }}'
+        path: '{{ nginx_site.fcgi_status_path }}'
+  - name: add fcgi_status_path to to_monitor
+    set_fact:
+      to_monitor: '{{ to_monitor | default({}) | combine(tmpmon) }}'
+  when: 'nginx_site.fcgi_status_path != ""'
+
+#- name: backend
+#  include_role:
+#    name: '{{ nginx_site.backend_role }}'
+#    vars:
+#      phpapps: 
+#        - '{{ nginx_site }}'
+#  when: '"backend_role" in nginx_site'

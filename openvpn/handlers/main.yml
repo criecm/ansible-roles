@@ -4,3 +4,6 @@
     name: 'openvpn{{ item }}'
     state: restarted
   with_items: '{{ openvpn_configs }}'
+
+- name: disable hw csum on kvm
+  command: 'sysctl hw.vtnet.csum_disable=1'

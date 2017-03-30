@@ -104,13 +104,13 @@
 - name: monitor tmp var
   set_fact:
     tmpmon:
-      proto: http
-      name: '{{ ansible_fqdn }}'
-      path: /nginx_status
+      - proto: http
+        name: '{{ ansible_fqdn }}'
+        path: /nginx_status
 
 - name: register to_monitor
   set_fact:
-    to_monitor: '{{ to_monitor | default({}) | combine(tmpmon) }}'
+    to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
 
 - name: debug monitor
   debug:

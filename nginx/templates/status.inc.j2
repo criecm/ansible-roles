@@ -6,6 +6,7 @@ location = {{ nginx_site.fcgi_status_path }} {
 {% endfor %}
 	deny all;
 	include fastcgi_params;
+	fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 	fastcgi_pass {% if nginx_site.fcgisocket | match("\/.*") %}unix:{% endif %}{{ nginx_site.fcgisocket }};
 }
 {% endif %}

@@ -10,7 +10,7 @@ Calls webserver role (nginx by default) per site to create HTTP confs
 
 * `monitoring_from` ([127.0.0.1])
   host(s) or net(s) allowed to query status url's
-* `ifpm_priority` (12)
+* `fpm_priority` (12)
   default processes priority
 * `fpm_error_log` (syslog)
   error log filename or "syslog"
@@ -56,6 +56,8 @@ Calls webserver role (nginx by default) per site to create HTTP confs
   additional forced `php_values`
 * `php_admin_flags` ([])
   additional forced `php_flags`
+* `error_log` (`{{fpm_error_log}}`)
+  error log file for this site
 
 #### fpm specifics
 see http://php.net/manual/en/install.fpm.configuration.php

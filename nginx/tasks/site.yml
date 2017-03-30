@@ -63,23 +63,17 @@
   template:
     dest: '{{ nginx_etcdir }}/servers.d/{{ nginx_site.id }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'
+  notify: reload nginx
 
 - block:
   - name: monitor tmp var
     set_fact:
       tmpmon:
-        proto: '{% if nginx_site.x509_cert %}https{% else %}http{% endif %}'
-        name: '{{ nginx_site.name }}'
-        path: '{{ nginx_site.fcgi_status_path }}'
+        - proto: '{% if nginx_site.x509_cert %}https{% else %}http{% endif %}'
+          name: '{{ nginx_site.name }}'
+          path: '{{ nginx_site.fcgi_status_path }}'
   - name: add fcgi_status_path to to_monitor
     set_fact:
-      to_monitor: '{{ to_monitor | default({}) | combine(tmpmon) }}'
+      to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
   when: 'nginx_site.fcgi_status_path != ""'
 
-#- name: backend
-#  include_role:
-#    name: '{{ nginx_site.backend_role }}'
-#    vars:
-#      phpapps: 
-#        - '{{ nginx_site }}'
-#  when: '"backend_role" in nginx_site'

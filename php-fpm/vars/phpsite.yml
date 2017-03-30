@@ -36,6 +36,7 @@ default_fpm_site:
   include_path: '.:{{ pear_path }}'
   memory_limit: 128M
   upload_max_meg: 20
+  error_log: '{{ fpm_error_log }}'
   fcgisocket: '/var/run/{{ phpsite.id }}.sock'
   webserver_role: nginx
 

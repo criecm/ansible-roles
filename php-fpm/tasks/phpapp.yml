@@ -33,11 +33,6 @@
     group: '{{ fpm_site.group }}'
   when: fpm_site.maintainer != ""
 
-- name: fpm_site config
-  template:
-    src: fpm-site.conf.j2
-    dest: '{{ fpm_pools_dir }}/{{ fpm_site.id }}.conf'
-
 - name: mkdirs
   file:
     path: '{{ item }}'
@@ -50,6 +45,12 @@
     - '{{ fpm_site.tmpdir }}'
     - '{{ fpm_site.upload_dir }}'
   when: item | match("^/.*")
+
+- name: fpm_site config
+  template:
+    src: fpm-site.conf.j2
+    dest: '{{ fpm_pools_dir }}/{{ fpm_site.id }}.conf'
+  notify: reload fpm
 
 - name: nginx config
   include_role:

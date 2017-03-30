@@ -39,12 +39,14 @@ env[TEMP] = {{ fpm_site.tmpdir }}
 env[TMPDIR] = {{ fpm_site.tmpdir }}
 
 php_value[session.save_path] = {{ fpm_site.sessions_path }}
-php_value[error_log] = {{ fpm_site.errorlog }}
+php_value[error_log] = {{ fpm_site.error_log }}
 php_admin_value[upload_tmp_dir] = {{ fpm_site.tmpdir }}
 php_admin_value[memory_limit] = {{ fpm_site.memory_limit }}
 {% if fpm_site.limit_openbasedir %}
-php_admin_value[open_basedir] = {{ fpm_site.tmpdir }}:{{ fpm_site.rootdir }}:{{ pear_path }}:/etc/ssl{% if fpm_site.open_basedir_add %}:{{ fpm_site.open_basedir_add }}{% endif %}
+php_admin_value[open_basedir] = {{ fpm_site.tmpdir }}:{{ fpm_site.rootdir }}:{{ pear_path }}:/etc/ssl{% if fpm_site.open_basedir_add %}:{{ fpm_site.open_basedir_add }}
 {% endif %}
+{% endif %}
+
 php_admin_value[post_max_size] = {{ ( fpm_site.upload_max_meg * 1.3 ) | int }}M
 php_admin_value[upload_max_filesize] = {{ fpm_site.upload_max_meg }}M
 

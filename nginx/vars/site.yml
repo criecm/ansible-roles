@@ -18,7 +18,7 @@ default_site:
   id: default
   name: ''
   nginx_includes: []
-  rootdir: '/home/{{ onesite.id }}/{{ onesite.id }}'
+  rootdir: '{{ onesite_home | default("/home/"+onesite.id) }}/{{ onesite.id }}'
   rootsrc: ''
   listen: '80'
   tls_hsts: '{% if "x509_cert" in onesite %}31536000{% else %}0{% endif %}'

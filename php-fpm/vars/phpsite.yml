@@ -9,7 +9,7 @@
 default_fpm_site:
   id: default
   name: ''
-  rootdir: '{{ phpsite.home | default("/home/"+phpsite.id+"/"+phpsite.id) }}'
+  rootdir: '{{ phpsite.home | default("/home/"+phpsite.id) }}/{{ phpsite.id }}'
   pm: ondemand
   pm_max: 200
   pm_max_requests: 500

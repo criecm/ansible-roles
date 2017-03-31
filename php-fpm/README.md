@@ -6,7 +6,7 @@ Installs php-fpm and one or many pools using 'site' configs.
 
 Calls webserver role (nginx by default) per site to create HTTP confs
 
-# Variables (default value)
+# Role variables (default value)
 
 * `monitoring_from` ([127.0.0.1])
   host(s) or net(s) allowed to query status url's
@@ -30,8 +30,6 @@ Calls webserver role (nginx by default) per site to create HTTP confs
 
 ### optional (default value)
 
-* `webserver_role` (nginx)
-  Which webserver role to use (see this role's README.md for additional vars)
 * `user` (_{{id}})
   System user to run php
 * `maintainer` ({{id}})
@@ -40,6 +38,27 @@ Calls webserver role (nginx by default) per site to create HTTP confs
   Common group for user and maintainer
 * `home` (/home/{{id}})
   Home of 'maintainer' and base for other default values (tmpdir, rootdir, ...)
+* `rootdir` (/home/{{id}}/{{id}})
+* `gits` ([]) - list of dicts
+  list of git repositories with their details: for each element of the list you MUST provide:
+  * `repo`: git URL to the repository
+  and MAY provide (default):
+  * `dest`: destination directory (`{{rootdir}}`)
+  * `depth`: nr of commits of history to get (1)
+  * `umask`: ('0022')
+  * `update`: whether to update existing repo (no)
+  * `version`: tag or branch (master)
+  * `owner`: owner of files (`{{maintainer}}`)
+  * `group`: group for files (`{{group}}`)
+  * `mode`: chmod -R (u=rwX,g=rX,o-rwx)
+* `configfiles` ([]) list of dicts
+  * `src`: template path, relative to playbooks dir (files/mytpl.j2)
+  * `dest`: path on dest, absolute or relative to `{{rootdir}}`
+  * `mode`: (0640)
+  * `owner`: (`{{maintainer}}`)
+  * `group`: (`{{group}}`)
+* `webserver_role` (nginx)
+  Which webserver role to use (see this role's README.md for additional vars)
 * `tmpdir` (/home/{{id}}/tmp)
   Base for tmp, sessions, uploads
 * `limit_openbasedir` (True)

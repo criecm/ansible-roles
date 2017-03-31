@@ -72,7 +72,7 @@
 - name: phpapp config files
   template:
     src: '{{ item.src }}'
-    dest: '{{ item.dest | regex_replace("^([^/])",fpm_site.rootdir+"/\\1") }}'
+    dest: '{{ item.dest | regex_replace("^([^/])",fpm_site.rootdir+"/\1") }}'
     mode: '{{ item.mode | default("0640") }}'
     owner: '{{ item.owner | default(fpm_site.maintainer) }}'
     group: '{{ item.group | default(fpm_site.group) }}'

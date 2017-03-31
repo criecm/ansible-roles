@@ -8,6 +8,7 @@
     src: '{{ lookup("first_found", include_locations) }}/{{ item }}'
   with_items: '{{ nginx_site.nginx_includes }}'
   when: '"nginx_includes" in nginx_site'
+  notify: reload nginx
 
 - name: conf includes
   copy:
@@ -16,6 +17,7 @@
     mode: '0644'
   with_fileglob:
     - '{{ nginx_site.id }}/nginx/conf.d/*.conf'
+  notify: reload nginx
 
 - name: conf includes (templates)
   template:
@@ -24,6 +26,7 @@
     mode: '0644'
   with_fileglob:
     - '{{ nginx_site.id }}/nginx/conf.d/*.conf.j2'
+  notify: reload nginx
 
 - name: root dir
   copy:
@@ -33,13 +36,18 @@
     owner: root
   when: '"rootsrc" in onesite'
 
+- name: stat rootdir
+  stat:
+    path: '{{ nginx_site.rootdir }}'
+  register: statrootdir
+
 - name: mkdir root dir
   file:
     dest: '{{ nginx_site.rootdir }}'
     state: directory
     mode: '0755'
     owner: root
-  when: '"rootsrc" not in onesite and "rootdir" in onesite'
+  when: not statrootdir.stat.exists
 
 - block:
   - name: x509 cert

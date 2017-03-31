@@ -18,6 +18,7 @@ Calls webserver role (nginx by default) per site to create HTTP confs
   log level (alert, error, warning, notice, debug)
 * `www_user` and `www_group` (system dependant)
   webserver user and group
+* `sites`: list of dicts, see above
 
 ## per-site variables (default value)
 

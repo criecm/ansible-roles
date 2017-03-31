@@ -31,11 +31,13 @@ Calls webserver role (nginx by default) per site to create HTTP confs
 ### optional (default value)
 
 * `user` (_{{id}})
-  System user to run php
+System user to run php
 * `maintainer` ({{id}})
-  Maintenance user for the app (with shell and home)
+Maintenance user for the app (with shell and home)
+
 * `group` (_{{id}})
   Common group for user and maintainer
+
 * `home` (/home/{{id}})
   Home of 'maintainer' and base for other default values (tmpdir, rootdir, ...)
 * `rootdir` (/home/{{id}}/{{id}})
@@ -50,9 +52,9 @@ Calls webserver role (nginx by default) per site to create HTTP confs
   * `version`: tag or branch (master)
   * `owner`: owner of files (`{{maintainer}}`)
   * `group`: group for files (`{{group}}`)
-  * `mode`: chmod -R (u=rwX,g=rX,o-rwx)
+  * `mode`: chmod -R (u=rwX,g=rX,o=rX)
 * `configfiles` ([]) list of dicts
-  * `src`: template path, relative to playbooks dir (files/mytpl.j2)
+  * `src`: template path, relative to playbooks dir (no default, ex:files/mytpl.j2)
   * `dest`: path on dest, absolute or relative to `{{rootdir}}`
   * `mode`: (0640)
   * `owner`: (`{{maintainer}}`)

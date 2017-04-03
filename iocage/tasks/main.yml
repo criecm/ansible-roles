@@ -74,12 +74,9 @@
 #  tags: iocage, hostinit
 #  when: '{{jail_list}}'
 
-- include_vars: vars/jail.yml
-  tags: jails
-
 - include: jail.yml
-  vars:
-    jail: '{{ jail_defaults | combine(item) }}'
   with_items: '{{ jail_list }}'
-  tags: jails
+  loop_control:
+    loop_var: onejail
+  tags: iocage, jails
 

@@ -1,5 +1,14 @@
 ---
+- include_vars: jail.yml
+
 - debug: var=jail
+
+- debug: var=jail_ips
+
+- debug: var=jail_nameservers
+
+- debug:
+    msg: '{{nonexistent}}'
 
 - name: create jail
   iocage: 
@@ -11,6 +20,7 @@
       pkglist: /iocage/pkglist.txt
       hostname: '{{ jail.hostname }}'
       host_hostname: '{{ jail.hostname }}'
+      resolver: '{{ jail_nameservers }}'
     state: present
   register: iocage_jail
 

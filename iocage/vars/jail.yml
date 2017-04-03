@@ -1,4 +1,9 @@
 ---
+jail_ip6s: '{{ onejail.ip6 | default("") | regex_replace(",?([^\|]+\|)"," ") }}'
+jail_ips: '{{ jail_ip6s }}{{ onejail.ip4 | default("") | regex_replace(",?([a-z0-9\.]+\|)"," ") }}'
+
+jail_nameservers: '{% for ns in nameservers if not ns.network == "0.0.0.0/0" %}{% for i in jail_ips.split(" ") %}{% if i | ipaddr(ns.network) %}nameserver {{ ns.ip }};{% endif %}{% endfor %}{% endfor %}'
+
 jail_defaults:
   ip6: 'none'
   ip4: 'none'
@@ -6,3 +11,4 @@ jail_defaults:
   hostname: ''
   fstab: ''
 
+jail: '{{ jail_defaults | combine(onejail) }}'

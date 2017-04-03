@@ -34,7 +34,7 @@ default_fpm_site:
   limit_openbasedir: True
   open_basedir_add: ''
   include_path: '.:{{ pear_path }}'
-  memory_limit: 128M
+  memory_limit: 128
   upload_max_meg: 20
   error_log: '{{ fpm_error_log }}'
   fcgisocket: '/var/run/{{ phpsite.id }}.sock'

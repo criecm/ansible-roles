@@ -65,6 +65,8 @@ Calls webserver role (nginx by default) per site to create HTTP confs
 
 * `tmpdir` (/home/{{id}}/tmp): Base for tmp, sessions, uploads
 
+* `memory_limit` (128): php [[http://php.net/manual/fr/ini.core.php#ini.memory-limit|`memory_limit`]] param, without 'M'
+
 * `limit_openbasedir` (True): activate php `open_basedir` limitation: limits fopen to tmpdir+rootdir+`pear_path`+`open_basedir_add`
 
 * `open_basedir_add` (''): path(es) to add to php `open_basedir` — string, separated by ':'

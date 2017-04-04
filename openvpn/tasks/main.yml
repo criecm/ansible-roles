@@ -35,18 +35,16 @@
     mode: '0700'
   tags: openvpn, keys
 
+- name: generate dhparams
+  shell: openssl dhparam -out /usr/local/etc/openvpn/keys/dh.pem 2048
+  creates: /usr/local/etc/openvpn/keys/dh.pem
+  tags: openvpn, config
+
 - name: check dhparam
   file:
     dest: /usr/local/etc/openvpn/keys/dh.pem
     state: file
     mode: '0600'
-  register: dhfile
-  failed_when: False
-  tags: openvpn, config
-
-- name: generate dhparams
-  shell: openssl dhparam -out /usr/local/etc/openvpn/keys/dh.pem 2048
-  when: dhfile.state == "absent"
   tags: openvpn, config
 
 - name: copy openvpn state files

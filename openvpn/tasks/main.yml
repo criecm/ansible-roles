@@ -74,13 +74,14 @@
   notify: restart openvpn
 
 - name: sysctl if kvm
-  lineinfile:
-    file: /etc/sysctl.conf
-    line: 'hw.vtnet.csum_disable=1'
-    regexp: '^hw.vtnet.csum_disable'
+  sysctl:
+    sysctl_file: /etc/sysctl.conf
+    name: hw.vtnet.csum_disable
+    value: 1
     state: present
+    sysctl_set: yes
+    reload: yes
   when: ansible_default_ipv4.device == "vtnet0"
-  notify: disable hw csum on kvm
 
 - name: start openvpn
   service:

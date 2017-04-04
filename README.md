@@ -4,6 +4,8 @@
 
 Prévus pour Debian, FreeBSD, OpenBSD
 
+Ansible >= 2.2.1.0
+
 ## Prérequis
 
 [lire la doc](http://docs.ansible.com/ansible/intro_getting_started.html "getting started")

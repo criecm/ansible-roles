@@ -3,13 +3,6 @@
 
 - debug: var=jail
 
-- debug: var=jail_ips
-
-- debug: var=jail_nameservers
-
-- debug:
-    msg: '{{nonexistent}}'
-
 - name: create jail
   iocage: 
     tag: '{{ jail.tag }}'
@@ -20,7 +13,7 @@
       pkglist: /iocage/pkglist.txt
       hostname: '{{ jail.hostname }}'
       host_hostname: '{{ jail.hostname }}'
-      resolver: '{{ jail_nameservers }}'
+      resolver: '{{ jail.resolver }}'
     state: present
   register: iocage_jail
 

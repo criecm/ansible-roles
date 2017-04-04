@@ -6,7 +6,7 @@ fcgiwrap_netmagis_user="netmagis"
 fcgiwrap_netmagis_flags="-f"
 #fcgiwrap_netmagis_flags="-p /usr/local/www/netmagis -p /usr/local/bin -p /usr/bin -p /bin -f"
 fcgiwrap_netmagis_socket="{{ netmagis_socket }}"
-fcgiwrap_netmagis_socket_owner="{{ wwwuser }}"
+fcgiwrap_netmagis_socket_owner="{{ www_user }}"
 fcgiwrap_netmagis_socket_mode="750"
 #fcgiwrap_netmagis_socket="tcp:{{ ansible_default_ipv4 | default('*') }}:9000"
 

@@ -63,4 +63,7 @@ nameservers:
       - { tag: myjail, hostname: myjail.example.org, ip4: 'bge0|198.51.100.0' }
 </pre></code>
 
+## ansible-iocage module
+update from source:
 
+`git subtree pull -P iocage/library/src/iocage https://github.com/criecm/ansible-iocage.git master`

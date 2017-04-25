@@ -112,14 +112,14 @@ dhcpfile	{{ netmagis_dhcpd_file }}
 # dhcp failover text to add to generated pools. Keep empty if you don't
 # have any DHCP failover configuration.
 #dhcpfailover	"failover peer "dhcp"; load balance max seconds 3;"
-dhcpfailover	""
+dhcpfailover	"{{ netmagis_dhcpd_failover }}"
 
 # command to test dhcpd configuration file
-dhcptest	"/usr/sbin/service isc-dhcpd configtest"
+dhcptest	"{{ netmagis_dhcpd_check_cmd }}"
 
 # command to restart dhcpd
 #dhcpcmd		"sh /usr/local/etc/rc.d/isc-dhcpd.sh restart"
-dhcpcmd		"/usr/sbin/service isc-dhcpd restart"
+dhcpcmd		"{{ netmagis_dhcpd_cmd }}"
 
 ########################################
 # mksmtpf

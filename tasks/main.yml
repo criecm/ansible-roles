@@ -7,7 +7,7 @@
       skip: True
   loop_control:
     loop_var: includefile
-  tags: nsd
+  tags: nsd, vars
 
 - include: '{{ includefile }}'
   with_first_found:
@@ -70,8 +70,18 @@
     src: nsd.conf.j2
     dest: '{{ nsd_configdir }}/nsd.conf'
     validate: nsd-checkconf %s
+  register: nsdcfg
   tags: config, nsd
   notify: 
     - restart nsd
-    - reconfig nsd
 
+- name: restart nsd now
+  command: nsd-control reconfig
+  when: nsdcfg.changed
+  tags: config, nsd
+
+- include: zone.yml
+  with_items: '{{ nsd_zones }}'
+  loop_control:
+    loop_var: nsd_zone
+  tags: nsd, zones

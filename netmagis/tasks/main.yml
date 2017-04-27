@@ -76,13 +76,6 @@
     state: started
   tags: netmagis
 
-- name: https_fastcgi_params nginx
-  copy:
-    src: https_fastcgi_params
-    dest: '{{ etcprefix }}/etc/nginx/https_fastcgi_params'
-    mode: '0644'
-  tags: config, netmagis, nginx
-
 - name: config nginx
   template:
     src: nginx_netmagis.conf.j2

@@ -1,0 +1,16 @@
+---
+- name: get zone pattern
+  shell: 'nsd-control zonestatus {{ nsd_zone.name }}'
+  failed_when: False
+  check_mode: False
+  changed_when: False
+  register: z
+
+- name: add zone 
+  shell: 'nsd-control addzone {{ nsd_zone.name }} {{ nsd_zone.pattern }}'
+  when: 'z.rc == 1'
+
+- name: change zone pattern
+  shell: 'nsd-control delzone {{ nsd_zone.name }}; nsd-control addzone {{ nsd_zone.name }} {{ nsd_zone.pattern }}'
+  when: '"	pattern: "+nsd_zone.pattern not in z.stdout_lines'
+  notify: reconfig nsd

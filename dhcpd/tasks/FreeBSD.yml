@@ -5,10 +5,12 @@
     state: present
   tags: pkg, dhcpd
 
-- name: dhcpd rc
-  template:
-    src: dhcpd_rc.j2
-    dest: '/etc/rc.conf.d/{{ dhcpd_service_name }}'
-    owner: root
-    mode: '0644'
-  tags: pkg, dhcpd
+#- name: dhcpd rc
+#  template:
+#    src: dhcpd_rc.j2
+#    dest: '/etc/rc.conf.d/{{ dhcpd_service_name }}'
+#    owner: root
+#    mode: '0644'
+#    force: no
+#  when: 'dhcpd_enabled'
+#  tags: pkg, dhcpd

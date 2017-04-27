@@ -17,6 +17,7 @@
   service:
     name: '{{ dhcpd_service_name }}'
     enabled: yes
+  when: 'dhcpd_enabled'
   tags: rc, dhcpd
 
 - name: default dhcpd.local.conf
@@ -45,5 +46,6 @@
     mode: '0750'
     owner: root
     group: dhcpd
+    force: no
   tags: dhcpd, config
   notify: restart dhcpd

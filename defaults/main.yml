@@ -7,3 +7,4 @@ dhcpd_max_lease_time: 7200
 dhcpd_log_facility: local7
 dhcpd_leases_dir: /var/db/dhcpd
 dhcpd_configdir: /etc/dhcpd
+dhcpd_enabled: True

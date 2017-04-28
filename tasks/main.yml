@@ -104,13 +104,13 @@
   - cron:
       name: generate zones
       minute: '*/1'
-      job: '{{ prefix }}/sbin/mkzones'
-      user: root
+      job: '{{ netmagis_cron_dns }}'
+      user: '{{ netmagis_cron_user }}'
   - cron:
       name: generate dhcp
       minute: '*/1'
-      job: '{{ prefix }}/sbin/mkdhcp'
-      user: root
+      job: '{{ netmagis_cron_dhcp }}'
+      user: '{{ netmagis_cron_user }}'
   - cron:
       name: daily maintenance (backup, ...)
       job: '{{ prefix }}/sbin/netmagis-dbmaint daily'

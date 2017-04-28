@@ -15,3 +15,7 @@ netmagis_dhcpd_file: /var/netmagis/dhcpd-gen.conf
 netmagis_dhcpd_failover: ''
 netmagis_dhcpd_check_cmd: '/usr/sbin/service isc-dhcpd configtest'
 netmagis_dhcpd_cmd: '/usr/sbin/service isc-dhcpd restart'
+netmagis_zonecmd: '/usr/local/sbin/nsd-control reload'
+netmagis_cron_user: root
+netmagis_cron_dns: '{{ prefix }}/usr/sbin/mkzones'
+netmagis_cron_dhcp: '{{ prefix }}/usr/sbin/mkdhcp'

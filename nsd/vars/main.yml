@@ -1,0 +1,3 @@
+---
+
+nsd_patterns_list: '{{ nsd_patterns | map(attribute="name") | list }}'

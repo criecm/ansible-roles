@@ -64,7 +64,7 @@ zonedir		{{ nsd_zonesdir }}/master
 
 # tell BIND to reload files
 #zonecmd		"/usr/sbin/rndc reload"
-zonecmd		"/usr/local/sbin/nsd-control reload"
+zonecmd		"{{ netmagis_zonecmd }}"
 
 ########################################
 # mkmroute

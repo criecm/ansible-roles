@@ -6,4 +6,6 @@ nsd_adresses: '{{ ansible_all_ipv4_addresses + ansible_all_ipv6_addresses }}'
 nsd_dbdir: /var/db/nsd
 nsd_keys: []
 nsd_patterns: []
+nsd_zones: []
 is_jail: False
+is_internal_nsd: False

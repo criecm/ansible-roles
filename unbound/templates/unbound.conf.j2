@@ -35,7 +35,6 @@ server:
 	private-address: {{ net }}
 {% endfor %}
 
-
 {% for dom in private_domains %}
 	domain-insecure: "{{ dom.name }}"
   {% if not dom.name | match(".*\.arpa\.?") %}

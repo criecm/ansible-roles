@@ -22,7 +22,7 @@
 
 - name: default dhcpd.local.conf
   template:
-    dest: '{{ dhcpd_configdir }}/dhcpd.local.conf'
+    dest: '{{ dhcpd_includesdir }}/dhcpd.local.conf'
     src: dhcpd.local.conf.j2
     mode: '0640'
     owner: root

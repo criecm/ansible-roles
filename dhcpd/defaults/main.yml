@@ -8,3 +8,8 @@ dhcpd_log_facility: local7
 dhcpd_leases_dir: /var/db/dhcpd
 dhcpd_configdir: /etc/dhcpd
 dhcpd_enabled: True
+dhcpd_chroot: False
+dhcpd_chrootdir: ''
+dhcpd_includesdir: '{{ dhcpd_configdir }}'
+dhcpd_user: '{{ dhcpd_default_user | default("root") }}'
+syslog_server: False

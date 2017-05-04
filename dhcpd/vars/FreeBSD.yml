@@ -1,3 +1,7 @@
 ---
 dhcpd_service_name: isc-dhcpd
 dhcpd_configdir: /usr/local/etc
+dhcpd_chroot: True
+dhcpd_chrootdir: /var/db/dhcpd
+dhcpd_includesdir: '{{ dhcpd_chrootdir }}/etc'
+dhcpd_default_user: dhcpd

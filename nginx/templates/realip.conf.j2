@@ -10,3 +10,9 @@ map $http_x_forwarded_proto$scheme $myscheme {
 	httpshttps	https;
 	https		https;
 }
+
+map $http_x_forwarded_proto $myport {
+	default		$server_port;
+	http		80;
+	https		443;
+}

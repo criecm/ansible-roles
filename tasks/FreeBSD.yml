@@ -3,7 +3,45 @@
   pkgng:
     name: isc-dhcp43-server
     state: present
-  tags: pkg, dhcpd
+
+- block:
+  - name: config dhcpd chroot
+    lineinfile:
+      line: '{{ dhcpdrc.line }}'
+      regexp: '{{ dhcpdrc.regexp }}'
+      dest: /etc/rc.conf
+    with_items:
+      - { line: 'dhcpd_chroot_enable="YES"', regexp: '^dhcpd_chroot_enable' }
+    loop_control:
+      loop_var: dhcpdrc
+  - name: mkdir chroot dirs
+    file:
+      dest: '{{ dhcpddir }}'
+      state: directory
+      owner: '{{ dhcpd_user }}'
+    with_items:
+      - '{{ dhcpd_chrootdir }}'
+      - '{{ dhcpd_includesdir }}'
+    loop_control:
+      loop_var: dhcpddir
+  when: 'dhcpd_chroot'
+
+- block:
+  - name: syslog dhcpd socket
+    lineinfile:
+      line: '{{ syslogdhcpdline.line }}'
+      regexp: '{{ syslogdhcpdline.regexp }}'
+      dest: /etc/rc.conf
+    with_items:
+      - { line: 'dhcpd_chrootdir="{{ dhcpd_chrootdir }}"', regexp: '^dhcpd_chrootdir=' }
+      - { line: 'altlog_proglist="dhcpd"', regexp: '^altlog_proglist=' }
+    loop_control:
+      loop_var: syslogdhcpdline
+  - name: syslog dhcpd
+    lineinfile:
+      line: 'local7.*   @{{ syslog_server }}'
+      insertafter: '\*\.\*.*@'
+  when: 'dhcpd_chroot and syslog_server'
 
 #- name: dhcpd rc
 #  template:

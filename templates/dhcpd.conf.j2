@@ -10,4 +10,4 @@ option fqdn.no-client-update true;
 deny client-updates;
 get-lease-hostnames true;
 lease-file-name "{{ dhcpd_leases_dir }}/dhcpd.leases";
-include "{{ dhcpd_configdir }}/dhcpd.local.conf";
+include "{{ dhcpd_includesdir | regex_replace('^'+dhcpd_chrootdir,'') }}/dhcpd.local.conf";

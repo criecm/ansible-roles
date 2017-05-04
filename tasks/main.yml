@@ -69,13 +69,14 @@
     with_items:
       - { line: 'fastcgi_param  HTTPS $myhttps if_not_empty;', regexp: '^fastcgi_param\s+HTTPS' }
       - { line: 'fastcgi_param  REQUEST_SCHEME $myscheme if_not_empty;', regexp: '^fastcgi_param\s+REQUEST_SCHEME' }
+      - { line: 'fastcgi_param  SERVER_PORT $myport if_not_empty;', regexp: '^fastcgi_param\s+SERVER_PORT' }
     notify: restart nginx
   - name:
     template:
       src: realip.conf.j2
       dest: '{{ nginx_etcdir }}/conf.d/realip.conf'
     notify: restart nginx
-  when: '{{ proxified_by | count() }} > 0'
+  when: 'proxified_by != ""'
   tags: nginx, config
 
 # x509 - global part

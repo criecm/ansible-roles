@@ -87,16 +87,17 @@
   tags: config, netmagis, nginx
 
 - name: netmagis dhcpd config
-  file:
+  copy:
     dest: "{{ netmagis_dhcpd_file }}"
-    state: touch
+    content: ""
     owner: netmagis
+    force: no
   tags: dhcpd, netmagis
 
 - name: config dhcpd-netmagis
   lineinfile:
-    dest: '{{ dhcpd_configdir }}/dhcpd.local.conf'
-    line: 'include "{{ netmagis_dhcpd_file }}";'
+    dest: '{{ dhcpd_includesdir }}/dhcpd.local.conf'
+    line: 'include "{{ netmagis_dhcpd_file | regex_replace("^"+dhcpd_chrootdir, "") }}";'
   notify: restart dhcpd
   tags: dhcpd, netmagis
 

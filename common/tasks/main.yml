@@ -138,7 +138,7 @@
       mode: '0750'
       owner: root
       group: 0
-    when: '{{ sysadm_gits | union(host_sysadm_gits) | count() > 0 }}'
+    when: 'sysadm_gits | union(host_sysadm_gits) | count() > 0'
   - name: cle ssh depoiement
     copy:
       dest: '/root/.ssh/{{ git_ssh_key }}'

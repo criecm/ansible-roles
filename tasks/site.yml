@@ -67,6 +67,24 @@
       mode: '0644'
   when: 'nginx_site.x509_cert != ""'
 
+- block:
+  - name: x509 cert
+    copy:
+      src: '{{ nginx_site.x509_cert }}'
+      dest: '/etc/ssl/{{ nginx_site.name }}.crt'
+      mode: '0400'
+  - name: x509 key
+    copy:
+      src: '{{ nginx_site.x509_key }}'
+      dest: '/etc/ssl/private/{{ nginx_site.name }}.key'
+      mode: '0400'
+  - name: x509 chain
+    copy:
+      src: '{{ nginx_site.x509_stapling_chain }}'
+      dest: '/etc/ssl/{{ nginx_site.name }}_stapling.pem'
+      mode: '0644'
+  when: 'nginx_site.x509_cert != ""'
+
 - name: site config
   template:
     dest: '{{ nginx_etcdir }}/servers.d/{{ nginx_site.id }}.conf'

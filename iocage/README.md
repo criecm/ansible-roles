@@ -66,4 +66,4 @@ nameservers:
 ## ansible-iocage module
 update from source:
 
-`git subtree pull -P iocage/library/src/iocage https://github.com/criecm/ansible-iocage.git master`
+`git subtree pull -P roles/iocage/library/src/iocage https://github.com/criecm/ansible-iocage.git master`

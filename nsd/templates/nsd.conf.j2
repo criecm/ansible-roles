@@ -4,7 +4,8 @@ server:
 {% if not ip | match("fe80") %}	ip-address: {{ip}}
 {% endif %}
 {% endfor %}
-{% if nsd_port != 53 %}	port: {{ nsd_port }}{% endif %}
+{% if nsd_port != 53 %}	port: {{ nsd_port }}
+{% endif %}
 	verbosity: 1
 	zonesdir: {{ nsd_zonesdir }}
 	database: {{ nsd_dbdir }}/nsd.db

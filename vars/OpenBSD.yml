@@ -2,4 +2,6 @@
 nsd_configdir: /var/nsd/etc
 nsd_zonesdir: /var/nsd/zones
 nsd_dbdir: /var/nsd/db
+nsd_user: _nsd
+nsd_group: _nsd
 

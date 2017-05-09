@@ -1,3 +1,5 @@
 ---
 nsd_configdir: /etc/nsd
 nsd_dbdir: /var/lib/nsd
+nsd_user: nsd
+nsd_group: nsd

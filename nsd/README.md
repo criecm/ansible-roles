@@ -22,4 +22,5 @@ avec `nsd-control (add|delete)zone $ZONE $PATTERN`
   prefer "intpattern" to "pattern" in `nsd_zones`
 * `nsd_zones_force_pattern` ('')
   if not empty, use this pattern for *all* zones in `nsd_zones`
-
+* `nsd_zonesdir_owner` (root)
+  user who should own master zone files

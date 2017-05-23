@@ -28,6 +28,12 @@
   when: unbound_key.stat.exists == False
   tags: unbound,config
   
+- name: root hints
+  get_url:
+    url: 'http://www.internic.net/domain/named.root'
+    dest: '{{ unbound_root_hints }}'
+  tags: unbound,config
+
 - name: unbound.conf
   template:
     src: unbound.conf.j2

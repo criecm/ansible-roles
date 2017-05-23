@@ -4,6 +4,8 @@ unbound_base: /usr/sbin/unbound
 unbound_dir: /etc/unbound
 unbound_trust_anchor: /etc/unbound/root.key
 unbound_control_interface: ''
+unbound_root_hints: ''
+#/etc/unbound/named.cache
 
 # unbound service ip's (may be ip@port)
 # all interfaces if none here

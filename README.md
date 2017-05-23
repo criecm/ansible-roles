@@ -4,7 +4,7 @@
 
 Prévus pour Debian, FreeBSD, OpenBSD
 
-Ansible >= 2.2.1.0
+Ansible >= 2.3
 
 ## Prérequis
 

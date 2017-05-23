@@ -42,6 +42,7 @@
     - munin-node
     - smartmontools
   when: not is_jail
+  tags: baseconf, pkg
 
 # mail via relay
 - name: mailrelay
@@ -51,7 +52,7 @@
     regexp: '^FEATURE\(.?msp'
   register: domailrelay
   when: mailrelay != '' and not is_mailrelay
-  tags: mailclient
+  tags: baseconf, mailclient
 
 - block:
   - name: stop sendmail
@@ -71,7 +72,7 @@
       regexp: '^sendmail_submit_enable='
 
   when: domailrelay.changed == True
-  tags: mailclient
+  tags: baseconf mailclient
 
 # timezone
 - block:
@@ -84,7 +85,7 @@
   - name: set timezone
     command: 'tzsetup {{ host_timezone }}'
     when: zoneinfo.stdout != host_timezone
-  tags: timezone
+  tags: baseconf, timezone
 
 # syslog
 - block:
@@ -103,7 +104,7 @@
       insertafter: '^\*.\*\s+@.*'
     notify: restart BSD syslogd
   when: syslog_server != '' and not is_syslogd
-  tags: syslog
+  tags: baseconf, syslog
 
 # hardening freebsd
 - block:
@@ -121,7 +122,8 @@
       line: '{{item.line}}'
     with_items:
       - { regexp: '^security.bsd.see_other_uids=', line: 'security.bsd.see_other_uids=0' }
-  tags: security
+    when: 'freebsd_allow_see_other | default(False)'
+  tags: baseconf, security
 
 # snmp
 - name: config snmpd
@@ -135,6 +137,15 @@
   notify: restart bsnmpd
   when: not is_jail
   tags: baseconf, snmpd
+
+# ntp leapfile
+- name: leapfile
+  lineinfile:
+    line: 'daily_ntpd_leapfile_enable="NO"'
+    regexp: '^daily_ntpd_leapfile_enable='
+    insertafter: 'daily_ntpd_leapfile_enable'
+    dest: /etc/periodic.conf
+  tags: baseconf, ntpd
 
 - name: enable bsnmpd
   service:

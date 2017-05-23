@@ -1,0 +1,7 @@
+---
+openldap_confdir: /etc/openldap
+openldap_user: _openldap
+openldap_group: _openldap
+openldap_datadir: /var/openldap-data
+openldap_db_engine: hdb
+slapd_exec: /usr/local/libexec/slapd

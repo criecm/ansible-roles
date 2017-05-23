@@ -1,0 +1,19 @@
+# defaults are debian-compatible
+---
+openldap_confdir: /etc/ldap
+openldap_user: openldap
+openldap_group: openldap
+openldap_datadir: /var/lib/ldap
+openldap_db_engine: mdb
+openldap_db_maxsize: 1073741824
+slapd_service_name: slapd
+slapd_exec: /usr/sbin/slapd
+
+openldap_slave_rid: 0
+openldap_schmas:
+  - core
+  - cosine
+  - inetorgperson
+  - nis
+
+openldap_tls_cert:

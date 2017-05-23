@@ -15,6 +15,21 @@ zshpath: /bin/zsh
 # etcprefix (/usr/local or not)
 etcprefix: ''
 
+# ntp
+ntp_service: ntp
+
+# config ntp
+ntp_config: ntp.conf
+
+# serveurs ntp
+ntp_servers: []
+
+ntp_pools: []
+
+ntp_listen_addrs: []
+
+ntp_leapfile:
+
 # mailrelays selected by network
 # ex: - { network: 10.0.0.0/24, relay: smtp.internal }
 #     - { network: 192.168.0.0/24, relay: smtp.special }
@@ -98,3 +113,4 @@ host_sysadm_gits: []
 
 # ssh key for above git repos (fiole name in files/, copied to /root/.ssh/)
 git_ssh_key:
+

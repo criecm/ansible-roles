@@ -3,3 +3,5 @@ ldap_etcdir: /etc/openldap
 zshpath: /usr/local/bin/zsh
 mailaliases: /etc/mail/aliases
 prefix: /usr/local
+ntp_service: ntpd
+ntp_config: ntpd.conf

@@ -145,6 +145,7 @@
     regexp: '^daily_ntpd_leapfile_enable='
     insertafter: 'daily_ntpd_leapfile_enable'
     dest: /etc/periodic.conf
+    create: True
   tags: baseconf, ntpd
 
 - name: enable bsnmpd

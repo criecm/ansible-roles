@@ -3,8 +3,8 @@
 include		{{ openldap_confdir }}/schema/{{ schema }}.schema
 {% endfor %}
 
-pidfile         /var/run/openldap/slapd.pid
-argsfile        /var/run/openldap/slapd.args
+pidfile         {{ slapd_pidfile }}
+argsfile        {{ slapd_argsfile }}
 
 #       1      trace function calls
 #       2      debug packet handling
@@ -27,13 +27,13 @@ argsfile        /var/run/openldap/slapd.args
 #loglevel 1 
 loglevel 0
 
+{% if openldap_modsdir != "" %}
 # Load dynamic backend modules:
-#modulepath     /usr/local/libexec/openldap
-#moduleload     back_bdb.la
-# moduleload    back_ldap.la
-#moduleload     back_ldbm.la
-# moduleload    back_passwd.la
-# moduleload    back_shell.la
+modulepath     {{ openldap_modsdir }}
+{% for dbm in openldap_dbmodules %}
+moduleload     back_{{ dbm }}.la
+{% endfor %}
+{% endif %}
 
 {% if openldap_tls_cert %}
 TLSCertificateFile      {{ openldap_confdir }}/ssl/{{ openldap_tls_cert }}
@@ -94,12 +94,15 @@ syncrepl rid={{ db.slave.rid | default(openldap_slave_rid) }}
         credentials={{ db.slave.credentials }}
         bindmethod={{ db.slave.bindmethod }}
         searchbase="dc=egim-mrs,dc=fr"
-        tls_cacert={{ ldap_tls_cacert }}
+        tls_cacert={{ db.slave.tls_cacert | default(ldap_tls_cacert) }}
         scope=sub
         schemachecking=on
 
 {% if "updateref" in db.slave %}updateref {{ db.slave.updateref }}{% endif %}
 
+{% endif %}
+{% if openldap_modsdir != "" %}
+moduleload dynlist
 {% endif %}
 overlay dynlist
 dynlist-attrset groupOfURLs memberURL member

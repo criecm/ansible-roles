@@ -6,12 +6,11 @@ Install openldap server
 Requirements
 ------------
 
-FreeBSD 10+
+FreeBSD 10|11, debian 8
 
 Role Variables (default)
 ------------------------
 
- 
   * `openldap_schmas` ([core, cosine, inetorgperson, nis ])
     LDAP schemas to include in config
     if a file exists in files/openldap/{{name}}.schema, it will be copied
@@ -35,12 +34,19 @@ Role Variables (default)
       * in playbook: playbook/files/openldap/ for source
       * destination: `openldap_confdir`/
     * `slave`: dict ({})
-      * `rid` (`openldap_slave_rid`)
-      * `provider` ()
-      * `searchbase` ()
-      * `binddn` ()
-      * `credentials` ()
+      Makes this server a slave (syncrepl protocol)
+      * `rid` (`openldap_slave_rid`) *
+      * `provider` () *
+      * `searchbase` (suffix)
+      * `binddn` () *
+      * `credentials` () *
       * `bindmethod` (simple)
+      * `scope` (sub)
+      * `schemachecking` (on)
+      * `type` (refreshAndPersist)
+      * `retry` ("60 10 120 +")
+      * `interval` (00:00:00:15)
+      * `tls_cacert` (ldap_tls_cacert)
       * `updateref` ()
     * `indexes` (["objectClass","pres,eq"]) (+ ["entryUUID,entryCSN","eq"] if slave)
       list of couples attributeName(,s…), typeofsearch(es)
@@ -87,7 +93,13 @@ Example Playbook
       includes: [ slapd.access ]
       indexes:
         - [ "uid,uidNumber,gidNumber,memberUID", "pres,eq" ]
-
+      slave:
+        rid: 675
+        provider: ldaps://master.ldap.univ.fr:636
+        binddn: cn=bind,dc=dn
+        credentials: bindpw
+        bindmethod: simple
+        
 ```
 
 License

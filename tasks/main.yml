@@ -93,6 +93,11 @@
   - name: create dhparam
     command: 'openssl dhparam -out /etc/ssl/dhparam4096.pem 4096'
     when: not stat_dh.stat.exists
+  - name: mkdir private
+    file:
+      state: directory
+      mode: '0700'
+      path: '{{ tls_certs_dir }}/private'
   tags: nginx, config
 
 - name: sites

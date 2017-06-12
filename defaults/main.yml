@@ -19,3 +19,5 @@ sites: []
 
 monitoring_from:
   - 127.0.0.1
+
+tls_certs_dir: /etc/ssl

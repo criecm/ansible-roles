@@ -83,7 +83,7 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   x509 certificate (with intermediate certs)
 * `x509_key`
   private key for tls/http2
-* `x509_cachain`
+* `x509_stapling_chain`
   complete ca chain for stapling
   (from root CA to last intermediate)
 

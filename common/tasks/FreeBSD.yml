@@ -1,4 +1,16 @@
 ---
+# get jail status
+- name: get jail status
+  command: 'sysctl -n security.jail.jailed'
+  failed_when: False
+  check_mode: False
+  register: jail_status
+
+- name: register is_jail
+  set_fact:
+    is_jail: True
+  when: 'jail_status.rc == 0 and jail_status.stdout == "1"'
+
 # packages ecm
 - block:
   - name: mkdir pkgrepo

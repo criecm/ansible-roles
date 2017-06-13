@@ -20,3 +20,5 @@ openldap_schmas:
   - nis
 
 openldap_tls_cert:
+openldap_tls_key:
+openldap_tls_cacert:

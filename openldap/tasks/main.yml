@@ -41,10 +41,10 @@
       - '{{ openldap_tls_key }}'
   - name: ssl ca file
     copy:
-      src: '{{ openldap_tls_cacert }}'
+      src: '{{ openldap_tls_cacert | default(ldap_cacert) | default(tls_cacert) }}'
       dest: '{{ openldap_confdir }}/ca.crt'
-    when: 'openldap_tls_cacert'
-  when: 'openldap_tls_cert'
+    when: 'openldap_tls_cacert != "" or ldap_cacert != "" or tls_cacert != ""'
+  when: 'openldap_tls_cert != ""'
   tags: config, ssl, openldap
 
 - name: openldap schemas

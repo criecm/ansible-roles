@@ -1,6 +1,11 @@
 # {{ ansible_managed }}
 <VirtualHost *:80>
   ServerName {{ site.name }}
+{% if "aliases" in site and site.aliases | count() > 0 %}
+{% for alias in site.aliases %}
+  ServerAlias {{alias}}
+{% endfor%}
+{% endif %}
   LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" pcombined
   CustomLog "|/usr/bin/logger -h syslog.serv.int -p local3.info" pcombined
 

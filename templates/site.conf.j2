@@ -1,7 +1,7 @@
-{% if nginx_site.tls_redirect %}
+{% if nginx_site.tls_redirect and not proxified_by %}
 server {
 	listen 80;
-	server_name	{{ nginx_site.name }};
+	server_name	{{ nginx_site.name }}{% if nginx_site.aliases %} {{ nginx_site.aliases | join(" ") }}{% endif %};
 	redirect permanent / https://{{ nginx_site.name }}/;
 }
 {% endif %}
@@ -9,6 +9,9 @@ server {
 {% if nginx_site.listen %}
 server {
 	listen	{{ nginx_site.listen }}{% if nginx_site.x509_cert %} ssl{% endif %};
+{% if proxified_by %}
+	listen 80;
+{% endif %}
 {% if nginx_site.x509_cert %}
 	ssl_certificate {{ tls_certs_dir }}/{{ nginx_site.x509_cert | regex_replace(".*/","") }};
 	ssl_certificate_key {{ tls_certs_dir }}/private/{{ nginx_site.x509_key | regex_replace(".*/","") }};
@@ -29,7 +32,7 @@ server {
 	real_ip_header X-Forwarded-For;
 {% endif %}
 
-	server_name	{{ nginx_site.name }};
+	server_name	{{ nginx_site.name }}{% if nginx_site.aliases %} {{ nginx_site.aliases | join(" ") }}{% endif %};
 {% if not nginx_site.nginx_includes %}
 	location / {
 		root	{{ nginx_site.rootdir }};

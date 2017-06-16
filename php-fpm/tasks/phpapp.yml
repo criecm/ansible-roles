@@ -3,8 +3,6 @@
 
 - include_vars: phpsite.yml
 
-- debug: var=phpsite
-
 - debug: var=fpm_site
 
 - name: group
@@ -46,6 +44,27 @@
     - '{{ fpm_site.upload_dir }}'
   when: item | match("^/.*")
 
+- name: rsync home
+  synchronize:
+    compress: no
+    dest: '{{ fpm_site.home }}/'
+    src: '{{ fpm_site.id }}/home/'
+  with_first_found:
+    - 'files/{{ fpm_site.id }}/home'
+    - skip: True
+
+- name: chown home
+  file:
+    state: directory
+    owner: '{{ fpm_site.maintainer }}'
+    group: '{{ fpm_site.group }}'
+    recurse: yes
+    path: '{{ fpm_site.home }}'
+
+- name: site cron(s)
+  cron: '{{ item }}'
+  with_items: '{{ fpm_site.crons }}'
+
 - name: phpapp git code
   git:
     depth: '{{ item.depth | default(1) }}'
@@ -54,6 +73,7 @@
     umask: '{{ item.umask | default("0022") }}'
     version: '{{ item.version | default("master") }}'
     accept_hostkey: yes
+    update: '{{ item.update | default(0) | bool() }}'
   with_items: '{{ fpm_site.gits }}'
   when: '"gits" in fpm_site'
   register: fpmgitdirs

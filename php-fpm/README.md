@@ -38,7 +38,8 @@ Calls webserver role (nginx by default) per site to create HTTP confs
 * `group` (_{{id}}): Common group for user and maintainer
 
 * `home` (/home/{{id}}): Home of 'maintainer' and base for other default values (tmpdir, rootdir, ...)
-
+  if a directory playbook/files/{{ id }}/home exists, it will be used as a template for the homedir
+  
 * `rootdir` (/home/{{id}}/{{id}}): php and webserver root directory
 
 * `gits` ([]): list of dicts:
@@ -60,6 +61,8 @@ Calls webserver role (nginx by default) per site to create HTTP confs
   * `mode`: (0640)
   * `owner`: (`{{maintainer}}`)
   * `group`: (`{{group}}`)
+
+* `crons` ([]): List of cron dicts (see ansible cron module for values)
 
 * `webserver_role` (nginx): Which webserver role to use (see webserver's role's README.md for additional vars)
 

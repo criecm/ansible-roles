@@ -39,5 +39,6 @@ default_fpm_site:
   error_log: '{{ fpm_error_log }}'
   fcgisocket: '/var/run/{{ phpsite.id }}.sock'
   webserver_role: nginx
+  crons: []
 
 fpm_site: '{{ default_fpm_site | combine(phpsite) }}'

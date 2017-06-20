@@ -1,7 +1,7 @@
 ---
 - name: iocage pkg
   pkgng:
-    name: iocage
+    name: py36-iocage
     state: present
   tags: iocage,hostinit,pkg
 
@@ -27,7 +27,7 @@
 - name: initialize iocage
   iocage:
     state: fetched
-    properties: '{{ fetch_properties }}'
+    args: '{{ fetch_args }}'
     release: '{{ releasecmd.stdout }}'
   tags: iocage, hostinit
 #  shell: /usr/local/sbin/iocage fetch release=11.0-RELEASE ftpfiles="base.txz doc.txz"
@@ -61,10 +61,10 @@
 #  tags: iocage, newjails
 
 # creer un/des jails
-- name: pkglist.txt
+- name: pkglist.json
   copy:
-    src: pkglist.txt
-    dest: /iocage/pkglist.txt
+    src: pkglist.json
+    dest: /iocage/pkglist.json
   tags: iocage, newjails
 
 #- name: create basejail

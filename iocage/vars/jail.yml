@@ -17,6 +17,7 @@ jail_defaults:
   tag: ''
   hostname: ''
   fstab: ''
+  template: 'no'
   resolver: '{% if "resolver" in onejail and onejail.resolver == "auto" %}{{ jail_resolver }}{% endif %}'
 
 jail: '{{ jail_defaults | combine(onejail) }}'

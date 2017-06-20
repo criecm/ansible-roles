@@ -9,9 +9,7 @@
     properties:
       ip4_addr: '{{ jail.ip4 | default("none") }}'
       ip6_addr: '{{ jail.ip6 | default("none") }}'
-      boot: "on"
-      pkglist: /iocage/pkglist.txt
-      hostname: '{{ jail.hostname }}'
+      boot: '{{ jail.boot | default("on") }}'
       host_hostname: '{{ jail.hostname }}'
       resolver: '{{ jail.resolver }}'
     state: present
@@ -92,6 +90,6 @@
   register: pkg_installed
 
 - name: install python
-  shell: 'env ASSUME_ALWAYS_YES=yes pkg -c /iocage/jails/{{ iocage_jail.uuid }}/root install -y pkg python'
-  when: not pkg_installed.stat.exists
+  shell: 'env ASSUME_ALWAYS_YES=yes pkg -c /iocage/jails/{{ iocage_jail.uuid }}/root install -y pkg python rsync'
+  when: not pkg_installed.stat.exists and 'template' not in iocage_jail
 

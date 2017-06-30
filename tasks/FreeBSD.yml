@@ -116,6 +116,14 @@
       regexp: '^auth.*@.*'
       insertafter: '^\*.\*\s+@.*'
     notify: restart BSD syslogd
+  - name: get rc flags
+    command: 'sysrc -n syslogd_flags'
+    register: sysrc_syslogd_flags
+    changed_when: False
+    check_mode: False
+  - name: set syslogd_flags
+    command: 'sysrc syslogd_flags="-c -s"'
+    when: sysrc_syslogd_flags.stdout != "-c -s"
   when: syslog_server != '' and not is_syslogd
   tags: baseconf, syslog
 

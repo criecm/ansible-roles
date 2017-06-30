@@ -96,6 +96,7 @@
     group: '{{ openldap_group }}'
     mode: '0640'
   tags: tst
+  changed_when: False
 
 - name: slapd.conf
   template:

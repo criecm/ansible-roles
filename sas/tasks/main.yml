@@ -47,7 +47,7 @@
 - name: stat crons
   shell: ls /var/cron/tabs
   register: lscron
-  changed_when: '{{ lscron.stdout_lines | count() }} == 0'
+  changed_when: 'lscron.stdout_lines | count() == 0'
   failed_when: False
   tags: sas, cron
 

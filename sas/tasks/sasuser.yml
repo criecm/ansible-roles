@@ -39,7 +39,7 @@
   copy:
     src: '{{ item }}'
     dest: '/var/cron/tabs/{{ item | regex_replace("^.*/([^/]+)$","\1") }}'
-  when: '"{{ item | regex_replace("^.*/([^/]+)$","\1") }}" not in crons.stdout_lines'
+  when: '"item | regex_replace(\"^.*/([^/]+)$\",\"\1\")" not in crons.stdout_lines'
   with_fileglob: 
     - 'files/sas/crontabs/{{ ansible_hostname }}/*'
 

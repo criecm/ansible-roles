@@ -94,7 +94,7 @@
   with_nested:
     - '{{ pam_config_dirs }}'
     - '{{ pam_ldap_services }}'
-  when: '{{ pam_ldap_services | count }} > 0'
+  when: 'pam_ldap_services | count > 0'
   register: statpam
 
 - name: modify pam configs

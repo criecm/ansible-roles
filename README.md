@@ -1,7 +1,8 @@
 # nsd
 
-Install & (re)configure nsd server on Debian or FreeBSD
+Install & (re)configure nsd server on Debian, FreeBSD or OpenBSD
 avec `nsd-control (add|delete)zone $ZONE $PATTERN`
+
 
 ## Variables (default)
 

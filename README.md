@@ -73,7 +73,7 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   server aliases
 * `nginx_includes`
   files or templates included inside `server {}` block
-  see *files locations* for path
+  see *Files / Templates locations* for path
 
 #### TLS / HTTP2 (all or none)
 

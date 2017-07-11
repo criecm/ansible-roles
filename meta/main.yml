@@ -19,8 +19,8 @@ galaxy_info:
         - stretch
 
 dependencies:
-  - role: common
-  - role: nginx
-  - role: nsd
-  - role: dhcpd
+  - role: criecm.common
+  - role: criecm.nginx
+  - role: criecm.nsd
+  - role: criecm.dhcpd
 

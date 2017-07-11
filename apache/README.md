@@ -43,14 +43,14 @@ apache install with different sites
 From vars/site.yml:
 ```
 siteconf_locations:
-  - '{{ playbook_dir }}/templates/{{ apache_site.id }}/apache/{{ apache_site.id }}.conf.j2'
-  - '{{ playbook_dir }}/files/{{ apache_site.id }}/apache/{{ apache_site.id }}.conf'
+  - '{{ playbook_dir }}/templates/{{ id }}/apache/{{ id }}.conf.j2'
+  - '{{ playbook_dir }}/files/{{ id }}/apache/{{ id }}.conf'
   - 'templates/{{ apache_type }}/site.conf.j2'
   - templates/site.conf.j2
 
 include_locations:
-  - '{{ playbook_dir }}/templates/{{ apache_site.id }}/apache/{{ item }}.j2'
-  - '{{ playbook_dir }}/files/{{ apache_site.id }}/apache/{{ item }}'
+  - '{{ playbook_dir }}/templates/{{ id }}/apache/{{ item }}.j2'
+  - '{{ playbook_dir }}/files/{{ id }}/apache/{{ item }}'
   - 'templates/apache/{{ apache_type }}/{{ item }}.j2'
   - 'templates/apache/{{ item }}.j2'
   - '{{ playbook_dir }}/files/apache/{{ item }}'

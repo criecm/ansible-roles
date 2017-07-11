@@ -40,7 +40,7 @@ iocage host install/config and jails installation
 (here we have them in `group_vars/all.yml`). This will select search domain(s) and nameservers
  depending on jail's IP addresses.
 
-<code><pre>``
+``
 # if ip is in 'network', 'domain' is added
 search_domains:
   - { network: '192.0.2.0/24', domain: 'our.example.net' }
@@ -55,18 +55,18 @@ nameservers:
   - { network: '2001:0DB8:fe43::/56', ip: 2001:0DB8::1 }
   - { network: '0.0.0.0/0', ip: 8.8.8.8 }
   - { network: '::/0', ip: 2620:0:ccc::2 }
-``</pre></code>
+``
 
 ## example playbook for host and one jail:
 
-```
+``
 - hosts: realmachine
   roles:
     - iocage
   vars:
     jail_list:
       - { tag: myjail, hostname: myjail.example.org, ip4: 'bge0|198.51.100.0' }
-```
+``
 
 ## ansible-iocage module
 update from source:

@@ -1,4 +1,4 @@
-# common - role ECM de base
+# common - base system role
 
 * CA x509
 * client OpenLDAP + config

@@ -1,8 +1,7 @@
 # {{ ansible_managed }}
+# put your one on playbooks/templates to ovverride this one
 autoload -Uz compinit
 compinit
-[ -r /usr/local/admin/sysutils/common/rootlogin.env.sh ] && . /usr/local/admin/sysutils/common/rootlogin.env.sh
-[ -r /usr/local/admin/sysutils/common/shell_aliases ] && . /usr/local/admin/sysutils/common/shell_aliases
 PS1='%n@%m# '
 HISTFILE=~/.zsh_history
 SAVEHIST=100000

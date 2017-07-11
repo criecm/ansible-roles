@@ -20,8 +20,8 @@ galaxy_info:
         - 6.1
     - name: Debian
       versions:
-        - 8
-        - 9
+        - jessie
+        - stretch
 
   galaxy_tags:
     - mailrelay_client

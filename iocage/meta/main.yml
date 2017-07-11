@@ -1,6 +1,6 @@
 galaxy_info:
   author: Geoffroy Desvernay
-  description: sysadm
+  description: iocage jail management for FreeBSD
   company: Ecole Centrale Marseille
 
   license: BSD

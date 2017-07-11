@@ -30,8 +30,6 @@
     args: '{{ fetch_args }}'
     release: '{{ releasecmd.stdout }}'
   tags: iocage, hostinit
-#  shell: /usr/local/sbin/iocage fetch release=11.0-RELEASE ftpfiles="base.txz doc.txz"
-#  tags: iocage, hostinit
 
 - name: Enable iocage service
   service:
@@ -73,7 +71,7 @@
 #    release: '{{ releasecmd.stdout }}'
 #    state: basejail
 #  tags: iocage, hostinit
-#  when: '{{jail_list}}'
+#  when: 'jail_list | count() > 0'
 
 - include: jail.yml
   with_items: '{{ jail_list }}'

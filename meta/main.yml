@@ -1,6 +1,6 @@
 galaxy_info:
   author: Geoffroy Desvernay
-  description: sysadm
+  description: base role for working system
   company: Ecole Centrale Marseille
 
   license: BSD

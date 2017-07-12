@@ -2,9 +2,12 @@
 
 iocage host install/config and jails installation
 
+Uses the `iocage` ansible module from https://github.com/criecm/ansible-iocage
+(embedded in the role's library/)
+
 ## Requirements
 
-* `iocage` ansible module from https://github.com/criecm/ansible-iocage
+FreeBSD host system
 
 ## Role variables
 

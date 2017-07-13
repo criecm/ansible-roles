@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Geoffroy Desvernay
-  description: netmagis
+  description: php-fpm server and webapps
   company: Ecole Centrale Marseille
 
   license: BSD
@@ -18,9 +18,5 @@ galaxy_info:
         - jessie
         - stretch
 
-dependencies:
-  - role: criecm.common
-  - role: criecm.nginx
-  - role: criecm.nsd
-  - role: criecm.dhcpd
+dependencies: []
 

@@ -140,10 +140,14 @@
   - name: zshrc
     template:
       dest: /root/.zshrc
-      src: zshrc.j2
+      src: '{{ item }}'
       mode: '0600'
       owner: root
   tags: zshroot
+  with_first_found:
+    - '{{ playbook_dir }}/templates/zshrc.j2'
+    - '{{ playbook_dir }}/files/zshrc'
+    - zshrc.j2
 
 - block:
   - name: git sysutils/common

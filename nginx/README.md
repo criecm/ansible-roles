@@ -35,7 +35,7 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 * `nginx_processes` (1)
    as in nginx.conf
 * `error_loglevel` (info)
-* `www_default_root` (/var/www/default)
+* `www_default_root` (platform dependant)
 * `nginx_log_dir` (/var/log/nginx)
 * `nginx_modules` ([])
   nginx dynamic modules to include

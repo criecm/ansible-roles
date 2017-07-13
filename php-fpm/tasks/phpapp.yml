@@ -67,7 +67,6 @@
 
 - name: phpapp git code
   git:
-    depth: '{{ item.depth | default(1) }}'
     dest: '{{ item.dest | default(fpm_site.rootdir) | regex_replace("^([^/])",fpm_site.home+"/\\1") }}'
     repo: '{{ item.repo }}'
     umask: '{{ item.umask | default("0022") }}'

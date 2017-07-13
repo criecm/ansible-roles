@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Geoffroy Desvernay
-  description: netmagis
+  description: apache webserver and sites
   company: Ecole Centrale Marseille
 
   license: BSD
@@ -20,7 +20,4 @@ galaxy_info:
 
 dependencies:
   - role: criecm.common
-  - role: criecm.nginx
-  - role: criecm.nsd
-  - role: criecm.dhcpd
 

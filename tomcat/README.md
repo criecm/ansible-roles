@@ -2,24 +2,30 @@
 
 FreeBSD & Debian, tomcat 8, jdk8, memcache sessions, remoteipvalve support
 
-## general config
+## variables (default value)
 
-* RemoteIpValve from:
-  * `reverse_proxies` (array of IP's)
-* `classpath_adds`: jar's list to be added
-* `tomcat_java_opts`: java command opts
-* listen on 8080 (`tomcat_http_port`) and 8009 (`tomcat_ajp_port`)
+### general config
+
+* `classpath_adds` ('')
+  jar's list to be added, column-separated (:)
+* `tomcat_java_opts` ('')
+  additional java command args
+* `tomcat_http_port` (8080)
+  http port
+* `tomcat_ajp_port` (8009)
+  ajp port
 * see `defaults/main.yml` for exhaustive list
 
-## http(s) reverse-proxy support
+### http(s) reverse-proxy support
 
-if `proxies_ips_regex` is not empty:
+* `proxies_ips_regex` ('')
+  regex matching proxy(ies) IP (eg: '^(127\.0\.0\.1|::1)$' for localhost IPv4 and IPv6)
 
-* RemoteIpValve will be configured, supporting:
+* if `proxies_ips_regex` is defined, RemoteIpValve will be configured, supporting:
   * X-Forwarded-For
   * X-Forwarded-Proto (must be 'https' if ssl)
 
-## memcache sessions
+### memcache sessions
 
 if `tomcat_memcached_nodes` is not empty:
 
@@ -32,7 +38,7 @@ Using https://github.com/magro/memcached-session-manager/wiki
 
 (see templates/context.xml.j2)
 
-## webapps deployment
+### webapps deployment
 
 * `tomcat_webapps` is a dict of webapps to deploy (defaults to empty)
   * `key` is name

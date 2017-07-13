@@ -47,7 +47,6 @@ Calls webserver role (nginx by default) per site to create HTTP confs
   * `repo`: git URL to the repository
   and MAY provide (default):
   * `dest`: destination directory (`{{rootdir}}`)
-  * `depth`: nr of commits of history to get (1)
   * `umask`: ('0022')
   * `update`: whether to update existing repo (no)
   * `version`: tag or branch (master)

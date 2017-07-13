@@ -1,23 +1,23 @@
 ---
 siteconf_locations:
-  - '{{ playbook_dir }}/templates/apache/{{ apache_site.key }}/{{ apache_site.key }}.conf.j2'
-  - '{{ playbook_dir }}/files/apache/{{ apache_site.key }}/{{ apache_site.key }}.conf'
+  - '{{ playbook_dir }}/templates/{{ apache_site.id }}/apache/{{ apache_site.id }}.conf.j2'
+  - '{{ playbook_dir }}/files/{{ apache_site.id }}/apache/{{ apache_site.id }}.conf'
   - 'templates/{{ apache_type }}/site.conf.j2'
   - templates/site.conf.j2
 
 include_locations:
-  - '{{ playbook_dir }}/templates/apache/{{ apache_site.key }}/{{ item }}.j2'
-  - '{{ playbook_dir }}/files/apache/{{ apache_site.key }}/{{ item }}'
+  - '{{ playbook_dir }}/templates/{{ apache_site.id }}/apache/{{ item }}.j2'
+  - '{{ playbook_dir }}/files/{{ apache_site.id }}/apache/{{ item }}'
   - 'templates/apache/{{ apache_type }}/{{ item }}.j2'
   - 'templates/apache/{{ item }}.j2'
   - '{{ playbook_dir }}/files/apache/{{ item }}'
 
 # site par defaut
 default_site:
-  key: default
+  id: default
   name: ''
-  includes: []
-  rootdir: '{{ apache_rootbase }}/{{ onesite.key }}'
+  apache_includes: []
+  rootdir: '{{ apache_rootbase }}/{{ onesite.id }}'
   rootsrc: ''
   gitroot: ''
   group: '{{ www_group }}'

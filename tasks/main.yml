@@ -37,7 +37,7 @@
   notify: restart ntpd
 - name: enable ntp
   service:
-    name: ntpd
+    name: '{{ ntp_service }}'
     enabled: yes
     state: started
   when: 'ntp_servers or ntp_pools and not is_jail'

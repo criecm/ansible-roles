@@ -152,12 +152,12 @@
 - block:
   - name: git sysutils/common
     file:
-      path: /usr/local/admin/sysutils
+      path: '{{ gits_root }}'
       state: directory
       mode: '0750'
       owner: root
       group: 0
-    when: 'sysadm_gits | union(host_sysadm_gits) | count() > 0'
+    when: 'gits_root != "/root"'
   - name: cle ssh depoiement
     copy:
       dest: '/root/.ssh/{{ git_ssh_key }}'
@@ -165,16 +165,22 @@
       owner: root
       group: 0
       mode: '0600'
-    when: git_ssh_key != ""
-  - name: repos git sysadm_gits
+    when: 'git_ssh_key != ""'
+  - name: repos git gits
     git:
-      dest: '/usr/local/admin/sysutils/{{ item.name }}'
+      dest: '{{ item.dest | regex_replace("^[^/]",gits_root+"/\1" }}'
       repo: '{{ item.giturl }}'
       accept_hostkey: yes
       key_file: '/root/.ssh/{{ git_ssh_key }}'
       depth: 2
-    with_items: '{{ sysadm_gits | union(host_sysadm_gits) }}'
-  tags: gitecm
+      umask: '{{ item.umask | default("0022") }}'
+      version: '{{ item.version | default("master") }}'
+      owner: '{{ item.owner | default("root") }}'
+      group: '{{ item.group | default("0") }}'
+      mode: '{{ item.mode | default("u=rwX,g=rX,o-rwX") }}'
+    with_items: '{{ gits | union(host_gits) }}'
+  tags: gits
+  when: 'gits | union(host_gits) | count() > 0'
 
 - block:
   - name: old cron daily

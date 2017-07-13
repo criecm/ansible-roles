@@ -38,10 +38,19 @@
     list of dicts, ip will be used if host match network (in listed order)
   * `rootmailto` ()
     mail to forward root's mail
-  * `sysadm_gits` and `host_sysadm_gits` ([])
-    list of dicts:
-      name: name of directory in /usr/local/admin/sysutils/
-      giturl: git url to clone there
+  * `gits_root` ('/root')
+    path for relative path in `gits`
+  * `gits` and `host_gits` ([])
+    lists of dicts: each MUST have at least
+      * `repo`: git url to clone there
+      * `dest`: destination path (absolute or relative to gits_root)
+    and MAY have:
+      * `umask` ('0022')
+      * `update` (False)
+      * `version` (master)
+      * `owner` (root)
+      * `group` (0)
+      * `mode` (u=rwX,g=rX,o=rX)
 
 ### FreeBSD specific
 
@@ -50,12 +59,12 @@
   * `is_jail` (False)
     if True, will skip hardware monitoring tools (smart, ipmi, snmp, dmidecode, munin)
 
-### *BSD specific
+### BSD specific
 
   * `pkgs` ([])
     additionnal packages to install
 
-### syslog
+### Syslog
 
   * `syslog_server` ()
     If defined, all logs will be send there
@@ -69,13 +78,13 @@
   * `x509_ca_path` (/etc/ssl/ca.crt)
     dest path for above cert file
 
-### mailrelay
+### Mailrelay
   * `is_mailrelay` (False)
     Does not configure mail relay if True
   * `mailrelay` ()
     If defined, name/IP of the mail relay
 
-### ldap basic config
+### LDAP basic config
   * `ldap_base` (dc=univ,dc=fr)
     baseDN ldap (for ldap.conf)
   * `ldap_uri` ('ldaps://ldapr.univ.fr/ ldaps://ldap.univ.fr/')
@@ -83,7 +92,7 @@
   * `ldap_tls_reqcert` (never)
     value for same name in ldap.conf
 
-### ntp
+### Network Time Protocol (ntp)
 
 If any of `ntp_servers` or `ntp_pools` is non-empty
   the role will take care of ntp(d).conf and ntp service

@@ -105,11 +105,14 @@ sshd_lines: []
 # host specific pkgs 
 pkgs: []
 
-# sysadm_gits: git repos to deploy in /usr/local/admin/sysutils
-sysadm_gits: []
+# path prefix for relative gits[path]'s
+gits_root: /root
 
-# idem, for use in host vars
-host_sysadm_gits: []
+# gits: git repos to deploy in /usr/local/admin/sysutils
+gits: []
+
+# idem, added to gits at runtime (for use in host vars or ...)
+host__gits: []
 
 # ssh key for above git repos (fiole name in files/, copied to /root/.ssh/)
 git_ssh_key:

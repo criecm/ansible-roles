@@ -143,11 +143,11 @@
       src: '{{ item }}'
       mode: '0600'
       owner: root
+    with_first_found:
+      - '{{ playbook_dir }}/templates/zshrc.j2'
+      - '{{ playbook_dir }}/files/zshrc'
+      - zshrc.j2
   tags: zshroot
-  with_first_found:
-    - '{{ playbook_dir }}/templates/zshrc.j2'
-    - '{{ playbook_dir }}/files/zshrc'
-    - zshrc.j2
 
 - block:
   - name: git sysutils/common

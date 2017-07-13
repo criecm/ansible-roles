@@ -1,7 +1,7 @@
 {% if nginx_site.tls_redirect and not proxified_by %}
 server {
 	listen 80;
-	server_name	{{ nginx_site.name }}{% if nginx_site.aliases %} {{ nginx_site.aliases | join(" ") }}{% endif %};
+	server_name	{{ nginx_site.name }}{% if nginx_site.aliases | count > 0 %} {{ nginx_site.aliases | join(" ") }}{% endif %};
 	redirect permanent / https://{{ nginx_site.name }}/;
 }
 {% endif %}

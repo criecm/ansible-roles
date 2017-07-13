@@ -17,6 +17,7 @@ include_locations:
 default_site:
   id: default
   name: ''
+  aliases: []
   nginx_includes: []
   rootdir: '{{ onesite_home | default("/home/"+onesite.id) }}/{{ onesite.id }}'
   rootsrc: ''

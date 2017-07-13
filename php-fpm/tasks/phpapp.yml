@@ -67,7 +67,7 @@
 
 - name: phpapp git code
   git:
-    dest: '{{ item.dest | default(fpm_site.rootdir) | regex_replace("^([^/])",fpm_site.home+"/\\1") }}'
+    dest: '{{ item.dest | default(fpm_site.rootdir) | regex_replace("^([^/])",fpm_site.home+"/\1") }}'
     repo: '{{ item.repo }}'
     umask: '{{ item.umask | default("0022") }}'
     version: '{{ item.version | default("master") }}'
@@ -80,7 +80,7 @@
 - name: chown git code
   file:
     state: directory
-    path: '{{ item.dest | default(fpm_site.rootdir) | regex_replace("^([^/])",fpm_site.home+"/\\1") }}'
+    path: '{{ item.dest | default(fpm_site.rootdir) | regex_replace("^([^/])",fpm_site.home+"/\1") }}'
     recurse: yes
     owner: '{{ item.owner | default(fpm_site.maintainer) }}'
     group: '{{ item.group | default(fpm_site.group) }}'

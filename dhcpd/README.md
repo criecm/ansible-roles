@@ -6,7 +6,7 @@ Serveur isc-dhcpd, config manuelle dans dhcpd.conf.local
 
   * `dhcpd_default_domain`: '{{ ansible_domain }}'
     default domain name for dhcp clients
-  * `dhcpd_default_dns`: '{{ nameservers[0].ip }}'
+  * `dhcpd_default_dns`: '{{ resolvers[0].ip }}'
     resolver for clients
   * `dhcpd_default_lease_time`: 1200
   * `dhcpd_max_lease_time`: 7200

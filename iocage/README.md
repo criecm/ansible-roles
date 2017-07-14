@@ -39,8 +39,8 @@ FreeBSD host system
 
 ### resolver=auto logic
 
-`resolver` will be auto-populated according to variables `search_domains` and `nameservers`
-(here we have them in `group_vars/all.yml`). This will select search domain(s) and nameservers
+`resolver` will be auto-populated according to variables `search_domains` and `resolvers`
+(here we have them in `group_vars/all.yml`). This will select search domain(s) and resolvers
  depending on jail's IP addresses.
 
 ```
@@ -51,8 +51,8 @@ search_domains:
   - { network: '2001:0DB8:fe43::/32', domain: 'ipv6.example.org' }
   - { network: '0.0.0.0/0', domain: 'example.com' }
 
-# if ip is in 'network', 'ip' is added to nameservers
-nameservers:
+# if ip is in 'network', 'ip' is added to resolvers
+resolvers:
   - { network: '192.0.2.0/24', ip: 192.0.2.1 }
   - { network: '198.51.100.0/24', ip: 192.0.2.1 }
   - { network: '2001:0DB8:fe43::/56', ip: 2001:0DB8::1 }

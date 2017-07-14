@@ -116,14 +116,14 @@
 
 - name: nginx config
   include_role:
-    name: nginx
+    name: criecm.nginx
   vars:
     sites: '[ {{ fpm_site }} ]'
-  when: 'fpm_site.webserver_role == "nginx"'
+  when: 'fpm_site.webserver_role == "criecm.nginx"'
 
 - name: apache config
   include_role:
-    name: apache
+    name: criecm.apache
   vars:
     sites: '[ {{ fpm_site }} ]'
-  when: 'fpm_site.webserver_role == "apache"'
+  when: 'fpm_site.webserver_role == "criecm.apache"'

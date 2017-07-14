@@ -59,7 +59,7 @@ include_locations:
 ## example playbook
 ```
 - hosts: webhost*
-  roles: apache
+  roles: criecm.apache
   vars:
     apache_freebsd_modules:
       - ap24-mod_auth_cas

@@ -34,7 +34,7 @@
   * `host_timezone` (Europe/Paris)
   * `is_resolver` (False)
     if True, will use 127.0.0.1 in resolv.conf first
-  * `nameservers` ( [{ network='0.0.0.0/0', ip='8.8.8.8' }] )
+  * `resolvers` ( [{ network='0.0.0.0/0', ip='8.8.8.8' }] )
     list of dicts, ip will be used if host match network (in listed order)
   * `rootmailto` ()
     mail to forward root's mail

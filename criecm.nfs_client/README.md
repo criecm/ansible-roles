@@ -16,7 +16,7 @@ Just define `{{ldap_autofs_master_map}}` to auto.master with the example below:
 default values (defaults/main.yml) will work 
 with this kind of ldap records:
 
-<pre><code>
+```
 # auto.master glue
 dn: nisMapName=auto.master,ou=automount,dc=example,dc=com
 nisMapName: auto.master
@@ -42,6 +42,6 @@ objectClass: nisObject
 nisMapName: auto.users
 cn: info
 nisMapEntry: -fstype=nfs,rw filer:/srv/info
-</code></pre>
+```
 
 

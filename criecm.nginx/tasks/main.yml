@@ -76,7 +76,7 @@
       src: realip.conf.j2
       dest: '{{ nginx_etcdir }}/conf.d/realip.conf'
     notify: restart nginx
-  when: 'proxified_by != ""'
+  when: 'proxified_by | length != 0'
   tags: nginx, config
 
 # x509 - global part

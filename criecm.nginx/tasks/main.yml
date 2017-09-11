@@ -98,6 +98,7 @@
       state: directory
       mode: '0700'
       path: '{{ tls_certs_dir }}/private'
+  when: do_tls
   tags: nginx, config
 
 - name: sites

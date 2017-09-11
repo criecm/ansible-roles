@@ -8,10 +8,10 @@ server {
 
 {% if nginx_site.listen %}
 server {
-	listen	{{ nginx_site.listen }}{% if nginx_site.x509_cert %} ssl{% endif %};
 {% if proxified_by %}
 	listen 80;
-{% endif %}
+{% else %}
+	listen	{{ nginx_site.listen }}{% if nginx_site.x509_cert %} ssl{% endif %};
 {% if nginx_site.x509_cert %}
 	ssl_certificate {{ tls_certs_dir }}/{{ nginx_site.x509_cert | regex_replace(".*/","") }};
 	ssl_certificate_key {{ tls_certs_dir }}/private/{{ nginx_site.x509_key | regex_replace(".*/","") }};
@@ -21,6 +21,7 @@ server {
 	ssl_stapling_verify     on;
 {% if nginx_site.tls_hsts | default(31536000) > 0 %}
 	add_header Strict-Transport-Security "max-age={{ nginx_site.tls_hsts | default(31536000) }}";
+{% endif %}
 {% endif %}
 {% endif %}
 {% endif %}

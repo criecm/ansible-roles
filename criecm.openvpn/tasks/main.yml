@@ -36,8 +36,9 @@
   tags: openvpn, keys
 
 - name: generate dhparams
-  shell: openssl dhparam -out /usr/local/etc/openvpn/keys/dh.pem 2048
-  creates: /usr/local/etc/openvpn/keys/dh.pem
+  shell: 'openssl dhparam -out /usr/local/etc/openvpn/keys/dh.pem 2048'
+  args:
+    creates: /usr/local/etc/openvpn/keys/dh.pem
   tags: openvpn, config
 
 - name: check dhparam

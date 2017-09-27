@@ -14,6 +14,7 @@
     - 'nfsuserd_enable="YES"'
     - 'rpc_lockd_flags="-p 4045"'
     - 'rpc_statd_flags="-p 4047"'
+    - 'rpc_mountd_flags="-p 4046"'
     - 'nfscbd_flags="-p 4048"'
     - 'nfsuserd_flags="-domain {{idmap_domain}} -usermax 5000"'
   notify: freebsd restart nfs all

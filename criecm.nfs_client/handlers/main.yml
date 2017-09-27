@@ -25,5 +25,11 @@
 
 - name: debian restart nfs all
   service:
-    name: nfs-common
+    name: '{{ item }}'
     state: restarted
+  with_items:
+    - nfs-client
+    - nfs-utils
+    - nfs-statd
+    - nfs-statd-notify
+  failed_when: never

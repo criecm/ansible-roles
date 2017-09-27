@@ -1,15 +1,17 @@
 ---
 # config nfs services
 - block:
-  - apt:
-    name: nfs-common
-    state: present
+  - name: installe nfs-common
+    apt:
+      name: nfs-common
+      state: present
   - name: lockd & callback ports
     copy:
       src: :etc:modprobe.d:nfs.conf
       dest: /etc/modprobe.d/nfs.conf
       mode: '0600'
       owner: root
+    notify: debian restart nfs all
   - name: statd port
     lineinfile:
       dest: /etc/default/nfs-common
@@ -18,6 +20,7 @@
       - 'STATDOPTS="-p 4047"'
       - 'NEED_STATD=yes'
       - 'NEED_IDMAPD=yes'
+    notify: debian restart nfs all
   - name: fix start-statd
     copy:
       src: :usr:sbin:start-statd
@@ -30,6 +33,6 @@
       dest: /etc/idmapd.conf
       mode: '0644'
       owner: root
-  notify: debian restart nfs all
+    notify: debian restart nfs all
 
 # TODO: autofs LDAP

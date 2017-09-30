@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Geoffroy Desvernay
-  description: netmagis
+  description: netmagis DHCP/DNS/... web frontend
   company: Ecole Centrale Marseille
 
   license: BSD
@@ -11,7 +11,6 @@ galaxy_info:
   platforms:
     - name: FreeBSD
       versions:
-        - 11.1
         - 11.0
         - 10.3
     - name: Debian
@@ -19,6 +18,10 @@ galaxy_info:
         - jessie
         - stretch
 
+  galaxy_tags:
+    - dhcp
+    - dns
+    - web
 dependencies:
   - role: criecm.common
   - role: criecm.nginx

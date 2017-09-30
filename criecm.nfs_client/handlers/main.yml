@@ -32,4 +32,4 @@
     - nfs-utils
     - nfs-statd
     - nfs-statd-notify
-  failed_when: never
+  failed_when: False

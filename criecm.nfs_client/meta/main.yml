@@ -23,5 +23,4 @@ galaxy_info:
     - nss
     - pam
 
-dependencies:
-  - role: criecm.ldap_client
+dependencies: []

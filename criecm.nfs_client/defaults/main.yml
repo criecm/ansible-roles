@@ -1,4 +1,5 @@
 ---
+ldap_autofs: False
 # if defined, automount from ldap map
 #ldap_autofs_master_map: auto.master
 ldap_autofs_master_map:
@@ -22,4 +23,12 @@ ldap_autofs_entry_attr: cn
 #   we have used this to remove vers=3 from mount options:
 # ldap_autofs_transform: "sed 's/,vers=3//'"
 ldap_autofs_transform:
+
+statd_port: 4047
+
+lockd_port: 4045
+
+nfsccb_port: 4048
+
+idmap_domain:
 

@@ -22,4 +22,4 @@
 
 - debug:
    msg: 'Zone {{ zone.name }} modifiee ou ajoutee'
-  when: 'zadd.changed'
+  when: 'zone.pattern != "" and z.rc == 1 and zone.pattern in nsd_patterns_list and zadd.changed'

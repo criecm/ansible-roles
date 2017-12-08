@@ -5,25 +5,16 @@
 # Le fichier de conf sera copié (si .j2 c'est un template):
 #   dans /etc/apache2/sites-enables/sitexmple.conf
 #   depuis (first match wins) {{ siteconf_locations }} dans vars/site.yml:
-#     playbooks/templates/apache/sitexemple/sitexemple.conf.j2
-#     playbooks/files/apache/sitexemple/sitexemple.conf
-#     playbooks/templates/apache/site.conf.j2
-#     templates/apache/site.conf.j2
-# 
+ 
 # les 'includes' seront copiés: (ex. pour 'file1.inc'):
 #   dans /etc/apache2/file1.inc
 #   depuis (first match wins) {{ include_locations }} dans vars/site.yml:
-#     playbooks/templates/apache/sitexemple/file1.inc.j2
-#     playbooks/files/apache/sitexemple/file1.inc
-#     playbooks/templates/apache/file1.inc.j2
-#     playbooks/files/apache/file1.inc
-#     
 ---
 - include_vars: site.yml
 
 - name: site includes
   template:
-    dest: '{{ apache_etcdir }}/{{ item }}'
+    dest: '{{ apache_etcdir }}/{{ item | regex_replace(".j2$","") }}'
     src: '{{ lookup("first_found", include_locations) }}'
   with_items: '{{ apache_site.apache_includes }}'
   when: '"apache_includes" in apache_site'
@@ -79,8 +70,36 @@
     with_items: '{{ apache_site.grwdirs }}'
     when: '"grwdirs" in onesite'
 
+- name: TLS cert
+  copy:
+    src: 'tls/{{ apache_site.tls_cert }}'
+    dest: '{{ tls_dir }}/{{ apache_site.tls_cert }}'
+    mode: '0644'
+  when: '"tls_cert" in apache_site'
+
+- block:
+  - name: TLS private dir
+    file:
+      dest: '{{ tls_dir }}/private'
+      state: directory
+      mode: 0750
+      owner: root
+  - name: TLS key
+    copy:
+      src: 'tls/{{ apache_site.tls_key }}'
+      dest: '{{ tls_dir }}/private/{{ apache_site.tls_key }}'
+      mode: '0644'
+  when: '"tls_key" in apache_site'
+
 - name: site apache config
   template:
     dest: '{{ apache_etcdir }}/{{ apache_sitesdir }}/{{ apache_site.id }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'
 
+- name: Listen in Zsites.conf
+  lineinfile:
+    dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/Zsites.conf'
+    line: 'Listen {{ apache_site.listen }}'
+    regexp: 'Listen {{ apache_site.listen | regex_escape() }}'
+    insertafter: 'Listen'
+  when: '( ansible_os_family == "FreeBSD" and not apache_site.listen | regex_search("80$") ) or ( ansible_os_family == "Debian" and not apache_site.listen | regex_search("(80|443)$") )'

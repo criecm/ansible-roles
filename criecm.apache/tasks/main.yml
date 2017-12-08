@@ -25,7 +25,8 @@
       mode: '0644'
     with_fileglob:
       - 'apache/{{ apache_includesdir }}/*.conf'
-      - 'apache/{{ apache_type }}/{{ apache_includesdir }}/*.conf'
+      - '{{ inventory_hostname | regex_replace("[0-9]*$","") }}/apache/{{ apache_includesdir }}/*.conf'
+      - '{{ inventory_hostname }}/apache/{{ apache_includesdir }}/*.conf'
   - name: conf modules
     copy:
       src: '{{ item }}'
@@ -33,21 +34,29 @@
       mode: '0644'
     with_fileglob:
       - 'apache/{{ apache_modsconfdir }}/*.conf'
-      - 'apache/{{ apache_type }}/{{ apache_modsconfdir }}/*.conf'
+      - '{{ inventory_hostname | regex_replace("[0-9]*$","") }}/apache/{{ apache_modsconfdir }}/*.conf'
+      - '{{ inventory_hostname }}/apache/{{ apache_modsconfdir }}/*.conf'
   - name: conf .inc's
     copy:
       src: '{{ item }}'
       dest: '{{ apache_etcdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
       mode: '0644'
     with_fileglob:
+      - 'apache/{{ inventory_hostname }}/*.inc'
       - 'apache/*.inc'
-      - 'apache/{{ apache_type }}/*.inc'
+  - name: conf include sites
+    template:
+      dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/Zsites.conf'
+      src: sites.conf.j2
+      mode: '0644'
+      force: no
   - name: apache default files
     copy:
       dest: '{{ apache_rootbase }}/default/'
       src: '{{ item }}/'
     with_first_found:
-      - 'apache/{{ apache_type }}/default_root'
+      - '{{ inventory_hostname }}/apache/default_root'
+      - '{{ inventory_hostname | regex_replace("[0-9]*$","") }}/apache/default_root'
       - 'apache/default_root'
   tags: apache, config
 

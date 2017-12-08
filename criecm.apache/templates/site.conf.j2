@@ -1,0 +1,76 @@
+# {{ ansible_managed }}
+<VirtualHost {% if apache_site.listen | search(':') %}{{ apache_site.listen }}{% else %}*:{{ apache_site.listen }}{% endif %}>
+  ServerName {{ apache_site.name }}
+{% if "aliases" in apache_site and apache_site.aliases | count() > 0 %}
+{% for alias in apache_site.aliases %}
+  ServerAlias {{alias}}
+{% endfor %}
+{% endif %}
+
+{% if apache_site.rootdir %}
+  DocumentRoot {{ apache_site.rootdir }}
+
+  <Directory {{ apache_site.rootdir }}>
+    Require all granted
+  </Directory>
+{% endif %}
+
+{% if apache_site.tls %}
+  SSLEngine on
+{% if "tls_cert" in apache_site %}
+  SSLCertificateFile {{ tls_dir }}/{{ apache_site.tls_cert }}
+{% if "tls_key" in apache_site %}
+  SSLCertificateKeyFile {{ tls_dir }}/private/{{ apache_site.tls_key }}
+{% endif %}
+{% endif %}
+{% if "hsts" in apache_site %}
+  Header unset Strict-Transport-Security
+  Header set Strict-Transport-Security "max-age={{ apache_site.hsts }}"
+{% endif %}
+{% endif %}
+
+{% if "backends" in apache_site %}
+  ProxyPreserveHost On
+{% if apache_site.backends | count() > 1 %}
+  Header add Set-Cookie "{{ apache_site.id }}B=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
+  <Proxy balancer://{{ apache_site.id }}>
+	{% for backend in apache_site.backends %}
+	BalancerMember {{ backend }}
+	{% endfor %}
+	Require all granted
+	ProxySet stickysession={{ apache_site.id }}B timeout=3
+  </Proxy>
+  ProxyPass / balancer://{{ apache_site.id }}/
+  ProxyPassReverse / balancer://{{ apache_site.id }}/
+
+{% if admin_from %}
+<Location /balancer-manager>
+	SetHandler balancer-manager
+{% for net in admin_from %}
+	Require ip {{ net }}
+{% endfor %}
+</Location>
+ProxyPass /balancer-manager !
+{% endif %}
+
+{% endif %}
+{% elif apache_site.backends | count() == 1 %}
+  <Proxy {{ apache_site.backends[0] }}>
+    Require all granted
+  </Proxy>
+  ProxyPass / {{ apache_site.backends[0] }}
+  ProxyPassReverse / {{ apache_site.backends[0] }}
+{% endif %}
+
+{% for include in apache_site.apache_includes %}
+  Include {{ apache_etcdir }}/{{ include | regex_replace(".j2$","") }}
+{% endfor %}
+
+
+</VirtualHost>
+
+{% if apache_site.tls and apache_site.tls_redir %}
+<VirtualHost {% if apache_site.listen | search(':') %}{{ apache_site.listen | regex_replace(':.*',':80') }}{% else %}*:80{% endif %}>
+  Redirect permanent "/" "https://{{ apache_site.name }}{% if not apache_site.listen | regex_search(':?443$') %}:{{ apache_site.listen | regex_replace('.*:','') }}{% endif %}/"
+</VirtualHost>
+{% endif %}

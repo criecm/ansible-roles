@@ -1,12 +1,11 @@
 ---
-# backend or rproxy or whatever
-apache_type: backend
-
 # modules packages to install
 apache_freebsd_modules: []
 apache_debian_modules: []
 
 apache_enabled_modules: []
+
+tls_dir: /etc/ssl
 
 default_enabled_modules:
   - authn_file

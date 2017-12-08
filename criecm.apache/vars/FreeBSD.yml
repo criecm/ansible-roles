@@ -7,3 +7,4 @@ apache_modsconfdir: modules.d
 apache_rootbase: /usr/local/www
 www_user: www
 www_group: www
+tls_dir: /usr/local/etc/ssl

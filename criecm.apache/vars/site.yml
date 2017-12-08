@@ -2,13 +2,11 @@
 siteconf_locations:
   - '{{ playbook_dir }}/templates/{{ apache_site.id }}/apache/{{ apache_site.id }}.conf.j2'
   - '{{ playbook_dir }}/files/{{ apache_site.id }}/apache/{{ apache_site.id }}.conf'
-  - 'templates/{{ apache_type }}/site.conf.j2'
   - templates/site.conf.j2
 
 include_locations:
   - '{{ playbook_dir }}/templates/{{ apache_site.id }}/apache/{{ item }}.j2'
   - '{{ playbook_dir }}/files/{{ apache_site.id }}/apache/{{ item }}'
-  - 'templates/apache/{{ apache_type }}/{{ item }}.j2'
   - 'templates/apache/{{ item }}.j2'
   - '{{ playbook_dir }}/files/apache/{{ item }}'
 
@@ -17,12 +15,15 @@ default_site:
   id: default
   name: ''
   apache_includes: []
-  rootdir: '{{ apache_rootbase }}/{{ onesite.id }}'
+  rootdir: '{% if "rootsrc" in onesite or "gitroot" in onesite %}{{ apache_rootbase }}/{{ onesite.id }}{% endif %}'
   rootsrc: ''
   gitroot: ''
   group: '{{ www_group }}'
   user: '{{ www_user }}'
   grwfiles: []
   grwdirs: []
+  tls: False
+  tls_redir: False
+  listen: '{% if "tls" in onesite and onesite.tls %}*:443{% else %}*:80{% endif %}'
 
 apache_site: '{{ default_site | combine(onesite) }}'

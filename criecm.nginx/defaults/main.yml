@@ -20,4 +20,6 @@ sites: []
 monitoring_from:
   - 127.0.0.1
 
+admin_from: []
+
 tls_certs_dir: /etc/ssl

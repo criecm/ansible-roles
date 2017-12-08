@@ -1,7 +1,7 @@
 {% if "fcgi_status_path" in nginx_site and "fcgisocket" in nginx_site %}
 # fastcgi status
 	location = {{ nginx_site.fcgi_status_path }} {
-{% for net in monitoring_from %}
+{% for net in monitoring_from | intersect(admin_from) %}
 		allow {{ net }};
 {% endfor %}
 		deny all;

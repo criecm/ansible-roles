@@ -43,6 +43,8 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   list of sites dicts (see below)
 * `nginx_status_path` (`/nginx_status`)
 * `monitoring_from` ([127.0.0.1])
+* `admin_from` ([])
+  ip addresses/networks allowed to access monitoring pages
 
 ### if behind reverse-proxy
 

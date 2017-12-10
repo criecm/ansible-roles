@@ -37,7 +37,9 @@ apache install with different sites
 * `backends` ([])
   eg: ``` - 'ajp://jentest1.nettest.egim:8009 route=jentest1 timeout=20 loadfactor=100'```
   - if only one is defined, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html 
+    eg: ``` - 'http://my.backend.local:8080/'
   - if more than one, see https://httpd.apache.org/docs/2.4/mod/mod_proxy_balancer.html
+    eg: 
 
 ### optional (sane defaults)
 * `rootdir` (system-dependant/{{name}})

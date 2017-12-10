@@ -4,7 +4,7 @@
   tags: apache, vars
 
 - name: install and enable apache
-  include: '{{ ansible_os_family }}.yml'
+  import_tasks: '{{ ansible_os_family }}.yml'
   tags: apache, pkg
 
 # conf standard
@@ -61,7 +61,7 @@
   tags: apache, config
 
 - name: sites
-  include: site.yml
+  include_tasks: site.yml
   with_items: '{{ sites }}'
   loop_control:
     loop_var: onesite

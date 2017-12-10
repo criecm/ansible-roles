@@ -13,11 +13,10 @@ galaxy_info:
   platforms:
     - name: FreeBSD
       versions:
-        - 11.0
+        - 11.1
         - 10.3
     - name: Debian
       versions:
-        - jessie
         - stretch
 
   galaxy_tags:

@@ -9,7 +9,7 @@
     loop_var: includefile
   tags: nsd, vars
 
-- include: '{{ includefile }}'
+- include_tasks: '{{ includefile }}'
   with_first_found:
     - files:
         - '{{ ansible_os_family }}.yml'
@@ -80,7 +80,7 @@
   when: nsdcfg.changed
   tags: config, nsd
 
-- include: zone.yml
+- include_tasks: zone.yml
   with_items: '{{ nsd_zones }}'
   loop_control:
     loop_var: nsd_zone

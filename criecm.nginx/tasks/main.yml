@@ -4,7 +4,7 @@
     - '{{ ansible_os_family }}.yml'
   tags: vars, nginx
 
-- include: '{{ item }}'
+- include_tasks: '{{ item }}'
   with_first_found:
     - '{{ ansible_os_family }}.yml'
   tags: vars, nginx
@@ -102,7 +102,7 @@
   tags: nginx, config
 
 - name: sites
-  include: site.yml
+  include_tasks: site.yml
   with_items: '{{ sites }}'
   loop_control:
     loop_var: onesite

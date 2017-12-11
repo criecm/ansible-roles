@@ -3,4 +3,4 @@
     name: criecm.ldap_client
   when: ldap_autofs_master_map != ""
 
-- include: 'tasks/{{ansible_os_family}}.yml'
+- include_tasks: 'tasks/{{ansible_os_family}}.yml'

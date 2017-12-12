@@ -53,19 +53,18 @@
 ProxyPass /balancer-manager !
 {% endif %}
 
-{% endif %}
 {% elif apache_site.backends | count() == 1 %}
   <Proxy {{ apache_site.backends[0] }}>
     Require all granted
   </Proxy>
-  ProxyPass / {{ apache_site.backends[0] }}
-  ProxyPassReverse / {{ apache_site.backends[0] }}
+  ProxyPass / {{ apache_site.backends[0] }}/
+  ProxyPassReverse / {{ apache_site.backends[0] }}/
+{% endif %}
 {% endif %}
 
 {% for include in apache_site.apache_includes %}
   Include {{ apache_etcdir }}/{{ include | regex_replace(".j2$","") }}
 {% endfor %}
-
 
 </VirtualHost>
 

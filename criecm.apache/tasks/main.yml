@@ -4,7 +4,7 @@
   tags: apache, vars
 
 - name: install and enable apache
-  import_tasks: '{{ ansible_os_family }}.yml'
+  include_tasks: '{{ ansible_os_family }}.yml'
   tags: apache, pkg
 
 # conf standard

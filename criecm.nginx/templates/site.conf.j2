@@ -41,7 +41,7 @@ server {
 {% if not nginx_site.nginx_includes %}
 	location / {
 		root	{{ nginx_site.rootdir }};
-		index	index.html index.htm;
+		index	{{ nginx_site.default_index | default("index.html index.htm") }};
 	}
 {% endif %}
 

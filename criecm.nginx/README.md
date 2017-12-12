@@ -45,6 +45,8 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 * `monitoring_from` ([127.0.0.1])
 * `admin_from` ([])
   ip addresses/networks allowed to access monitoring pages
+* `nginx_includes` ([])
+  list of templates (or files) to be 'included' (conf.d/)
 
 ### if behind reverse-proxy
 

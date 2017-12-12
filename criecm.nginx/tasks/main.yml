@@ -79,6 +79,16 @@
   when: 'proxified_by | length != 0'
   tags: nginx, config
 
+# nginx_includes if any
+- name: nginx includes
+  template:
+    src: '{{ item }}'
+    dest: '{{ nginx_etcdir }}/conf.d/{{ item | regex_replace("^.*/","") }}'
+    mode: '0640'
+    group: '{{ www_group }}'
+  with_items: '{{ nginx_includes }}'
+  tags: nginx, config
+
 # x509 - global part
 - block:
   - name: x509 global config

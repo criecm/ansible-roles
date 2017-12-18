@@ -2,12 +2,15 @@
 
 - include_vars: site.yml
 
+- set_fact:
+    site: '{{ default_site | combine(onesite) }}'
+
 - name: site includes
   template:
     dest: '{{ nginx_etcdir }}/{{ item }}'
     src: '{{ lookup("first_found", include_locations) }}/{{ item }}'
-  with_items: '{{ nginx_site.nginx_includes }}'
-  when: '"nginx_includes" in nginx_site'
+  with_items: '{{ site.nginx_includes }}'
+  when: '"nginx_includes" in site'
   notify: reload nginx
 
 - name: conf includes
@@ -16,7 +19,7 @@
     dest: '{{ nginx_etcdir }}/conf.d/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
     mode: '0644'
   with_fileglob:
-    - '{{ nginx_site.id }}/nginx/conf.d/*.conf'
+    - '{{ site.id }}/nginx/conf.d/*.conf'
   notify: reload nginx
 
 - name: conf includes (templates)
@@ -25,25 +28,25 @@
     dest: '{{ nginx_etcdir }}/conf.d/{{ item | regex_replace(".*/([^/]+)\.j2$","\1") }}'
     mode: '0644'
   with_fileglob:
-    - '{{ nginx_site.id }}/nginx/conf.d/*.conf.j2'
+    - '{{ site.id }}/nginx/conf.d/*.conf.j2'
   notify: reload nginx
 
 - name: root dir
   copy:
-    dest: '{{ nginx_site.rootdir }}/'
-    src: '{{ nginx_site.rootsrc }}/'
+    dest: '{{ site.rootdir }}/'
+    src: '{{ site.rootsrc }}/'
     mode: a=rX,u+w
     owner: root
-  when: '"rootsrc" in onesite'
+  when: '"rootsrc" in site and site.rootsrc'
 
 - name: stat rootdir
   stat:
-    path: '{{ nginx_site.rootdir }}'
+    path: '{{ site.rootdir }}'
   register: statrootdir
 
 - name: mkdir root dir
   file:
-    dest: '{{ nginx_site.rootdir }}'
+    dest: '{{ site.rootdir }}'
     state: directory
     mode: '0755'
     owner: root
@@ -52,42 +55,43 @@
 - block:
   - name: x509 cert
     copy:
-      src: '{{ nginx_site.x509_cert }}'
-      dest: '{{ tls_certs_dir }}/{{ nginx_site.name }}.crt'
+      src: '{{ site.x509_cert }}'
+      dest: '{{ tls_certs_dir }}/{{ site.name }}.crt'
       mode: '0400'
   - name: x509 key
     copy:
-      src: '{{ nginx_site.x509_key }}'
-      dest: '{{ tls_certs_dir }}/private/{{ nginx_site.name }}.key'
+      src: '{{ site.x509_key }}'
+      dest: '{{ tls_certs_dir }}/private/{{ site.name }}.key'
       mode: '0400'
   - name: x509 chain
     copy:
-      src: '{{ nginx_site.x509_stapling_chain }}'
-      dest: '{{ tls_certs_dir }}/{{ nginx_site.name }}_stapling.pem'
+      src: '{{ site.x509_stapling_chain }}'
+      dest: '{{ tls_certs_dir }}/{{ site.name }}_stapling.pem'
       mode: '0644'
-  when: 'nginx_site.x509_cert != ""'
+  when: '"x509_cert" in site and site.x509_cert != ""'
 
 - block:
   - name: x509 cert
     copy:
-      src: '{{ nginx_site.x509_cert }}'
-      dest: '/etc/ssl/{{ nginx_site.name }}.crt'
+      src: '{{ site.x509_cert }}'
+      dest: '/etc/ssl/{{ site.name }}.crt'
       mode: '0400'
   - name: x509 key
     copy:
-      src: '{{ nginx_site.x509_key }}'
-      dest: '/etc/ssl/private/{{ nginx_site.name }}.key'
+      src: '{{ site.x509_key }}'
+      dest: '/etc/ssl/private/{{ site.name }}.key'
       mode: '0400'
   - name: x509 chain
     copy:
-      src: '{{ nginx_site.x509_stapling_chain }}'
-      dest: '/etc/ssl/{{ nginx_site.name }}_stapling.pem'
+      src: '{{ site.x509_stapling_chain }}'
+      dest: '/etc/ssl/{{ site.name }}_stapling.pem'
       mode: '0644'
-  when: 'nginx_site.x509_cert != ""'
+    when: 'site.x509_stapling_chain != ""'
+  when: '"x509_cert" in site and site.x509_cert != ""'
 
 - name: site config
   template:
-    dest: '{{ nginx_etcdir }}/servers.d/{{ nginx_site.id }}.conf'
+    dest: '{{ nginx_etcdir }}/servers.d/{{ site.id }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'
   notify: reload nginx
 
@@ -95,11 +99,15 @@
   - name: monitor tmp var
     set_fact:
       tmpmon:
-        - proto: '{% if nginx_site.x509_cert %}https{% else %}http{% endif %}'
-          name: '{{ nginx_site.name }}'
-          path: '{{ nginx_site.fcgi_status_path }}'
+        - proto: '{% if site.x509_cert %}https{% else %}http{% endif %}'
+          name: '{{ site.name }}'
+          path: '{{ site.fcgi_status_path }}'
+    when: '"fcgi_status_path" in site'
+
   - name: add fcgi_status_path to to_monitor
     set_fact:
       to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
-  when: 'nginx_site.fcgi_status_path != ""'
+  when: '"fcgi_status_path" in site and site.fcgi_status_path != ""'
 
+- set_fact:
+    nginx_sites_done: True

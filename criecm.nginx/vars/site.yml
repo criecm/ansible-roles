@@ -1,14 +1,14 @@
 ---
 siteconf_locations:
-  - '{{ playbook_dir }}/templates/{{ nginx_site.id }}/nginx/site.conf.j2'
-  - '{{ playbook_dir }}/files/{{ nginx_site.id }}/nginx/site.conf'
-  - '{{ playbook_dir }}/templates/{{ inventory_hostname |regex_replace("[0-9]$","") }}/nginx/{{ nginx_site.id }}.conf'
-  - '{{ playbook_dir }}/files/{{ inventory_hostname |regex_replace("[0-9]$","") }}/nginx/{{ nginx_site.id }}.conf'
+  - '{{ playbook_dir }}/templates/{{ site.id }}/nginx/site.conf.j2'
+  - '{{ playbook_dir }}/files/{{ site.id }}/nginx/site.conf'
+  - '{{ playbook_dir }}/templates/{{ inventory_hostname |regex_replace("[0-9]$","") }}/nginx/{{ site.id }}.conf'
+  - '{{ playbook_dir }}/files/{{ inventory_hostname |regex_replace("[0-9]$","") }}/nginx/{{ site.id }}.conf'
   - templates/site.conf.j2
 
 include_locations:
-  - '{{ playbook_dir }}/templates/{{ nginx_site.id }}/nginx'
-  - '{{ playbook_dir }}/files/{{ nginx_site.id }}/nginx'
+  - '{{ playbook_dir }}/templates/{{ site.id }}/nginx'
+  - '{{ playbook_dir }}/files/{{ site.id }}/nginx'
   - '{{ playbook_dir }}/files/{{ inventory_hostname |regex_replace("[0-9]$","") }}/nginx'
   - 'templates/nginx'
   - '{{ playbook_dir }}/files/nginx'
@@ -22,11 +22,15 @@ default_site:
   rootdir: '{{ onesite_home | default("/home/"+onesite.id) }}/{{ onesite.id }}'
   rootsrc: ''
   listen: '{% if "x509_cert" in onesite %}443{% else %}80{% endif %}'
+  tls: '{% if "x509_cert" in onesite %}True{% endif %}'
   tls_hsts: '{% if "x509_cert" in onesite %}31536000{% else %}0{% endif %}'
   tls_redirect: False
   x509_cert: ''
   x509_key: ''
   x509_stapling_chain: ''
+  backends: []
+  default_index: 'index.html index.htm index.txt'
+  nginx_done: True
 
-nginx_site: '{{ default_site | combine(onesite) }}'
+#site: '{{ default_site | combine(onesite) }}'
 

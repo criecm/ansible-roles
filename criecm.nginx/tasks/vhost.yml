@@ -1,0 +1,16 @@
+---
+# usage:
+#   include_role:
+#     name: criecm.nginx
+#     tasks_from: vhost.yml
+#   vars:
+#     vhost: '{{  site }}'
+
+- include_vars: '{{ ansible_os_family }}.yml'
+
+#- include_vars: site.yml
+
+- include_tasks: site.yml
+  vars:
+    onesite: '{{vhost}}'
+  

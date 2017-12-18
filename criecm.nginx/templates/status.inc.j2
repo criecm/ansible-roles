@@ -1,12 +1,12 @@
-{% if "fcgi_status_path" in nginx_site and "fcgisocket" in nginx_site %}
-# fastcgi status
-	location = {{ nginx_site.fcgi_status_path }} {
+{% if "fcgi_status_path" in site and "fcgisocket" in site %}
+	# fastcgi status
+	location = {{ site.fcgi_status_path }} {
 {% for net in monitoring_from | intersect(admin_from) %}
 		allow {{ net }};
 {% endfor %}
 		deny all;
 		include fastcgi_params;
 		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-		fastcgi_pass {% if nginx_site.fcgisocket | match("\/.*") %}unix:{% endif %}{{ nginx_site.fcgisocket }};
+		fastcgi_pass {% if upstream %}{{ upstream }}{% else %}{% if site.fcgisocket | match("\/.*") %}unix:{% endif %}{{ site.fcgisocket }}{% endif %};
 	}
 {% endif %}

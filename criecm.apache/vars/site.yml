@@ -1,12 +1,12 @@
 ---
 siteconf_locations:
-  - '{{ playbook_dir }}/templates/{{ apache_site.id }}/apache/{{ apache_site.id }}.conf.j2'
-  - '{{ playbook_dir }}/files/{{ apache_site.id }}/apache/{{ apache_site.id }}.conf'
+  - '{{ playbook_dir }}/templates/{{ site.id }}/apache/{{ site.id }}.conf.j2'
+  - '{{ playbook_dir }}/files/{{ site.id }}/apache/{{ site.id }}.conf'
   - templates/site.conf.j2
 
 include_locations:
-  - '{{ playbook_dir }}/templates/{{ apache_site.id }}/apache/{{ item }}.j2'
-  - '{{ playbook_dir }}/files/{{ apache_site.id }}/apache/{{ item }}'
+  - '{{ playbook_dir }}/templates/{{ site.id }}/apache/{{ item }}.j2'
+  - '{{ playbook_dir }}/files/{{ site.id }}/apache/{{ item }}'
   - 'templates/apache/{{ item }}.j2'
   - '{{ playbook_dir }}/files/apache/{{ item }}'
 
@@ -25,5 +25,6 @@ default_site:
   tls: False
   tls_redir: False
   listen: '{% if "tls" in onesite and onesite.tls %}*:443{% else %}*:80{% endif %}'
+  default_index: 'index.html'
 
-apache_site: '{{ default_site | combine(onesite) }}'
+site: '{{ default_site | combine(onesite) }}'

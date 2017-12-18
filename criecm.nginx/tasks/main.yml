@@ -111,11 +111,19 @@
   when: do_tls
   tags: nginx, config
 
+- debug: var=onesite
+  with_items: '{{ sites }}'
+  loop_control:
+    loop_var: onesite
+  when: 'not "nginx_done" in onesite'
+  tags: nginx, sites
+
 - name: sites
   include_tasks: site.yml
   with_items: '{{ sites }}'
   loop_control:
     loop_var: onesite
+  when: '(not "backend" in onesite) and not nginx_sites_done | default(False)'
   tags: nginx, sites
 
 - name: monitor tmp var

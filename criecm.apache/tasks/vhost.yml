@@ -1,0 +1,18 @@
+---
+# usage:
+#   include_role:
+#     name: criecm.apache
+#     tasks_from: vhost.yml
+#   vars:
+#     vhost: '{{  site }}'
+
+- include_vars: '{{ ansible_os_family }}.yml'
+
+- include_vars: site.yml
+
+- include_tasks: site.yml
+  with_items:
+    - '{{ vhost }}'
+  loop_control:
+    loop_var: onesite
+

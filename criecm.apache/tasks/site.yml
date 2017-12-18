@@ -16,8 +16,8 @@
   template:
     dest: '{{ apache_etcdir }}/{{ item | regex_replace(".j2$","") }}'
     src: '{{ lookup("first_found", include_locations) }}'
-  with_items: '{{ apache_site.apache_includes }}'
-  when: '"apache_includes" in apache_site'
+  with_items: '{{ site.apache_includes }}'
+  when: '"apache_includes" in site'
 
 - name: conf includes
   copy:
@@ -25,40 +25,40 @@
     dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
     mode: '0644'
   with_fileglob:
-    - 'apache/{{ apache_site.id }}/{{ apache_includesdir }}/*.conf'
+    - 'apache/{{ site.id }}/{{ apache_includesdir }}/*.conf'
 
 # app root dir
 - block:
   - name: root dir
     copy:
-      dest: '{{ apache_site.rootdir }}/'
-      src: '{{ apache_site.rootsrc }}/'
+      dest: '{{ site.rootdir }}/'
+      src: '{{ site.rootsrc }}/'
       mode: a=rX,u+w
       owner: root
-      group: '{{ apache_site.group }}'
+      group: '{{ site.group }}'
     when: '"rootsrc" in onesite'
   - name: root git
     git:
       clone: yes
       depth: 2
-      repo: '{{ apache_site.gitroot }}'
-      dest: '{{ apache_site.rootdir }}'
+      repo: '{{ site.gitroot }}'
+      dest: '{{ site.rootdir }}'
     when: '"gitroot" in onesite'
   - name: mkdir root dir
     file:
-      dest: '{{ apache_site.rootdir }}'
+      dest: '{{ site.rootdir }}'
       state: directory
       mode: '0751'
       owner: root
-      group: '{{ apache_site.group }}'
+      group: '{{ site.group }}'
     when: '"rootdir" in onesite'
   - name: grwfiles
     file:
       dest: '{{ item }}'
       state: file
       mode: g+w
-      group: '{{ apache_site.group }}'
-    with_items: '{{ apache_site.grwfiles }}'
+      group: '{{ site.group }}'
+    with_items: '{{ site.grwfiles }}'
     when: '"grwfiles" in onesite'
   - name: grwdirs
     file:
@@ -66,16 +66,16 @@
       state: directory
       mode: g+w
       recurse: yes
-      group: '{{ apache_site.group }}'
-    with_items: '{{ apache_site.grwdirs }}'
+      group: '{{ site.group }}'
+    with_items: '{{ site.grwdirs }}'
     when: '"grwdirs" in onesite'
 
 - name: TLS cert
   copy:
-    src: 'tls/{{ apache_site.tls_cert }}'
-    dest: '{{ tls_dir }}/{{ apache_site.tls_cert }}'
+    src: 'tls/{{ site.tls_cert }}'
+    dest: '{{ tls_dir }}/{{ site.tls_cert }}'
     mode: '0644'
-  when: '"tls_cert" in apache_site'
+  when: '"tls_cert" in site'
 
 - block:
   - name: TLS private dir
@@ -86,23 +86,23 @@
       owner: root
   - name: TLS key
     copy:
-      src: 'tls/{{ apache_site.tls_key }}'
-      dest: '{{ tls_dir }}/private/{{ apache_site.tls_key }}'
+      src: 'tls/{{ site.tls_key }}'
+      dest: '{{ tls_dir }}/private/{{ site.tls_key }}'
       mode: '0644'
-  when: '"tls_key" in apache_site'
+  when: '"tls_key" in site'
 
 - debug: var=apache_site
 
 - name: site apache config
   template:
-    dest: '{{ apache_etcdir }}/{{ apache_sitesdir }}/{{ apache_site.id }}.conf'
+    dest: '{{ apache_etcdir }}/{{ apache_sitesdir }}/{{ site.id }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'
   notify: restart apache
 
 - name: Listen in Zsites.conf
   lineinfile:
     dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/Zsites.conf'
-    line: 'Listen {{ apache_site.listen }}'
-    regexp: 'Listen {{ apache_site.listen | regex_escape() }}'
+    line: 'Listen {{ site.listen }}'
+    regexp: 'Listen {{ site.listen | regex_escape() }}'
     insertafter: 'Listen'
-  when: '( ansible_os_family == "FreeBSD" and not apache_site.listen | regex_search("80$") ) or ( ansible_os_family == "Debian" and not apache_site.listen | regex_search("(80|443)$") )'
+  when: '( ansible_os_family == "FreeBSD" and not site.listen | regex_search("80$") ) or ( ansible_os_family == "Debian" and not site.listen | regex_search("(80|443)$") )'

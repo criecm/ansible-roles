@@ -1,33 +1,54 @@
-{% if nginx_site.tls_redirect and not proxified_by %}
+{% if site.backends | count > 0 %}
+{% set upstream = site.id %}
+upstream {{ upstream }} {
+{% for srv in site.backends %}
+	server {{ srv }};
+{% endfor %}
+{% if site.backends | count > 1 %}
+	sticky cookie {{ site.id }}LBID expires=1h path=/;
+}
+{% endif %}
+{% elif "fcgisocket" in site %}
+{% set upstream = site.id %}
+{% if site.fcgisocket | regex_search("^\/") %}
+{%  set server = "unix:"+site.fcgisocket %}
+{% else %}
+{%  set server = site.fcgisocket %}
+{% endif %}
+upstream {{ upstream }} {
+	server {{ server }};
+}
+{% endif %}
+{% if site.tls_redirect and not proxified_by %}
 server {
 	listen 80;
-	server_name	{{ nginx_site.name }}{% if nginx_site.aliases | count > 0 %} {{ nginx_site.aliases | join(" ") }}{% endif %};
-	redirect permanent / https://{{ nginx_site.name }}/;
+	server_name	{{ site.name }}{% if site.aliases | count > 0 %} {{ site.aliases | join(" ") }}{% endif %};
+	redirect permanent / https://{{ site.name }}/;
 }
 {% endif %}
 
-{% if nginx_site.listen %}
+{% if site.listen %}
 server {
 {% if proxified_by %}
 	listen 80;
 {% else %}
-	listen	{{ nginx_site.listen }}{% if nginx_site.x509_cert %} ssl{% endif %};
-{% if nginx_site.x509_cert %}
-	ssl_certificate {{ tls_certs_dir }}/{{ nginx_site.x509_cert | regex_replace(".*/","") }};
-	ssl_certificate_key {{ tls_certs_dir }}/private/{{ nginx_site.x509_key | regex_replace(".*/","") }};
-{% if nginx_site.x509_stapling_chain %}
-	ssl_trusted_certificate {{ tls_certs_dir }}/{{ nginx_site.name }}_stapling.pem;
+	listen	{{ site.listen }}{% if site.x509_cert %} ssl{% endif %};
+{% if site.x509_cert %}
+	ssl_certificate {{ tls_certs_dir }}/{{ site.x509_cert | regex_replace(".*/","") }};
+	ssl_certificate_key {{ tls_certs_dir }}/private/{{ site.x509_key | regex_replace(".*/","") }};
+{% if site.x509_stapling_chain %}
+	ssl_trusted_certificate {{ tls_certs_dir }}/{{ site.name }}_stapling.pem;
 	ssl_stapling    on;
 	ssl_stapling_verify     on;
-{% if nginx_site.tls_hsts | default(31536000) > 0 %}
-	add_header Strict-Transport-Security "max-age={{ nginx_site.tls_hsts | default(31536000) }}";
+{% if site.tls_hsts | default(31536000) > 0 %}
+	add_header Strict-Transport-Security "max-age={{ site.tls_hsts | default(31536000) }}";
 {% endif %}
 {% endif %}
 {% endif %}
 {% endif %}
 
-{% if nginx_site.upload_max_meg | default(False) %}
-	client_max_body_size {{ ( nginx_site.upload_max_meg * 1.3 ) | int }}m;
+{% if site.upload_max_meg | default(False) %}
+	client_max_body_size {{ ( site.upload_max_meg * 1.3 ) | int }}m;
 {% endif %}
 
 {% if proxified_by %}
@@ -37,17 +58,17 @@ server {
 	real_ip_header X-Forwarded-For;
 {% endif %}
 
-	server_name	{{ nginx_site.name }}{% if nginx_site.aliases %} {{ nginx_site.aliases | join(" ") }}{% endif %};
-{% if not nginx_site.nginx_includes %}
+	server_name	{{ site.name }}{% if site.aliases %} {{ site.aliases | join(" ") }}{% endif %};
+{% if not site.nginx_includes | list() %}
 	location / {
-		root	{{ nginx_site.rootdir }};
-		index	{{ nginx_site.default_index | default("index.html index.htm") }};
+		root	{{ site.rootdir }};
+		index	{{ site.default_index | default("index.html index.htm") }};
 	}
 {% endif %}
 
 {% include "status.inc.j2" %}
 
-{% for inc in nginx_site.nginx_includes %}
+{% for inc in site.nginx_includes %}
 	include {{ inc }};
 {% endfor %}
 

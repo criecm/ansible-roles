@@ -1,6 +1,6 @@
 server {
 	listen	80 default_server;
-	server_name	{{ ansible_fqdn }};
+	server_name	_;
 	location / {
 		root	{{ www_default_root }};
 		index	index.html index.htm;

@@ -6,8 +6,8 @@ upstream {{ upstream }} {
 {% endfor %}
 {% if site.backends | count > 1 %}
 	sticky cookie {{ site.id }}LBID expires=1h path=/;
-}
 {% endif %}
+}
 {% elif "fcgisocket" in site %}
 {% set upstream = site.id %}
 {% if site.fcgisocket | regex_search("^\/") %}

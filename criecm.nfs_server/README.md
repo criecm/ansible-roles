@@ -1,38 +1,45 @@
-Role Name
-=========
+# criecm.nfs_server
 
-A brief description of the role goes here.
+NFS server
+
+Will 
+  * enable nfs daemons
+  * fix ports of NFSv3 services
+  * enable nfsuserd to map uid<->uidnumbers
+  * create exports blocks in /etc/exports for each share
+    when share.nfs == True
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+FreeBSD
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+* `shares` ([]): list of "share" dicts
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
     - hosts: servers
       roles:
-         - { role: username.rolename, x: 42 }
+         - criecm.nfs_server
+      vars:
+        shares:
+          - name: "myshare"
+            path: "/shares/t"
+            nfs: True
+            nfsshares:
+              - "-maproot=0 -network 2001:0DB8:fe43:ff44:/64"
+              - "-network 192.0.2.0/24"
 
 License
 -------
 
 BSD
 
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).

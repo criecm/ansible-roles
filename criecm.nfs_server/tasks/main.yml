@@ -1,5 +1,4 @@
 ---
-# defaults file for criecm.nfs_server
 - name: rc conf
   lineinfile:
     line: '{{ item }}'
@@ -10,4 +9,13 @@
   notify: restart freebsd nfs server
   when: ansible_os_family == "FreeBSD"
 
+- name: mkdir & co
+  include_tasks: share.yml
+  with_items:
+    - '{{ shares }}'
+    - '{{ group_shares }}'
+  loop_control:
+    loop_var: share
+  when: '"nfs" in share and share.nfs'
+  tags: nfs,shares
 

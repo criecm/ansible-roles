@@ -4,3 +4,8 @@
   service:
     name: nfsd
     state: restarted
+
+- name: reload mountd
+  service:
+    name: mountd
+    state: reloaded

@@ -46,7 +46,9 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 * `admin_from` ([])
   ip addresses/networks allowed to access monitoring pages
 * `nginx_includes` ([])
-  list of templates (or files) to be 'included' (conf.d/)
+  list of templates (or files) to be 'include'd in http block (conf.d/)
+* `nginx_mods_includes` ([])
+  list of templates to be included *before* http block (modules.d/)
 * `backends` ([])
   list of backend lines for upstream
 

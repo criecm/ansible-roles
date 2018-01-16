@@ -99,7 +99,7 @@
   - name: monitor tmp var
     set_fact:
       tmpmon:
-        - proto: '{% if site.x509_cert %}https{% else %}http{% endif %}'
+        - proto: '{% if site.x509_cert or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
           name: '{{ site.name }}'
           path: '{{ site.fcgi_status_path }}'
     when: '"fcgi_status_path" in site'

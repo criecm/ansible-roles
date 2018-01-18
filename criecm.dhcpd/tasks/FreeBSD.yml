@@ -41,6 +41,7 @@
     lineinfile:
       line: 'local7.*   @{{ syslog_server }}'
       insertafter: '\*\.\*.*@'
+      dest: /usr/local/etc/syslog.d/dhcpd
   - name: newsyslog config
     file:
       src: newsyslog_dhcpd.conf

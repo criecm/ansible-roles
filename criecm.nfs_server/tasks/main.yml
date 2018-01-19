@@ -8,6 +8,15 @@
     - 'nfs_server_enable="YES"'
   notify: restart freebsd nfs server
   when: ansible_os_family == "FreeBSD"
+  tags: nfs,rc
+
+- name: exports
+  copy:
+    dest: /etc/exports
+    force: no
+    content: |
+      V4: / -sec=sys
+  tags: nfs,exports
 
 - name: mkdir & co
   include_tasks: share.yml
@@ -16,6 +25,6 @@
     - '{{ group_shares }}'
   loop_control:
     loop_var: share
-  when: '"nfs" in share and share.nfs'
+  when: '"nfsshares" in share'
   tags: nfs,shares
 

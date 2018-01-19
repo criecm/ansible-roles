@@ -1,8 +1,5 @@
 ---
-- debug:
-    var: share
-
-- name: test share.path
+- name: 'test -e {{ share.path }}'
   stat:
     path: '{{ share.path }}'
   register: path_stat
@@ -27,9 +24,22 @@
 - name: nfs export
   blockinfile:
     path: /etc/exports
-    marker: '# { mark } ANSIBLE MANAGED BLOCK {{ share.path }}'
+    marker: '# {mark} ANSIBLE MANAGED BLOCK {{ share.path }}'
     block: |
       {% for ex in share.nfsshares %}
       {{ share.path }} {{ ex }}
       {% endfor %}
 
+# cleanup zfs sharenfs props
+- block:
+  - command: 'grep ^{{ share.path }} /etc/zfs/exports'
+    failed_when: False
+    changed_when: False
+    check_mode: False
+    register: zexport
+  - zfs:
+      name: '{{ share.zfsrc }}'
+      sharenfs: 'off'
+      state: present
+    when: zexport.rc != 0
+  when: '"zfsrc" in share'

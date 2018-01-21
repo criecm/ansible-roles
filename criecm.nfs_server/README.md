@@ -4,7 +4,6 @@ NFS server
 
 Will 
   * enable nfs daemons
-  * fix ports of NFSv3 services
   * enable nfsuserd to map uid<->uidnumbers
   * create exports blocks in /etc/exports for each share
     when share.nfs == True

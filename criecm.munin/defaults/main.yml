@@ -1,0 +1,17 @@
+---
+# defaults file for criecm.munin
+munin_etcdir: '{{ etcprefix | default("") }}/etc/munin'
+munin_dist_plugins: '{{ prefix | default("/usr") }}/share/munin/plugins'
+do_cleanup: False
+
+munin_base_url: /munin
+munin_logdir: /var/log/munin
+munin_rundir: /var/run/munin
+
+munin_graph_cgi: True
+munin_html_cgi: False
+
+munin_plugins: []
+
+munin_configs: {}
+munin_config_files: []

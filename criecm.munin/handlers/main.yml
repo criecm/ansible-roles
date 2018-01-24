@@ -1,0 +1,6 @@
+---
+# handlers file for criecm.munin
+- name: restart munin node
+  service:
+    name: '{{ munin_service }}'
+    state: restarted

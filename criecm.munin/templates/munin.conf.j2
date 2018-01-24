@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+dbdir   {{ munin_dbdir | default(munin_default_dbdir) }}
+htmldir {{ munin_htmldir | default(munin_default_htmldir) }}
+logdir  /var/log/munin
+rundir  /var/run/munin
+includedir {{ munin_etcdir }}/munin-conf.d
+{% if munin_graph_cgi %}
+graph_strategy cgi
+cgiurl_graph {{ munin_base_url }}/cgi-bin/munin-cgi-graph
+{% endif %}
+{% if munin_html_cgi %}
+html_strategy cgi
+{% endif %}
+munin_cgi_graph_jobs 10
+max_graph_jobs 10
+max_processes 12
+domain_order serv.int egim.int ec-m.fr etu.ec-m.fr
+

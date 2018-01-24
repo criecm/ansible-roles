@@ -1,0 +1,8 @@
+---
+# vars file for criecm.munin
+munin_default_dbdir: /var/lib/munin
+munin_default_htmldir: /var/cache/munin/www
+
+munin_role: '{% if munin_host == inventory_hostname %}master{% else %}node{% endif %}'
+
+munin_service: munin-node

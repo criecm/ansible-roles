@@ -1,0 +1,4 @@
+---
+- apt:
+    name: munin-node
+    state: present

@@ -1,0 +1,4 @@
+---
+- apt:
+    name: munin
+    state: present

@@ -1,0 +1,6 @@
+---
+- name: install freebsd node
+  pkgng:
+    name: munin-node
+    state: present
+

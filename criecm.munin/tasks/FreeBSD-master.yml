@@ -1,0 +1,18 @@
+---
+- name: install munin-server/freebsd
+  pkgng:
+    name: munin-master
+    state: present
+
+- name: config rrdcached
+  lineinfile:
+    dest: /etc/rc.conf
+    line: 'rrdcached_flags="-s munin -l /var/run/rrdcached.sock -p /var/run/rrdcached.pid"'
+    state: present
+    regexp: '^rrdcached_flags'
+
+- name: enable rrdcached
+  service:
+    name: rrdcached
+    state: started
+    enabled: yes

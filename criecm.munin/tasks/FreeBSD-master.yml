@@ -7,7 +7,7 @@
 - name: config rrdcached
   lineinfile:
     dest: /etc/rc.conf
-    line: 'rrdcached_flags="-s munin -l /var/run/rrdcached.sock -p /var/run/rrdcached.pid"'
+    line: 'rrdcached_flags="-U munin -s munin -m 0666 -l /var/run/rrdcached.sock -p /var/run/rrdcached.pid"'
     state: present
     regexp: '^rrdcached_flags'
 

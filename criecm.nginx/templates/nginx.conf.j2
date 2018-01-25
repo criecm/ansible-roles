@@ -22,7 +22,7 @@ http {
                       '"$http_user_agent" "$http_x_forwarded_for"';
 
 	{% if syslog_server %}
-	access_log syslog:server={{ syslog_server }},facility=notice combined;
+	access_log syslog:server={{ syslog_server }},facility=local5 combined;
 	{% else %}
 	access_log	{{ nginx_log_dir }}/access.log combined;
 	{% endif %}

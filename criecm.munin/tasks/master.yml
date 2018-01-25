@@ -22,28 +22,23 @@
   when: do_cleanup and hlist | count() > 1 and item not in groups.all
   with_items: '{{ hlist.files | regex_replace("^.*ansible-host-","") }}'
 
-- name: list installed aggregation templates
-  find:
-    paths: [ '{{ munin_etcdir }}/munin-conf.d' ]
-    patterns: [ 'ansible-aggr-*' ]
-  register: alist
-
-- debug: var=hostvars
-  tags: munin
+#- name: list installed aggregation templates
+#  find:
+#    paths: [ '{{ munin_etcdir }}/munin-conf.d' ]
+#    patterns: [ 'ansible-aggr-*' ]
+#  register: alist
 
 - name: install aggregation templates
   template:
     src: '{{ item }}'
     dest: '{{ munin_etcdir }}/munin-conf.d/ansible-aggr-{{ item | basename | regex_replace("^([^\.]*).*","\1") }}.conf'
-#  with_fileglob:
-#    - 'templates/munin/aggr/*'
   with_items: '{{ munin_aggr_templates }}'
-  register: ialist
+#  register: ialist
 
-- name: supress aggregation not anymore in current templates/aggr/*
-  file:
-    path: '{{ munin_etcdir }}/munin-conf.d/ansible-aggr-{{ item }}'
-    state: absent
-  when: do_cleanup and alist.rc == 0 and item not in ialist.stdout_lines | map(attribute="item") | list()
-  with_items: '{{ alist.files | regex_replace("^.*ansible-aggr-","") }}'
+#- name: supress aggregation not anymore in current templates/aggr/*
+#  file:
+#    path: '{{ munin_etcdir }}/munin-conf.d/ansible-aggr-{{ item }}'
+#    state: absent
+#  when: do_cleanup and alist.rc == 0 and item not in ialist.stdout_lines | map(attribute="item") | list()
+#  with_items: '{{ alist.files | regex_replace("^.*ansible-aggr-","") }}'
 

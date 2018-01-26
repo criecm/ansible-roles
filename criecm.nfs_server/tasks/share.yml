@@ -18,6 +18,7 @@
     file:
       path: '{{ share.path }}'
       state: directory
+      owner: '{{ share.owner | default(omit) }}'
     when: '"zfsrc" not in share'
   when: not path_stat.stat.exists
 

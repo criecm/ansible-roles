@@ -6,7 +6,7 @@ Will
   * enable nfs daemons
   * enable nfsuserd to map uid<->uidnumbers
   * create exports blocks in /etc/exports for each share
-    when share.nfs == True
+    when share.nfsshares is not empty
 
 Requirements
 ------------
@@ -20,7 +20,6 @@ Role Variables
 
 Dependencies
 ------------
-
 
 Example Playbook
 ----------------

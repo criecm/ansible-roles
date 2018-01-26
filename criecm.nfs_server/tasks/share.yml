@@ -29,6 +29,7 @@
       {% for ex in share.nfsshares %}
       {{ share.path }} {{ ex }}
       {% endfor %}
+  notify: reload mountd
 
 # cleanup zfs sharenfs props
 - block:

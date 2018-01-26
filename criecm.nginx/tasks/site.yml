@@ -7,7 +7,7 @@
 
 - name: site includes
   template:
-    dest: '{{ nginx_etcdir }}/{{ item }}'
+    dest: '{{ nginx_etcdir }}/{{ item | basename | regex_replace("\.j2$","") }}'
     src: '{{ lookup("first_found", include_locations) }}/{{ item }}'
   with_items: '{{ site.nginx_includes }}'
   when: '"nginx_includes" in site'

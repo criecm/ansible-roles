@@ -23,14 +23,14 @@
 
 - name: munin config blobs
   copy:
-    dest: '{{ munin_confdir }}/plugin-conf.d/{{ item.key }}'
+    dest: '{{ munin_etcdir }}/plugin-conf.d/{{ item.key }}'
     content: '{{ item.value }}'
   with_dict: '{{ munin_configs }}'
   notify: restart munin node
 
 - name: munin config files
   copy:
-    dest: '{{ munin_confdir }}/plugin-conf.d/{{ item | basename }}'
+    dest: '{{ munin_etcdir }}/plugin-conf.d/{{ item | basename }}'
     src: '{{ item }}'
   with_items: '{{ munin_config_files }}'
   notify: restart munin node

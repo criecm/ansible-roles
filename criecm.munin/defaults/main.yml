@@ -15,3 +15,4 @@ munin_plugins: []
 
 munin_configs: {}
 munin_config_files: []
+munin_aggr_templates: []

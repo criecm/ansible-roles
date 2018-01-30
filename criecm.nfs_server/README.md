@@ -11,15 +11,20 @@ Will
 Requirements
 ------------
 
-FreeBSD
-
 Role Variables
 --------------
 
-* `shares` ([]): list of "share" dicts
+* `shares` ([]): list of "share" dicts, with:
+  * `path` ('') MANDATORY
+  directory to share
+  * `nfsshares` ([]) MANDATORY
+  list of /etc/exports lines (without path)
 
 Dependencies
 ------------
+
+if any share contains 'zfsrc', `criecm.zfs` role will be called
+  to create/configure it
 
 Example Playbook
 ----------------
@@ -31,7 +36,6 @@ Example Playbook
         shares:
           - name: "myshare"
             path: "/shares/t"
-            nfs: True
             nfsshares:
               - "-maproot=0 -network 2001:0DB8:fe43:ff44:/64"
               - "-network 192.0.2.0/24"

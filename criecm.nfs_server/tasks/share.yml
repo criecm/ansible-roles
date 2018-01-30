@@ -7,13 +7,6 @@
 # create
 - block:
   # need mkdir
-  - name: zfs create
-    zfs:
-      name: '{{ share.zfsrc }}'
-      mountpoint: '{{ share.path }}'
-      state: present
-    register: zfsshare
-    when: '"zfsrc" in share'
   - name: mkdir
     file:
       path: '{{ share.path }}'

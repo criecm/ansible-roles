@@ -1,7 +1,7 @@
-Horde
-=====
+Netmagis
+========
 
-Install netmagis
+Install [netmagis](http://www.netmagis.org/)
 
 Requirements
 ------------

@@ -18,12 +18,6 @@
       V4: / -sec=sys
   tags: nfs,exports
 
-- name: zfs if needed
-  include_role:
-    name: criecm.zfs
-  when: shares | selectattr("zfsrc","defined") | list | count > 0
-  tags: zfs,shares
-
 - name: mkdir & co
   include_tasks: share.yml
   with_items:

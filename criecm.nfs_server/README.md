@@ -23,9 +23,6 @@ Role Variables
 Dependencies
 ------------
 
-if any share contains 'zfsrc', `criecm.zfs` role will be called
-  to create/configure it
-
 Example Playbook
 ----------------
 

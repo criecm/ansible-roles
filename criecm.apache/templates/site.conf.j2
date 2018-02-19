@@ -31,6 +31,10 @@
   Header unset Strict-Transport-Security
   Header set Strict-Transport-Security "max-age={{ site.hsts }}"
 {% endif %}
+{% if "backends" in site %}
+  RequestHeader set X-Forwarded-Proto "https"
+  RequestHeader set X-Forwarded-Port "443"
+{% endif %}
 {% endif %}
 
 {% if "backends" in site %}

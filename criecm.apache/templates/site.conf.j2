@@ -19,18 +19,16 @@
   </Directory>
 {% endif %}
 
-{% if site.tls %}
+{% if "tls_cert" in site and "tls_key" in onesite %}
   SSLEngine on
-{% if "tls_cert" in site %}
   SSLCertificateFile {{ tls_dir }}/{{ site.tls_cert }}
-{% if "tls_key" in site %}
   SSLCertificateKeyFile {{ tls_dir }}/private/{{ site.tls_key }}
-{% endif %}
-{% endif %}
+
 {% if "hsts" in site %}
   Header unset Strict-Transport-Security
   Header set Strict-Transport-Security "max-age={{ site.hsts }}"
 {% endif %}
+
 {% if "backends" in site %}
   RequestHeader set X-Forwarded-Proto "https"
   RequestHeader set X-Forwarded-Port "443"

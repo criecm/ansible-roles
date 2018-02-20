@@ -24,7 +24,7 @@ default_site:
   grwdirs: []
   tls: False
   tls_redir: False
-  listen: '{% if "tls" in onesite and onesite.tls %}*:443{% else %}*:80{% endif %}'
+  listen: '{% if "tls_cert" in onesite and onesite.tls_cert != "" %}*:443{% else %}*:80{% endif %}'
   default_index: 'index.html'
 
 site: '{{ default_site | combine(onesite) }}'

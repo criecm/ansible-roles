@@ -45,7 +45,7 @@ apache install with different sites
 * `rootdir` (system-dependant/{{name}})
   You have to populate it elsewhere (criecm.php-fpm does it from vars, or in your playbook)
 * `listen` (`*:80` or `*:443`)
-  IP:port or port to listen (default depends of `tls`)
+  IP:port or port to listen (default depends of `tls_cert` presence)
 * `user` (system dependant default)
 * `group` (same)
 
@@ -61,8 +61,6 @@ apache install with different sites
   dirs writable by site's group
 
 ### TLS : https support
-* `tls` (False)
-  if True, do HTTPS
 * `tls_cert` ([])
   file name, will be searched for in files/tls/ ans copied in {prefix}/etc/ssl/
 * `tls_key` ([])

@@ -35,8 +35,10 @@ http {
 
 	keepalive_timeout	65;
 
+	{% if "upload_progress" in nginx_modules %}
 	# "zone" pour le traitement des progressions d'uploads
 	upload_progress uploads 1m;
+	{% endif %}
 
 	log_not_found off;
 

@@ -90,13 +90,13 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 
 * `tls_hsts` (31536000 if `x509_cert`, else 0)
   if > 0, add Strict-Transport-Security header
-* `tls_redirect` (False)
+* `tls_redir` (False)
   if True, redirect all http requests to https
-* `x509_cert`
+* `tls_cert` (NODEFAULT)
   x509 certificate (with intermediate certs)
-* `x509_key`
+* `tls_key` (NODEFAULT)
   private key for tls/http2
-* `x509_stapling_chain`
+* `x509_stapling_chain` ('')
   complete ca chain for stapling
   (from root CA to last intermediate)
 

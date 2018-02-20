@@ -55,30 +55,30 @@
 - block:
   - name: x509 cert
     copy:
-      src: '{{ site.x509_cert }}'
+      src: '{{ site.tls_cert }}'
       dest: '{{ tls_certs_dir }}/{{ site.name }}.crt'
       mode: '0400'
   - name: x509 key
     copy:
-      src: '{{ site.x509_key }}'
+      src: '{{ site.tls_key }}'
       dest: '{{ tls_certs_dir }}/private/{{ site.name }}.key'
       mode: '0400'
   - name: x509 chain
     copy:
       src: '{{ site.x509_stapling_chain }}'
-      dest: '{{ tls_certs_dir }}/{{ site.name }}_stapling.pem'
+      dest: '{{ tls_certs_dir }}/{{ site.x509_stapling_chain | basename }}'
       mode: '0644'
-  when: '"x509_cert" in site and site.x509_cert != ""'
+  when: '"tls_cert" in site and site.tls_cert != ""'
 
 - block:
   - name: x509 cert
     copy:
-      src: '{{ site.x509_cert }}'
+      src: '{{ site.tls_cert }}'
       dest: '/etc/ssl/{{ site.name }}.crt'
       mode: '0400'
   - name: x509 key
     copy:
-      src: '{{ site.x509_key }}'
+      src: '{{ site.tls_key }}'
       dest: '/etc/ssl/private/{{ site.name }}.key'
       mode: '0400'
   - name: x509 chain
@@ -87,7 +87,7 @@
       dest: '/etc/ssl/{{ site.name }}_stapling.pem'
       mode: '0644'
     when: 'site.x509_stapling_chain != ""'
-  when: '"x509_cert" in site and site.x509_cert != ""'
+  when: '"tls_cert" in site and site.tls_cert != ""'
 
 - name: site config
   template:
@@ -99,7 +99,7 @@
   - name: monitor tmp var
     set_fact:
       tmpmon:
-        - proto: '{% if site.x509_cert or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
+        - proto: '{% if site.tls_cert or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
           name: '{{ site.name }}'
           path: '{{ site.fcgi_status_path }}'
     when: '"fcgi_status_path" in site'

@@ -19,7 +19,7 @@ upstream {{ upstream }} {
 	server {{ server }};
 }
 {% endif %}
-{% if site.tls_redirect and not proxified_by %}
+{% if site.tls_redir and not proxified_by %}
 server {
 	listen 80;
 	server_name	{{ site.name }}{% if site.aliases | count > 0 %} {{ site.aliases | join(" ") }}{% endif %};
@@ -32,12 +32,12 @@ server {
 {% if proxified_by %}
 	listen 80;
 {% else %}
-	listen	{{ site.listen }}{% if site.x509_cert %} ssl{% endif %};
-{% if site.x509_cert %}
-	ssl_certificate {{ tls_certs_dir }}/{{ site.x509_cert | regex_replace(".*/","") }};
-	ssl_certificate_key {{ tls_certs_dir }}/private/{{ site.x509_key | regex_replace(".*/","") }};
+	listen	{{ site.listen }}{% if site.tls_cert %} ssl{% endif %};
+{% if site.tls_cert %}
+	ssl_certificate {{ tls_certs_dir }}/{{ site.tls_cert | regex_replace(".*/","") }};
+	ssl_certificate_key {{ tls_certs_dir }}/private/{{ site.tls_key | regex_replace(".*/","") }};
 {% if site.x509_stapling_chain %}
-	ssl_trusted_certificate {{ tls_certs_dir }}/{{ site.name }}_stapling.pem;
+	ssl_trusted_certificate {{ tls_certs_dir }}/{{ site.x509_stapling_chain | basename}};
 	ssl_stapling    on;
 	ssl_stapling_verify     on;
 {% if site.tls_hsts | default(31536000) > 0 %}

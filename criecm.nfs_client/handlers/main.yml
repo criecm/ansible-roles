@@ -5,7 +5,6 @@
     state: restarted
   with_items:
     - nfsclient
-    - rpcbind
     - lockd
     - statd
     - nfscbd

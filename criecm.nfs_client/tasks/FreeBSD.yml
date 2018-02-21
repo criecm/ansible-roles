@@ -19,6 +19,11 @@
     - 'nfsuserd_flags="-domain {{idmap_domain}} -usermax 10000"'
   notify: freebsd restart nfs all
 
+- name: rpcbind started
+  service:
+    name: rpcbind
+    state: started
+
 # automount /users
 - block:
   - name: autofs rc.conf

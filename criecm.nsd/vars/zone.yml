@@ -1,6 +1,6 @@
 ---
 
-intpattern: '{% if "intpattern" in nsd_zone %}{{ nsd_zones_force_pattern | default(nsd_zone.intpattern) }}{% elif "pattern" in nsd_zone %}{{ nsd_zone.pattern }}{% endif %}'
+intpattern: '{% if "intpattern" in nsd_zone %}{{ nsd_zones_force_pattern | default(nsd_zone.intpattern) }}{% elif "pattern" in nsd_zone %}{{ nsd_zones_force_pattern | default(nsd_zone.pattern) }}{% endif %}'
 
 zone:
   pattern: '{% if is_internal_nsd %}{{ intpattern }}{% elif "pattern" in nsd_zone %}{{ nsd_zones_force_pattern | default(nsd_zone.pattern) }}{% endif %}'

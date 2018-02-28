@@ -75,6 +75,11 @@
   notify: 
     - restart nsd
 
+- name: start nsd
+  service:
+    name: nsd
+    state: started
+
 - name: restart nsd now
   command: nsd-control reconfig
   when: nsdcfg.changed

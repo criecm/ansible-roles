@@ -19,7 +19,7 @@ upstream {{ upstream }} {
 	server {{ server }};
 }
 {% endif %}
-{% if site.tls_redir and not proxified_by %}
+{% if "tls_redir" in site and site.tls_redir and not proxified_by %}
 server {
 	listen 80;
 	server_name	{{ site.name }}{% if site.aliases | count > 0 %} {{ site.aliases | join(" ") }}{% endif %};

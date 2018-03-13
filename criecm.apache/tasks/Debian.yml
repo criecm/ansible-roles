@@ -1,0 +1,21 @@
+---
+- name: install apache
+  apt:
+    name: apache2
+    state: present
+
+- block:
+  - name: list enabled modules
+    shell: 'ls {{ apache_etcdir }}/mods-enabled'
+    register: lsmods
+    check_mode: False
+  - name: enable modules
+    command: 'a2enmod {{ item }}'
+    when: '"{{ item }}.load" not in lsmods.stdout_lines'
+    with_items: '{{ default_enabled_modules | union(apache_enabled_modules) | difference(default_disabled_modules | difference(apache_enabled_modules) | union(apache_disabled_modules)) }}'
+  - name: disable modules
+    command: 'a2dismod {{ item }}'
+    when: '"{{ item }}.load" in lsmods.stdout_lines'
+    with_items: '{{ default_disabled_modules | difference(apache_enabled_modules) | union(apache_disabled_modules) }}'
+
+

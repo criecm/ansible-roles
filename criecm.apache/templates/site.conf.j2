@@ -59,6 +59,14 @@
 ProxyPass /balancer-manager !
 {% endif %}
 
+{% if monitoring_from | count > 0 and site.status_path %}
+<Location {{ site.status_path }}>
+	SetHandler server-status
+{% for net in monitoring_from %}
+	Require ip {{ net }}
+{% endfor %}
+{% endif %}
+
 {% elif site.backends | count() == 1 %}
   <Proxy {{ site.backends[0] }}>
     Require all granted
@@ -68,9 +76,15 @@ ProxyPass /balancer-manager !
 {% endif %}
 {% endif %}
 
+{% if "apache_includes" in site and site.apache_includes | count > 0 %}
 {% for include in site.apache_includes %}
   Include {{ apache_etcdir }}/{{ include | regex_replace(".j2$","") }}
 {% endfor %}
+{% else %}
+  <Location />
+    Require all granted
+  </Location>
+<% endif %}
 
 </VirtualHost>
 

@@ -26,6 +26,9 @@ apache install with different sites
 
 * `sites` ([])
   Array of sites descriptions, see below
+* `monitoring_from` ([127.0.0.1])
+* `admin_from` ([])
+  ip addresses/networks allowed to access monitoring pages
 
 ## per site variables (default value)
 
@@ -48,6 +51,9 @@ apache install with different sites
   IP:port or port to listen (default depends of `tls_cert` presence)
 * `user` (system dependant default)
 * `group` (same)
+* `status_path` (/apache-status)
+  will present apache status page to `monitoring_from` and `admin_from` nets, if thay are populated
+  and `status_path` is not empty
 
 ### options (none by default)
 * `aliases` ([])

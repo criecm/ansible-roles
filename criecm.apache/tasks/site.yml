@@ -106,3 +106,19 @@
     regexp: 'Listen {{ site.listen | regex_escape() }}'
     insertafter: 'Listen'
   when: '( ansible_os_family == "FreeBSD" and not site.listen | regex_search("80$") ) or ( ansible_os_family == "Debian" and not site.listen | regex_search("(80|443)$") )'
+
+# monitoring
+- block:
+  - name: monitor tmp var
+    set_fact:
+      tmpmon:
+        - proto: '{% if site.tls_key or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
+          name: '{{ site.name }}'
+          path: '{{ site.status_path }}'
+    when: '"fcgi_status_path" in site'
+  - name: add fcgi_status_path to to_monitor
+    set_fact:
+      to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
+  when: '"status_path" in site and site.status_path != ""'
+
+

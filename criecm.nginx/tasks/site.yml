@@ -102,8 +102,7 @@
         - proto: '{% if site.tls_cert or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
           name: '{{ site.name }}'
           path: '{{ site.fcgi_status_path }}'
-    when: '"fcgi_status_path" in site'
-
+          type: fcgi-status
   - name: add fcgi_status_path to to_monitor
     set_fact:
       to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'

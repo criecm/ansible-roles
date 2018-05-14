@@ -6,3 +6,10 @@ munin_default_htmldir: /var/cache/munin/www
 munin_role: '{% if munin_host == inventory_hostname %}master{% else %}node{% endif %}'
 
 munin_service: munin-node
+
+munin_async: '{% if munin_async_key != "" %}True{% else %}False{% endif %}'
+
+munin_async_path: /usr/share/munin/munin-async
+munin_async_spool: /var/lib/munin-async
+munin_async_home: /var/lib/munin-async
+munin_asyncd_service: munin-async

@@ -1,9 +1,11 @@
 ---
+
 - name: system-dependant vars if any
   include_vars: '{{ item }}'
   with_first_found:
-    - '{{ ansible_os_family }}.yml'
     - skip: True
+    - '{{ ansible_os_family }}.yml'
+    - '{{ ansible_os_family }}-{{ ansible_ansible_distribution_major_version }}.yml'
 
 - name: munin node
   include_tasks: node.yml

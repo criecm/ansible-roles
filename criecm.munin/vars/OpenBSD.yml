@@ -1,2 +1,9 @@
 ---
 munin_service: munin_node
+munin_dist_plugins: /usr/local/libexec/munin/plugins
+
+munin_async: True
+munin_async_home: /var/munin-async
+munin_async_path: /usr/local/libexec/munin/munin-async
+munin_async_spool: /var/db/munin/spool
+munin_asyncd_service: munin_asyncd

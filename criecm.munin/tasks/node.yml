@@ -14,8 +14,34 @@
     - '127.0.0.1'
   loop_control:
     loop_var: munin_server
+  when: not munin_async
+
+- name: listen localhost only
+  lineinfile:
+    dest: '{{ munin_etcdir }}/munin-node.conf'
+    line: 'host 127.0.0.1'
+    regexp: '^host '
+    insertafter: 'host'
+  when: munin_async
 
 - include_tasks: node-plugins.yml
+  notify:
+    - restart munin node
+    - restart munin-asyncd
+
+- name: munin-async user
+  user:
+    name: munin-async
+    home: '{{ munin_async_home }}'
+    shell: /bin/sh
+  when: munin_async
+
+- name: munin_async_key
+  authorized_key:
+    key: '{{ munin_async_key }}'
+    key_options: 'no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,no-user-rc,command="{{ munin_async_path }} -s {{ munin_async_spool }} --spoolfetch"'
+    user: munin-async
+  when: munin_async
 
 - name: enable munin service
   service:
@@ -23,12 +49,23 @@
     state: started
     enabled: yes
 
+- name: enable munin asyncd
+  service:
+    name: '{{ munin_asyncd_service }}'
+    state: started
+    enabled: yes
+  when: munin_async
+
 - name: add config in munin server
   copy:
     dest: '{{ munin_host_dir }}/ansible-host-{{ inventory_hostname }}.conf'
     content: |
       [{{ ansible_fqdn }}]
+      {% if munin_async %}
+      address ssh://munin-async@{{ inventory_hostname }}
+      {% else %}
       address {{ inventory_hostname }}
+      {% endif %}
     force: no
   delegate_to: '{{ munin_host }}'
   when: munin_host != ''

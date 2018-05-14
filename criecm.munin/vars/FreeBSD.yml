@@ -1,7 +1,11 @@
 ---
 munin_etcdir: /usr/local/etc/munin
-munin_dist_plugins: /usr/local/share/munin/plugins
 
 munin_default_dbdir: /var/db/munin
 munin_default_htmldir: /usr/local/www/munin
 
+munin_async: True
+munin_async_path: /usr/local/share/munin/munin-async
+munin_async_spool: /var/spool/munin/async
+munin_async_home: /var/munin-async
+munin_asyncd_service: munin-asyncd

@@ -4,3 +4,8 @@
   service:
     name: '{{ munin_service }}'
     state: restarted
+
+- name: restart munin asyncd
+  service:
+    name: '{{ munin_asyncd_service }}'
+    state: restarted

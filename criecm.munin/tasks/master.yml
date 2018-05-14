@@ -9,6 +9,13 @@
     regexp: '^rrdcached_socket'
     insertafter: '^include'
 
+- user:
+    name: munin
+    group: munin
+    generate_ssh_key: yes
+    ssh_key_comment: munin async user
+    shell: /bin/sh
+
 - name: list installed hosts
   find:
     paths: [ '{{ munin_etcdir }}/munin-conf.d' ]

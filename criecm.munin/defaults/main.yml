@@ -16,3 +16,6 @@ munin_plugins: []
 munin_configs: {}
 munin_config_files: []
 munin_aggr_templates: []
+
+munin_async: False
+munin_async_key: ''

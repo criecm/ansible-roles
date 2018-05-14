@@ -2,3 +2,8 @@
 - apt:
     name: munin-node
     state: present
+
+- apt:
+    name: munin-async
+    state: present
+  when: munin_async

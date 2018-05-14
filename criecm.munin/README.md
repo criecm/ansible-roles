@@ -36,6 +36,9 @@ FreeBSD or Debian
     * `ansible-host-*.conf` that does not match current inventory
     * `ansible-aggr-*.conf` that does not match templates
       in templates/munin/
+  * `munin_async_key` ('')
+    ssh public key for munin-async
+    If provided, munin-asyncd daemon will be used, with ssh access in lieu of tcp:4949
 
 ### for information/hacking
   * `munin_host_dir` ({{ prefix }}/munin-conf.d)

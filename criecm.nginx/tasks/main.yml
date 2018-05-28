@@ -36,6 +36,7 @@
     template:
       src: '{{ item }}.j2'
       dest: '{{ nginx_etcdir }}/{{ item }}'
+      force: no
     with_items:
       - servers.d/0default.conf
     notify: restart nginx
@@ -79,6 +80,7 @@
     mode: '0640'
     group: '{{ www_group }}'
   with_items: '{{ nginx_mods_includes }}'
+  notify: restart nginx
   tags: nginx, config
 
 # nginx_includes if any
@@ -89,6 +91,7 @@
     mode: '0640'
     group: '{{ www_group }}'
   with_items: '{{ nginx_includes }}'
+  notify: restart nginx
   tags: nginx, config
 
 # x509 - global part

@@ -27,7 +27,7 @@
 - include_tasks: node-plugins.yml
   notify:
     - restart munin node
-    - restart munin-asyncd
+    - restart munin asyncd
 
 - name: munin-async user
   user:
@@ -56,7 +56,7 @@
   when: munin_async
   notify:
     - restart munin node
-    - restart munin-asyncd
+    - restart munin asyncd
 
 - name: add config in munin server
   copy:

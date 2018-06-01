@@ -1,0 +1,17 @@
+---
+# tasks file for criecm.node
+- include_vars: '{{ item }}'
+  with_first_found:
+    - skip: True
+    - '{{ ansible_os_family }}.yml'
+
+# install node
+- include_tasks: '{{ ansible_os_family }}-install.yml'
+
+# install app(s)
+- include_tasks: app.yml
+  with_items: '{{ node_apps }}'
+  loop_control:
+    loop_var: oneapp
+
+

@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# PROVIDE: {{ node_app.name }}
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+
+# Add {{ node_app.name }}_enable="YES" to rc.conf
+
+. /etc/rc.subr
+
+name={{ node_app.name }}
+desc="node app $name"
+rcvar=${name}_enable
+
+load_rc_config ${name}
+
+{{ node_app.name }}_enable="${{ '{' }}{{ node_app.name }}_enable:-NO}"
+{{ node_app.name }}_script="${{ '{' }}{{ node_app.name }}_script:-{{ node_app.path }}/{{ node_app.script }}}"
+{{ node_app.name }}_chdir="{{ node_app.path }}"
+{{ node_app.name }}_procname="node_{{ node_app.name }}"
+
+pidfile="/var/run/{{ node_app.name }}.pid"
+command=/usr/sbin/daemon
+command_args="-rP $pidfile -u {{ node_app.user }} -t '{{ node_app.name }}' /usr/local/bin/node ${{ '{' }}{{ node_app.name }}_script}"
+
+start_precmd()
+{
+  # Have to empty rc_flags so they don't get passed to daemon(8)
+  rc_flags=""
+}
+
+run_rc_command "$1"

@@ -1,0 +1,10 @@
+---
+# app default vars
+default_node_app:
+  name: '{{ oneapp.name | mandatory }}'
+  user: '{{ oneapp.name | mandatory }}'
+  path: '/home/{{ oneapp.name }}/{{ oneapp.name }}'
+  update: '{{ node_update_git | default(False) }}'
+  script: app.js
+
+node_app: '{{ default_node_app | combine(oneapp) }}'

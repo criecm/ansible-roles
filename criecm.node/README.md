@@ -25,6 +25,9 @@ Install/run node apps on FreeBSD (could be easily adapted)
 * `confs` ([])
   List of config files, as dicts of {src=template,dest=dest}
   dest can be relative to `app.path`
+* `use_syslog` (False)
+  IP/name of syslog server (do enable syslog)
+* `syslog_tag` (`app.name`)
 
 ## Dependencies
 

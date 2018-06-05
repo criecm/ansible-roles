@@ -34,7 +34,7 @@
   shell: 'nsd-control-setup'
   when: not nsdcontrolkey.stat.exists
   tags: config, nsd
- 
+
 - name: dir conf.d
   file:
     dest: '{{ nsd_configdir }}/conf.d'
@@ -72,7 +72,7 @@
     validate: nsd-checkconf %s
   register: nsdcfg
   tags: config, nsd
-  notify: 
+  notify:
     - restart nsd
 
 - name: start nsd
@@ -90,3 +90,15 @@
   loop_control:
     loop_var: nsd_zone
   tags: nsd, zones
+
+- name: to_monitor
+  block:
+  - set_fact:
+      tmpmon:
+        - proto: dns
+          name: 'nsd {{ ansible_fqdn }}'
+          port: '{{ nsd_port }}'
+          host: '{{ inventory_hostname }}'
+          type: dns
+  - set_fact:
+      to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'

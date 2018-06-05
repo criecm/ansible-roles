@@ -96,14 +96,14 @@
   notify: reload nginx
 
 - block:
-  - name: monitor tmp var
+  - name: create to_monitor entry
     set_fact:
       tmpmon:
         - proto: '{% if site.tls_cert or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
           name: '{{ site.name }}'
           path: '{{ site.fcgi_status_path }}'
           type: fcgi-status
-  - name: add fcgi_status_path to to_monitor
+  - name: fcgi-status to_monitor
     set_fact:
       to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
   when: '"fcgi_status_path" in site and site.fcgi_status_path != ""'

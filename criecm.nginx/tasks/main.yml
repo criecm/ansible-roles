@@ -137,6 +137,7 @@
       - proto: http
         name: '{{ ansible_fqdn }}'
         path: /nginx_status
+        type: nginx_status
 
 - name: register to_monitor
   set_fact:

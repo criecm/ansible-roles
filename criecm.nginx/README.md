@@ -12,6 +12,7 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 * nginx on FreeBSD, Debian
 * default server
 * monitoring (on `/nginx_status` for `{monitoring_from}` IP's)
+* syslog if wanted
 
 ## Examples
 
@@ -58,6 +59,9 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   (let another role enrich it before calling out vhost.yml by himself — see below)
 * `nginx_debian_package` (nginx)
   Debian package for nginx (nginx-full, nginx-lite, …)
+* `syslog_server` ('')
+  nginx will log errors there
+* `syslog_facility` (local5)
 
 ### if behind reverse-proxy
 

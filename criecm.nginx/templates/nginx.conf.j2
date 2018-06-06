@@ -4,7 +4,7 @@ worker_processes	{{ nginx_processes }};
 
 error_log	{{ nginx_log_dir }}/nginx-error.log info;
 {% if syslog_server %}
-error_log syslog:server={{ syslog_server }},facility=local5,tag=nginx;
+error_log syslog:server={{ syslog_server }},facility={{ syslog_facility }},tag=nginx;
 {% endif %}
 
 include modules.d/*.conf;
@@ -27,18 +27,16 @@ http {
 	access_log	{{ nginx_log_dir }}/access.log combined;
 	{% endif %}
 
-	sendfile_max_chunk 512k;
 	server_tokens	off;
-	aio on;
-	sendfile	on;
-	tcp_nopush	on;
+
+	# https://thoughts.t37.net/optimisations-nginx-bien-comprendre-sendfile-tcp-nodelay-et-tcp-nopush-2ab3f33432ca
+	# si fichiers statiques, les deux:
+	#sendfile	on;
+	#tcp_nopush	on;
+	#sendfile_max_chunk 512k;
+	tcp_nodelay on;
 
 	keepalive_timeout	65;
-
-	{% if "upload_progress" in nginx_modules %}
-	# "zone" pour le traitement des progressions d'uploads
-	upload_progress uploads 1m;
-	{% endif %}
 
 	log_not_found off;
 
@@ -46,9 +44,12 @@ http {
 	gzip_min_length	1100;
 	gzip_buffers	4 8k;
 	gzip_types	text/plain text/css application/javascript;
+
+	include mime.types;
 	types {
 		text/plain	log;
 	}
+
 	include conf.d/*.conf;
 
 	include servers.d/*.conf;

@@ -4,17 +4,6 @@
     - '{{ ansible_os_family }}.yml'
   tags: vars, nginx
 
-- include_tasks: '{{ item }}'
-  with_first_found:
-    - '{{ ansible_os_family }}.yml'
-  tags: vars, nginx
-
-- name: installe nginx
-  pkgng:
-    name: nginx
-    state: present
-  tags: nginx, pkg
-
 - block:
   - name: default config
     template:
@@ -41,6 +30,11 @@
       - servers.d/0default.conf
     notify: restart nginx
   tags: nginx, config
+
+- include_tasks: '{{ item }}'
+  with_first_found:
+    - 'install-{{ ansible_os_family }}.yml'
+  tags: vars, nginx
 
 # logs dir
 - name: log dir
@@ -72,6 +66,11 @@
     notify: restart nginx
   when: 'proxified_by | length != 0'
   tags: nginx, config
+
+- include_tasks: '{{ item }}'
+  with_first_found:
+    - 'mods-{{ ansible_os_family }}.yml'
+  tags: nginx,config
 
 - name: nginx modconfs
   template:

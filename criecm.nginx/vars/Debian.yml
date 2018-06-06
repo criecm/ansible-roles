@@ -2,3 +2,5 @@
 www_user: 'www-data'
 www_group: 'www-data'
 www_default_root: '/var/www/html'
+nginx_mods_path: '/usr/lib/nginx/modules'
+nginx_modsprefix: 'modules/'

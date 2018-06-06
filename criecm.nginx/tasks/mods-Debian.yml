@@ -1,0 +1,19 @@
+---
+- name: list installed modules
+  shell: 'ls {{ nginx_mods_path }} | sed "s/\.so$//"'
+  check_mode: False
+  changed_when: False
+  register: lsmods
+  tags: nginx, config
+
+- name: nginx modules to install
+  apt:
+    name: '{{ module | regex_replace("ngx_","libnginx-") | regex_replace("_","-") }}'
+    state: present
+  with_items: '{{ nginx_modules }}'
+  loop_control:
+    loop_vars: module
+  when: module not in lsmods.stdout_lines
+  notify: restart nginx
+  tags: nginx, config
+

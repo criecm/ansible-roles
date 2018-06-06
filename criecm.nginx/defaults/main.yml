@@ -27,3 +27,4 @@ admin_from: []
 
 tls_certs_dir: /etc/ssl
 
+nginx_debian_package: nginx

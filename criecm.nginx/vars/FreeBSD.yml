@@ -3,3 +3,5 @@ www_user: www
 www_group: www
 www_default_root: '/usr/local/www/nginx'
 nginx_etcdir: '/usr/local/etc/nginx'
+nginx_mods_path: '/usr/local/libexec/nginx'
+nginx_modsprefix: '/usr/local/libexec/nginx/'

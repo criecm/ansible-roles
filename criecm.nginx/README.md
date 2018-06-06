@@ -47,6 +47,8 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   ip addresses/networks allowed to access monitoring pages
 * `nginx_includes` ([])
   list of templates (or files) to be 'include'd in http block (conf.d/)
+* `nginx_modules` ([])
+  nginx modules to load explicitly (eg: `["ngx_http_auth_pam_module","ngx_http_geoip_module"]`)
 * `nginx_mods_includes` ([])
   list of templates to be included *before* http block (modules.d/)
 * `backends` ([])
@@ -54,6 +56,8 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 * `backend` ('')
   if defined, criecm.nginx will skip it 
   (let another role enrich it before calling out vhost.yml by himself — see below)
+* `nginx_debian_package` (nginx)
+  Debian package for nginx (nginx-full, nginx-lite, …)
 
 ### if behind reverse-proxy
 

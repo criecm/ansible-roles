@@ -1,6 +1,6 @@
 galaxy_info:
   author: Geoffroy Desvernay
-  description: YAS (Yet Another Sysadmin)
+  description: node app runner for FreeBSD
   company: Ecole entrale Marseille
 
   # If the issue tracker for your role is not on github, uncomment the

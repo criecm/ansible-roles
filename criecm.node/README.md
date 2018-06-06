@@ -2,6 +2,13 @@
 
 Install/run node apps on FreeBSD (could be easily adapted)
 
+## Features:
+* dedicated system user/home
+* git source pull/update
+* config template placeholder
+* syslog for output
+* FreeBSD rc script for start/stop/restart
+
 ## Role Variables
 
 * `node_version` (8)
@@ -42,6 +49,7 @@ Including an example of how to use your role (for instance, with variables passe
         node_apps:
           - name: myapp1
             script: index.js
+            gitsrc: 'https://git.web.url/myproject.git'
             confs:
               - src: mytemplace.js.j2
                 dest: config.js

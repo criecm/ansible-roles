@@ -1,0 +1,17 @@
+# {{ ansible_managed }}
+# TYPE	DATABASE	USER	ADDRESS	METHOD
+local	all	{{ pg_user }}		ident
+
+{% for h in pg_allowed_hosts | default([]) %}
+host	all	all	{{ h }}	md5
+{% endfor %}
+
+{% if pg_admin_password != '' %}
+host	all	{{ pg_admin_user }}	{{ pg_admin_host | default("all") }}	md5
+{% endif %}
+
+{% for u in pg_users | union(pg_maintenance_users) %}
+host	u.db	u.name		db.host	md5
+{% endfor %}
+
+

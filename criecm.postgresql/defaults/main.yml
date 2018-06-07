@@ -1,0 +1,30 @@
+---
+# defaults file for criecm.mariadb
+pg_version: 9.6
+
+pg_basedir: '{% if ansible_os_family == "FreeBSD" %}/var/db/postgres{% else %}/var/lib/postgres{% endif %}'
+pg_datasubdir: '{% if ansible_os_family == "FreeBSD" %}data{{ pg_version | regex_replace("\.","") }}{% else %}{{ pg_version }}{% endif %}'
+pg_logdir: /var/log/postgres
+pg_class: postgresql
+pg_logdest: 'syslog'
+pg_owner_home: '{% if ansible_os_family == "FreeBSD" %}/var/db/postgres{% else %}/var/lib/postgres{% endif %}'
+pg_owner: postgres
+pg_group: postgres
+
+# if zfs
+pg_zfs_base: ''
+
+pg_admin_user: admin
+pg_admin_password: ''
+
+pg_root_password: ''
+
+pg_config: {}
+
+pg_users: []
+pg_maintenance_users: []
+
+pg_dbs: []
+
+pg_syslog_facility: 'local3'
+

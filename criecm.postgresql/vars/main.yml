@@ -1,0 +1,5 @@
+---
+# vars file for criecm.postgresql
+pg_service: 'postgresql'
+
+pg_random: '{{ 100000 | random(seed=inventory_hostname) }}'

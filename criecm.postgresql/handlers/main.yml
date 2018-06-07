@@ -1,0 +1,9 @@
+---
+# handlers file for criecm.mariadb
+- name: cap_mkdb login.conf
+  command: 'cap_mkdb /etc/login.conf'
+
+- name: restart postgresql
+  service:
+    name: postgresql
+    state: restarted

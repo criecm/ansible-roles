@@ -1,0 +1,94 @@
+---
+- name: install
+  include_tasks: 'install-{{ ansible_os_family }}.yml'
+
+- name: log dir
+  file:
+    dest: '{{ pg_logdir }}'
+    state: directory
+    mode: '0750'
+    owner: '{{ pg_owner }}'
+    group: '{{ pg_group }}'
+  when: pg_logdest != "syslog"
+
+- name: new server ?
+  stat:
+    path: '{{ pg_basedir }}/{{ pg_datasubdir }}/base'
+  register: pg_db_exists
+
+- name: dbdir
+  file:
+    dest: '{{ pg_basedir }}/{{ pg_datasubdir }}'
+    state: directory
+    owner: '{{ pg_owner }}'
+    group: '{{ pg_group }}'
+    mode: 'u+rwX,g-rwx,o-rwx'
+    recurse: yes
+  when: not pg_db_exists.stat.exists
+
+# first install
+- name: init postgresql server
+  command: 'service postgresql initdb'
+  when: not pg_db_exists.stat.exists
+  register: pg_init
+
+# postgresql.conf
+- name: postgresql.conf.j2
+  template:
+    src: postgresql.conf.j2
+    dest: '{{ pg_basedir }}/{{ pg_datasubdir }}/postgresql.conf'
+    mode: '0640'
+    group: '{{ pg_group }}'
+    force: no
+  notify: restart postgresql
+
+- name: postgresql.conf, specific
+  lineinfile:
+    line: '{{ item.key }} = {{ item.value }}'
+    dest: '{{ pg_basedir }}/{{ pg_datasubdir }}/postgresql.conf'
+  with_dict: '{{ pg_config }}'
+  notify: restart postgresql
+
+- name: pg_hba.conf
+  template:
+    src: pg_hba.conf.j2
+    dest: '{{ pg_basedir }}/{{ pg_datasubdir }}/pg_hba.conf'
+    mode: '0640'
+    group: '{{ pg_group }}'
+  when: pg_init.changed | default(False)
+  notify: reload postgresql
+
+- name: start if needed
+  service:
+    name: postgresql
+    state: started
+
+# default admins
+- postgresql_user:
+    name: '{{ pg_admin_user }}'
+    password: '{{ pg_admin_password }}'
+    role_attr_flags: 'SUPERUSER'
+    state: present
+  when: pg_admin_user != "" and pg_admin_password != "" and pg_init.changed | default(False)
+
+# admin users
+- postgresql_user:
+    name: '{{ item.name }}'
+    db: '{{ item.db | default(omit) }}'
+    priv: '{{ item.priv | default(omit) }}'
+    role_attr_flags: '{{ item.role_attr_flags | default(omit) }}'
+    password: '{{ item.password | default(item.name+pg_random | hash("sha256")) }}'
+    state: present
+  with_items: '{{ pg_users | union(pg_maintenance_users) }}'
+  when: pg_init.changed | default(False)
+
+# DBs
+- name: new dbs
+  postgresql_db:
+    name: '{{ item.name }}'
+    owner: '{{ item.owner | default(omit) }}'
+    state: present
+  with_items:
+    - '{{ pg_dbs }}'
+  when: 'pg_dbs | count > 0'
+

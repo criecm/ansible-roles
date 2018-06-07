@@ -102,3 +102,4 @@
           type: dns
   - set_fact:
       to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
+      cacheable: yes

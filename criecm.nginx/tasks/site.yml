@@ -106,6 +106,7 @@
   - name: fcgi-status to_monitor
     set_fact:
       to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
+      cacheable: yes
   when: '"fcgi_status_path" in site and site.fcgi_status_path != ""'
 
 - set_fact:

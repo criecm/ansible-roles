@@ -141,6 +141,7 @@
 - name: register to_monitor
   set_fact:
     to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
+    cacheable: yes
 
 - name: debug monitor
   debug:

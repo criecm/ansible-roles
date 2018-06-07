@@ -21,29 +21,27 @@
   - name: conf includes
     copy:
       src: '{{ item }}'
-      dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
+      dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | basename }}'
       mode: '0644'
-    with_fileglob:
-      - 'apache/{{ apache_includesdir }}/*.conf'
-      - '{{ inventory_hostname | regex_replace("[0-9]*$","") }}/apache/{{ apache_includesdir }}/*.conf'
-      - '{{ inventory_hostname }}/apache/{{ apache_includesdir }}/*.conf'
+    with_flattened:
+      - '{{ ["apache/"+apache_includesdir+"/*.conf"] | map("fileglob") | list }}'
+      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_includesdir+"/*.conf") | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
   - name: conf modules
     copy:
       src: '{{ item }}'
-      dest: '{{ apache_etcdir }}/{{ apache_modsconfdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
+      dest: '{{ apache_etcdir }}/{{ apache_modsconfdir }}/{{ item | basename }}'
       mode: '0644'
-    with_fileglob:
-      - 'apache/{{ apache_modsconfdir }}/*.conf'
-      - '{{ inventory_hostname | regex_replace("[0-9]*$","") }}/apache/{{ apache_modsconfdir }}/*.conf'
-      - '{{ inventory_hostname }}/apache/{{ apache_modsconfdir }}/*.conf'
+    with_flattened:
+      - '{{ ["apache/"+apache_modsconfdir+"/*.conf"] | map("fileglob") | list }}'
+      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_modsconfdir+"/*.conf") | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
   - name: conf .inc's
     copy:
       src: '{{ item }}'
       dest: '{{ apache_etcdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
       mode: '0644'
-    with_fileglob:
-      - 'apache/{{ inventory_hostname }}/*.inc'
-      - 'apache/*.inc'
+    with_flattened:
+      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/*.inc") | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
+      - '{{ ["apache/*.inc"] | map("fileglob") | list }}'
   - name: conf include sites
     template:
       dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/Zsites.conf'

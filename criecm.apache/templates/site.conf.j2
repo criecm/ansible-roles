@@ -80,7 +80,7 @@ ProxyPass /balancer-manager !
   <Location />
 {% if "apache_includes" in site and site.apache_includes | count > 0 %}
 {%   for include in site.apache_includes %}
-  Include {{ apache_etcdir }}/{{ include | regex_replace(".j2$","") }}
+  Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
 {%   endfor %}
 {% else %}
     Require all granted

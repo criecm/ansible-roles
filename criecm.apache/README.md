@@ -6,18 +6,25 @@ apache install with different sites
 
 ### config files/templates location
 
-* modules config files
-  All `modules.d/*.conf` (for FreeBSD) or `mods-enabled/*.conf` (Debian) files found in:
-  * apache/
-  * `inventory_hostname| with numbers stripped from end`/apache
-  * `inventory_hostname`/apache
-  will be installed
+#### auto-installed config files
 
-* same for `Includes/*.conf` (FreeBSD) or `conf.d/*.conf` (Debian)
+  * For these paths:
+    - `files/{{ inventory_hostname }}/apache/`
+    - `files/{{ any_group_of_this_machine }}/apache/`
+    - `files/{{ inventory_hostname | regex_replace("[0-9]*$","") }}/apache/`
+    - `files/apache/`
 
-* same for `*.inc` installed in apache's conf dir (to be included in sites configs)
+    All maching files will be installed under apache config dir:
+    * FreeBSD:
+    - `modules.d/*.conf`
+    - `Includes/*.conf`
+    * Debian:
+    - `mods-enabled/*.conf`
+    - `conf.d/*.conf`
+    * All:
+    - `*.inc`
 
-### data
+### data files
 * same order, but "first match wins" and recursive copy for default root directory:
   - `inventory_hostname`/apache/default_root/
   - `inventory_hostname with ending numbers stripped`/apache/default_root/

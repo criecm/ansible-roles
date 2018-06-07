@@ -14,7 +14,7 @@
 
 - name: site includes
   template:
-    dest: '{{ apache_etcdir }}/{{ item | regex_replace(".j2$","") }}'
+    dest: '{{ apache_etcdir }}/{{ item | basename | regex_replace(".j2$","") }}'
     src: '{{ lookup("first_found", include_locations) }}'
   with_items: '{{ site.apache_includes }}'
   when: '"apache_includes" in site'
@@ -22,7 +22,7 @@
 - name: conf includes
   copy:
     src: '{{ item }}'
-    dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
+    dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | basename | regex_replace(".*/([^/]+)$","\1") }}'
     mode: '0644'
   with_fileglob:
     - 'apache/{{ site.id }}/{{ apache_includesdir }}/*.conf'

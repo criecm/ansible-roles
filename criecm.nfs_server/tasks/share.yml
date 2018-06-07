@@ -33,7 +33,8 @@
     register: zexport
   - zfs:
       name: '{{ share.zfsrc }}'
-      sharenfs: 'off'
       state: present
+      extra_zfs_properties:
+        sharenfs: 'off'
     when: zexport.rc != 0
   when: '"zfsrc" in share'

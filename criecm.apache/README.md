@@ -4,17 +4,18 @@ apache install with different sites
 
 ## files used if existing
 
-### config files
+### config files/templates location
+
 * modules config files
-  All modules.d/*.conf (for FreeBSD) or mods-enabled/*.conf (Debian) files found in:
+  All `modules.d/*.conf` (for FreeBSD) or `mods-enabled/*.conf` (Debian) files found in:
   * apache/
   * `inventory_hostname| with numbers stripped from end`/apache
   * `inventory_hostname`/apache
   will be installed
 
-* same for Includes/*.conf (FreeBSD) or conf.d/*.conf (Debian)
+* same for `Includes/*.conf` (FreeBSD) or `conf.d/*.conf` (Debian)
 
-* same for *.inc installed in apache's conf dir (to be included in sites configs)
+* same for `*.inc` installed in apache's conf dir (to be included in sites configs)
 
 ### data
 * same order, but "first match wins" and recursive copy for default root directory:
@@ -52,7 +53,7 @@ apache install with different sites
 * `user` (system dependant default)
 * `group` (same)
 * `status_path` (/apache-status)
-  will present apache status page to `monitoring_from` and `admin_from` nets, if thay are populated
+  will present apache status page to `monitoring_from` and `admin_from` nets, if they are populated
   and `status_path` is not empty
 
 ### options (none by default)

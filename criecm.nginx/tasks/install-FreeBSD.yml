@@ -15,9 +15,11 @@
   file:
     dest: '{{ etcprefix }}/etc/newsyslog.conf.d'
     state: directory
+  when: do_local_log
 
 - name: freebsd newsyslog
   template:
     src: newsyslog_nginx.conf.j2
     dest: '{{ etcprefix }}/etc/newsyslog.conf.d/nginx.conf'
+  when: do_local_log
 

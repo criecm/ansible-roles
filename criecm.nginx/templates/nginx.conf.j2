@@ -2,7 +2,9 @@
 user	{{ www_user }};
 worker_processes	{{ nginx_processes }};
 
+{% if do_local_log %}
 error_log	{{ nginx_log_dir }}/nginx-error.log info;
+{% endif %}
 {% if syslog_server %}
 error_log syslog:server={{ syslog_server }},facility={{ syslog_facility }},tag=nginx;
 {% endif %}
@@ -25,10 +27,11 @@ http {
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
 
+	{% if do_local_access_log | default(do_local_log) %}
+	access_log	{{ nginx_log_dir }}/access.log combined;
+	{% endif %}
 	{% if syslog_server %}
 	access_log syslog:server={{ syslog_server }},facility=local5 combined;
-	{% else %}
-	access_log	{{ nginx_log_dir }}/access.log combined;
 	{% endif %}
 
 	server_tokens	off;

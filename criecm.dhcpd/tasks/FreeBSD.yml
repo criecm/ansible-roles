@@ -38,12 +38,14 @@
     loop_control:
       loop_var: syslogdhcpdline
   - name: syslog dhcpd
-    lineinfile:
-      line: 'local7.*   @{{ syslog_server }}'
-      insertafter: '\*\.\*.*@'
+    copy:
+      content: |
+        local7.*   @{{ syslog_server }}
+
       dest: /usr/local/etc/syslog.d/dhcpd
+      mode: '0644'
   - name: newsyslog config
-    file:
+    copy:
       src: newsyslog_dhcpd.conf
       dest: /usr/local/etc/newsyslog.conf.d/dhcpd
       mode: '0644'

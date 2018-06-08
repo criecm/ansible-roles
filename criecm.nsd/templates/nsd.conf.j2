@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 server:
-{% for ip in nsd_adresses %}
+{% for ip in nsd_addresses %}
 {% if not ip is search("fe80:") %}	ip-address: {{ip}}
 {% endif %}
 {% endfor %}

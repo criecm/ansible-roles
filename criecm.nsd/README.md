@@ -6,6 +6,8 @@ avec `nsd-control (add|delete)zone $ZONE $PATTERN`
 
 ## Variables (default)
 
+* `nsd_addresses` ([])
+  list of ip address (`*` if empty)
 * `nsd_patterns` ([])
   list of patterns to use with zones
   item format: same as `pattern` in nsd.conf

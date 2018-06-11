@@ -1,6 +1,6 @@
 # Role pour install apache ET sites
 
-apache install with different sites
+apache with sites configs
 
 ## files used if existing
 
@@ -26,26 +26,26 @@ apache install with different sites
 
 ### data files
 * same order, but "first match wins" and recursive copy for default root directory:
-  - `inventory_hostname`/apache/default_root/
-  - `inventory_hostname with ending numbers stripped`/apache/default_root/
-  - apache/default_root/
+  - `inventory_hostname/apache/default_root/`
+  - `(inventory_hostname with ending numbers stripped)/apache/default_root/`
+  - `apache/default_root/`
 
 ## variables (default)
 
-* `sites` ([])
+* `sites ([])`:
   Array of sites descriptions, see below
-* `monitoring_from` ([127.0.0.1])
-* `admin_from` ([])
+* `monitoring_from ([127.0.0.1])`:
+* `admin_from ([])`:
   ip addresses/networks allowed to access monitoring pages
 
 ## per site variables (default value)
 
 ### mandatory
-* `id` (no default)
+* `id (MANDATORY)`:
   unique short identifier (base for dirnames, usernames, etc.)
-* `name` (no default)
+* `name (MANDATORY)`:
   DNS name
-* `backends` ([])
+* `backends ([])`:
   eg: ``` - 'ajp://jentest1.nettest.egim:8009 route=jentest1 timeout=20 loadfactor=100'```
   - if only one is defined, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html 
     eg: ``` - 'http://my.backend.local:8080/'
@@ -53,35 +53,35 @@ apache install with different sites
     eg: 
 
 ### optional (sane defaults)
-* `rootdir` (system-dependant/{{name}})
+* `rootdir (system-dependant/{{name}})`:
   You have to populate it elsewhere (criecm.php-fpm does it from vars, or in your playbook)
-* `listen` (`*:80` or `*:443`)
-  IP:port or port to listen (default depends of `tls_cert` presence)
-* `user` (system dependant default)
-* `group` (same)
-* `status_path` (/apache-status)
+* `listen (*:80 or *:443)`
+  [IP:]port or port to listen (default depends of `tls_cert` presence)
+* `user (system dependant default)`
+* `group (user)`
+* `status_path (/apache-status)`:
   will present apache status page to `monitoring_from` and `admin_from` nets, if they are populated
   and `status_path` is not empty
 
 ### options (none by default)
-* `aliases` ([])
+* `aliases ([])`:
   DNS aliases (ServerAlias'es)
-* `apache_includes` ([])
+* `apache_includes ([])`
   Files to be included in virtualhost config.
   see *Files / Templates locations* for searched path
-* `grwfiles` ([])
+* `grwfiles ([])`
   files writeable by group
-* `grwdirs` ([])
+* `grwdirs ([])`
   dirs writable by site's group
 
 ### TLS : https support
-* `tls_cert` ([])
+* `tls_cert ([])`:
   file name, will be searched for in files/tls/ ans copied in {prefix}/etc/ssl/
-* `tls_key` ([])
+* `tls_key ([])`:
   file name, will be searched for in files/tls/ ans copied in {prefix}/etc/ssl/private/
-* `tls_hsts` (15768000)
+* `tls_hsts (15768000)`:
   will add a Strict-Transport-Security header with provided value
-* `tls_redir` (False)
+* `tls_redir (False)`:
   will define an http vhost redirecting to https if True
 
 # Files / Templates locations

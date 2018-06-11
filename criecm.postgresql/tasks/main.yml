@@ -63,6 +63,15 @@
     name: postgresql
     state: started
 
+# DBs in local facts
+- file: dest='{{ etcprefix }}/etc/ansible/facts.d' state=directory
+- name: install pg facts for DB
+  copy:
+    dest: '{{ etcprefix }}/etc/ansible/facts.d/pg_dbs.fact'
+    mode: '4750'
+    owner: '{{ pg_owner }}'
+    src: templates/pg.fact.j2
+
 # default admins
 - postgresql_user:
     name: '{{ pg_admin_user }}'
@@ -91,4 +100,5 @@
   with_items:
     - '{{ pg_dbs }}'
   when: 'pg_dbs | count > 0'
+
 

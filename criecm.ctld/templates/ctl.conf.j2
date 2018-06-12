@@ -5,7 +5,7 @@
 # dans ansible:
 #  1. ajouter le lun dans inventory/host_vars/{{ inventory_hostname }}.yml
 #  2. lancer:
-#     ansible-playbook -t vars,iscsi -l {{ inventory_hostname }} playbooks/fileservers.yml
+#     ansible-playbook [-t vars,iscsi] -l {{ inventory_hostname }} playbooks/filers.yml
 #
 {# ns: il faut un namespace pour la portee de iqn dans la boucle #}
 {% set ns = namespace(iqn=iscsi_iqn|default(''),dom='') %}

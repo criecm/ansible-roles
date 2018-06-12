@@ -1,6 +1,7 @@
 ---
 - name: install munin-node
   include_tasks: '{{ ansible_os_family }}-node.yml'
+  tags: munin-node
 
 - name: munin allow servers
   lineinfile:
@@ -15,6 +16,7 @@
   loop_control:
     loop_var: munin_server
   when: not munin_async
+  tags: munin-node
 
 - name: listen localhost only
   lineinfile:
@@ -23,11 +25,13 @@
     regexp: '^host '
     insertafter: 'host'
   when: munin_async
+  tags: munin-node
 
 - include_tasks: node-plugins.yml
   notify:
     - restart munin node
     - restart munin asyncd
+  tags: munin-node
 
 - name: munin-async user
   user:
@@ -35,6 +39,7 @@
     home: '{{ munin_async_home }}'
     shell: /bin/sh
   when: munin_async
+  tags: munin-node
 
 - name: munin_async_key
   authorized_key:
@@ -42,12 +47,14 @@
     key_options: 'no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,no-user-rc,command="{{ munin_async_path }} -s {{ munin_async_spool }} --spoolfetch"'
     user: munin-async
   when: munin_async
+  tags: munin-node
 
 - name: enable munin service
   service:
     name: '{{ munin_service }}'
     state: started
     enabled: yes
+  tags: munin-node
 
 - name: enable munin asyncd
   service:
@@ -57,6 +64,7 @@
   notify:
     - restart munin node
     - restart munin asyncd
+  tags: munin-node
 
 - name: add config in munin server
   copy:
@@ -71,4 +79,5 @@
     force: no
   delegate_to: '{{ munin_host }}'
   when: munin_host != ''
+  tags: munin-node
 

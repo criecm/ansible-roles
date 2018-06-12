@@ -127,7 +127,7 @@
   with_items: '{{ sites }}'
   loop_control:
     loop_var: onesite
-  when: '(not "backend" in onesite) and not nginx_sites_done | default(False)'
+  when: '(not "backend" in onesite) and not nginx_sites_done | default(False) and ( mysite == "" or mysite == onesite.id )'
   tags: nginx, sites
 
 - name: monitor tmp var

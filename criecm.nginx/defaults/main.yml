@@ -32,3 +32,5 @@ nginx_debian_package: nginx
 syslog_facility: local5
 
 do_local_log: True
+
+mysite: ''

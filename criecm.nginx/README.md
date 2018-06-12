@@ -17,17 +17,67 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 ## Examples
 
 ### minimal example:
-<pre>
+
+```yaml
 - hosts: webhost1
   roles:
     - nginx
   vars:
     sites:
       # this will create an empty website hosted in /home/mysite/mysite:
-      - { id: mysite, name: website.example.domain }
+      - { id: mysite, name: website.example.org }
       # another one hosted in /usr/local/www/other:
-      - { id: myothersite, name: othersite.example.domain, rootdir: /usr/local/www/other }
-</pre>
+      - { id: myothersite, name: othersite.example.org, rootdir: /usr/local/www/other }
+```
+
+### separate reverse-proxy:
+
+```yaml
+# backend
+---
+# of course this one may need criecm.node, criecm.tomcat, criecm.php-fpm or …
+# and contain many hosts
+- hosts: backends
+  roles:
+    - criecm.nginx
+  vars:
+    sites:
+      - id: myfirstbackend
+        name: mfb.example.org
+        nginx_includes: [myconf.conf.j2]
+
+# reverse-proxy
+- hosts: relays
+  roles:
+    - criecm.nginx
+  vars:
+    # monitoring hosts (allowed to access /nginx_status)
+    monitoring_from:
+      - 198.51.100.3
+      - 2001:DB8:ad31::b0b0:c001
+
+    # will register https from reverse proxy
+    proxified_by:
+      - 2001:DB8:1ee7::654:3/128
+      - 203.0.113.8/32
+
+    sites:
+      # this one will reverse-proxy, HTTPS and load-balancing
+      #  between backends
+      - id: mfb-proxy
+        name: mfb.example.org
+        tls_cert: files/tls/mycert.crt
+        tls_key: files/tls/private/mycert.key
+        # we want all http redirected to https:
+        tls_redir: True
+        # activate stapling
+        x509_stapling_chain: files/tls/stapling.pem
+        # this will load-balance, with sticky sessions by default (site.conf.j2)
+        backends:
+          - http://backend01.example.org
+          - http://backend02.example.org
+          - http://backend03.example.org
+```
 
 ## Role Variables
 
@@ -66,6 +116,8 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   keep logs locally
 * `do_local_access_log (do_local_log)`;
   keeps access log locally
+* `mysite ('')`:
+  if defined, will only process this `site.id`
 
 ### if behind reverse-proxy
 

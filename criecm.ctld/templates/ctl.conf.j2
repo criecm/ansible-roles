@@ -1,0 +1,56 @@
+# {{ ansible_managed }}
+#
+# ¡¡¡ ALL CHANGES WILL BE LOST !!!
+#
+# dans ansible:
+#  1. ajouter le lun dans inventory/host_vars/{{ inventory_hostname }}.yml
+#  2. lancer:
+#     ansible-playbook -t vars,iscsi -l {{ inventory_hostname }} playbooks/fileservers.yml
+#
+{# ns: il faut un namespace pour la portee de iqn dans la boucle #}
+{% set ns = namespace(iqn=iscsi_iqn|default(''),dom='') %}
+{% if iscsi_iqn | default(False) %}
+{%   set ns.iqn = iscsi_iqn %}
+{% else %}
+{%   for part in iscsi_domain.split('.') %}
+{%     set ns.dom = part+'.'+ns.dom %}
+{%   endfor %}
+{%   set ns.iqn = iscsi_iqn_base+'.'+ns.dom+ansible_hostname %}
+{% endif %}
+{% set iqn = ns.iqn %}
+# ansible-generated iqn: {{ iqn }}
+# iscsi_domain: {{ iscsi_domain }}
+#
+auth-group {{ iscsi_auth_group }} {
+  auth-type {{ iscsi_auth_type }}
+  initiator-portal {{ iscsi_network_cidr }}
+}
+
+portal-group {{ iscsi_portal_group }} {
+  listen {{ iscsi_listen_ip }}
+  discovery-auth-group {{ iscsi_auth_group }}
+}
+
+{% for target in iscsi_targets.keys() %}
+target {{ iscsi_targets[target].iqn | default(iqn) }}:{{ target | default(iscsi_target) }} {
+  auth-group {{ iscsi_targets[target].authgroup | default(iscsi_auth_group) }}
+  portal-group {{ iscsi_targets[target].portalgroup | default(iscsi_portal_group) }}
+{%   for opt in iscsi_targets[target].opts | default({}) %}
+  {{ opt }} {{ iscsi_targets[target].opts[opt] }}
+{%   endfor %}
+{%   for lun in iscsi_targets[target].luns.keys() %}
+  lun {{ lun }} {
+{%     for item in iscsi_targets[target].luns[lun].keys() %}
+    {{ item }} {{ iscsi_targets[target].luns[lun][item] }}
+{%     endfor %}
+{%     if not "option vendor" in iscsi_targets[target].luns[lun].keys() %}
+    option vendor FreeBSD
+{%     endif %}
+{%     if not "serial" in iscsi_targets[target].luns[lun].keys() %}
+    serial {{ inventory_hostname }}{{ '%04d' | format(lun) }}
+{%     endif %}
+  }
+{%   endfor %}
+}
+
+{% endfor %}

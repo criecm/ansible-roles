@@ -1,0 +1,7 @@
+---
+# handlers file for criecm.ctld
+- name: reload ctld
+  service:
+    name: ctld
+    state: reloaded
+

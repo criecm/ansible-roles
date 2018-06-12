@@ -1,0 +1,21 @@
+---
+# tasks file for criecm.ctld
+- name: ctl.conf template
+  template:
+    src: '{{ item }}'
+    dest: /etc/ctl.conf
+    backup: yes
+#    force: no
+  with_first_found:
+    - 'templates/{{ inventory_hostname }}/ctl.conf.j2'
+    - 'files/{{ inventory_hostname }}/ctl.conf.j2'
+    - 'templates/ctl.conf.j2'
+  notify: reload ctld
+  tags: iscsi, config
+
+- name: enable ctld
+  service:
+    name: ctld
+    state: started
+    enabled: yes
+  tags: iscsi, config

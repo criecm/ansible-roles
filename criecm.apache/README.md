@@ -37,6 +37,8 @@ apache with sites configs
 * `monitoring_from ([127.0.0.1])`:
 * `admin_from ([])`:
   ip addresses/networks allowed to access monitoring pages
+* `mysite ('')`:
+  if defined, only process this site.id instead of each `sites`
 
 ## per site variables (default value)
 

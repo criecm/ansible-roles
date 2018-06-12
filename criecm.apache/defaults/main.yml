@@ -110,6 +110,7 @@ default_disabled_modules:
 
 sites: []
 
+mysite: ''
 # list of reverse-proxies
 proxified_by: []
 

@@ -112,7 +112,7 @@
   - name: monitor tmp var
     set_fact:
       tmpmon:
-        - proto: '{% if site.tls_key or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
+        - proto: '{% if site.tls_key | default(False) or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
           name: '{{ site.name }}'
           path: '{{ site.status_path }}'
           type: apache-status

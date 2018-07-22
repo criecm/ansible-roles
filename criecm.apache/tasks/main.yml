@@ -3,9 +3,13 @@
   include_vars: '{{ ansible_os_family }}.yml'
   tags: apache, vars
 
+- set_fact:
+    do_sys: '{% if "criecm" in ansible_local and "apache" in ansible_local.criecm and ansible_local.criecm.apache.version | default(0) >= apache_role_version %}no{% else %}{{ do_sysadm | default(False) }}{% endif %}'
+
 - name: install and enable apache
   include_tasks: '{{ ansible_os_family }}.yml'
   tags: apache, pkg
+  when: do_sys
 
 # conf standard
 - block:
@@ -57,6 +61,17 @@
       - '{{ inventory_hostname | regex_replace("[0-9]*$","") }}/apache/default_root'
       - 'apache/default_root'
   tags: apache, config
+  when: do_sys
+
+- name: fact done
+  blockinfile:
+    path: '{{ etcprefix }}/etc/ansible/facts.d/criecm.fact'
+    marker: '# {mark} ANSIBLE criecm.apache BLOCK'
+    block: |
+      [apache]
+      version={{ apache_role_version }}
+    create: yes
+  when: do_sys
 
 - name: sites
   include_tasks: site.yml

@@ -4,7 +4,7 @@
   tags: apache, vars
 
 - set_fact:
-    do_sys: '{% if "criecm" in ansible_local and "apache" in ansible_local.criecm and ansible_local.criecm.apache.version | default(0) >= apache_role_version %}no{% else %}{{ do_sysadm | default(False) }}{% endif %}'
+    do_sys: '{% if "criecm" in ansible_local and "apache" in ansible_local.criecm and ansible_local.criecm.apache.version | default(0) >= apache_role_version and not do_sysadm | default(False) %}no{% else %}yes{% endif %}'
 
 - name: install and enable apache
   include_tasks: '{{ ansible_os_family }}.yml'

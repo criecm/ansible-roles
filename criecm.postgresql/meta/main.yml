@@ -10,7 +10,7 @@ galaxy_info:
   platforms:
     - name: FreeBSD
       versions:
-        - 11.1
+        - all
 
   galaxy_tags:
     - mariadb

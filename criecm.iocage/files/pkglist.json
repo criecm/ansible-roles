@@ -1,8 +1,0 @@
-{
-    "pkgs": [
-	"lang/python",
-	"lang/python3",
-    	"net/rsync"
-    ]
-}
-

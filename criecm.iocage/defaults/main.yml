@@ -1,0 +1,6 @@
+---
+jail_list: []
+iocage_zpool: zroot
+iocage_fetch_args: ''
+myjail: ''
+etcprefix: /usr/local

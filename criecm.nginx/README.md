@@ -118,6 +118,8 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   keeps access log locally
 * `mysite ('')`:
   if defined, will only process this `site.id`
+* `nginx_default_site ('default')`
+  set it to '' to prevent default site to be installed
 
 ### if behind reverse-proxy
 
@@ -135,16 +137,17 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 * `name` (no default)
   DNS name
 
-#### optional (default values can suffice)
+#### optional (default values may suffice)
 
 * `rootdir` (/home/{{id}}/{{id}})
   web root
 * `listen` (80)
   port or ip:port to listen to
+* `default_index ('index.html index.htm')`
 
 #### optional (no default)
 
-* `aliases` ([])
+* `aliases ([])`
   server aliases
 * `nginx_includes`
   files or templates included inside `server {}` block
@@ -195,4 +198,4 @@ You can call site.yml directly with:
           vars:
             vhost: '{{ site }}'
 
-It's already integrated with criecm.php-fpm
+It's already integrated with criecm.php-fpm if ever ;)

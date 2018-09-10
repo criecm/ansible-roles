@@ -5,6 +5,7 @@
 
 - set_fact:
     do_sys: '{% if "criecm" in ansible_local and "apache" in ansible_local.criecm and ansible_local.criecm.apache.version | default(0) >= apache_role_version and not do_sysadm | default(False) %}no{% else %}yes{% endif %}'
+  tags: apache, vars, config
 
 - name: install and enable apache
   include_tasks: '{{ ansible_os_family }}.yml'
@@ -28,8 +29,8 @@
       dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | basename }}'
       mode: '0644'
     with_flattened:
-      - '{{ ["apache/"+apache_includesdir+"/*.conf"] | map("fileglob") | list }}'
       - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_includesdir+"/*.conf") | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
+      - '{{ ["apache/"+apache_includesdir+"/*.conf"] | map("fileglob") | list }}'
   - name: conf modules
     copy:
       src: '{{ item }}'

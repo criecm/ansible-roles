@@ -82,9 +82,18 @@ ProxyPass /balancer-manager !
   Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
 {%   endfor %}
 {% else %}
-  <Location />
+{%   for prefix in site.prefixes %}
+  <Location {{ prefix.path }}>
+{%     if prefix.allow_from_nets | default([]) | count > 0 %}
+{%       for net in prefix.allow_from_nets %}
+    Require ip {{ net }}
+{%       endfor %}
+    Require all denied
+{%     else %}
     Require all granted
+{%     endif %}
   </Location>
+{%   endfor %}
 {% endif %}
 
 </VirtualHost>

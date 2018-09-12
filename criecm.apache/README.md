@@ -35,12 +35,14 @@ apache with sites configs
 * `sites ([])`:
   Array of sites descriptions, see below
 * `monitoring_from ([127.0.0.1])`:
+  ip addresses/networks allowed to access status pages
 * `admin_from ([])`:
-  ip addresses/networks allowed to access monitoring pages
+  ip addresses/networks allowed to access status/balancer-manager pages
 * `mysite ('')`:
   if defined, only process this site.id instead of each `sites`
 
 ## per site variables (default value)
+Most of these are used in bundled site.conf.j2 template only, except `id`, `apache_includes`, `rootdir`, `user/group`, `grwfiles/dirs` and `tls_key/cert`
 
 ### mandatory
 * `id (MANDATORY)`:
@@ -64,6 +66,9 @@ apache with sites configs
 * `status_path (/apache-status)`:
   will present apache status page to `monitoring_from` and `admin_from` nets, if they are populated
   and `status_path` is not empty
+* `prefixes ([{path: /}])`:
+  list of pathes allowed on this virtualhost. You may list IP networks allowed in `allow_from_nets` element
+  skipped if `apache_includes` is defined/not empty
 
 ### options (none by default)
 * `aliases ([])`:
@@ -78,9 +83,9 @@ apache with sites configs
 
 ### TLS : https support
 * `tls_cert ([])`:
-  file name, will be searched for in files/tls/ ans copied in {prefix}/etc/ssl/
+  file name, will be searched for in files/tls/ and copied in {prefix}/etc/ssl/
 * `tls_key ([])`:
-  file name, will be searched for in files/tls/ ans copied in {prefix}/etc/ssl/private/
+  file name, will be searched for in files/tls/ and copied in {prefix}/etc/ssl/private/
 * `tls_hsts (15768000)`:
   will add a Strict-Transport-Security header with provided value
 * `tls_redir (False)`:
@@ -92,8 +97,9 @@ From vars/site.yml:
 siteconf_locations:
   - '{{ playbook_dir }}/templates/{{ id }}/apache/{{ id }}.conf.j2'
   - '{{ playbook_dir }}/files/{{ id }}/apache/{{ id }}.conf'
-  - templates/site.conf.j2
+  - templates/site.conf.j2 # bundled
 
+# used for apache_includes vars:
 include_locations:
   - '{{ playbook_dir }}/templates/{{ id }}/apache/{{ item }}.j2'
   - '{{ playbook_dir }}/files/{{ id }}/apache/{{ item }}'
@@ -122,10 +128,11 @@ include_locations:
       - slotmem_shm
       - access_compat
     sites:
+      # simple site
       - id: webperso
         name: site.domain.example
         apache_includes:
-          - site_example.inc
+          - site_example.inc # see Files / Templates locations
           - favicon.inc
         rootdir: /usr/local/www/default
       - id: rproxy
@@ -133,9 +140,22 @@ include_locations:
 	listen: 443
 	tls: True
 	tls_redir: True
+        tls_cert: www.my.univ.crt # relative to playbook_dir/ssl/
+        tls_key: www.my.univ.key # idem
         aliases:
           - my.univ.fr
           - univ.fr
         backends:
           - 'http://my.backend.internal:8090/'
+      - id: ajpproxy
+        name: apps.univ.fr
+        backends:
+          - 'ajp://backend1.internal:8009/'
+          - 'ajp://backend2.internal:8009/'
+        prefixes:
+          - path: /firstapp
+            allow_from_nets:
+              - 192.0.2.128/25
+              - 2001:db8:cafe:f001::/64
+          - path: /publicapp
 ```

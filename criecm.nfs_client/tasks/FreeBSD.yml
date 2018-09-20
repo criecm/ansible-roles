@@ -2,21 +2,22 @@
 # NFS services
 - name: rc conf
   lineinfile:
-    line: '{{ item }}'
-    regexp: "^{{ item | regex_replace('=.*$','=') }}"
+    line: '{{ item.key }}="{{ item.value }}"'
+    regexp: "^{{ item.key }}="
     dest: /etc/rc.conf
-  with_items:
-    - 'nfs_client_enable="YES"'
-    - 'rpcbind_enable="YES"'
-    - 'rpc_lockd_enable="YES"'
-    - 'rpc_statd_enable="YES"'
-    - 'nfscbd_enable="YES"'
-    - 'nfsuserd_enable="YES"'
-    - 'rpc_lockd_flags="-p 4045"'
-    - 'rpc_statd_flags="-p 4047"'
-    - 'rpc_mountd_flags="-p 4046"'
-    - 'nfscbd_flags="-p 4048"'
-    - 'nfsuserd_flags="-domain {{idmap_domain}} -usermax 10000"'
+  when: item.value != ''
+  with_dict:
+    nfs_client_enable: "YES"
+    rpcbind_enable: "YES"
+    rpc_lockd_enable: "YES"
+    rpc_statd_enable: "YES"
+    nfscbd_enable: "YES"
+    rpc_lockd_flags: "-p 4045"
+    rpc_statd_flags: "-p 4047"
+    rpc_mountd_flags: "-p 4046"
+    nfscbd_flags: "-p 4048"
+    nfsuserd_enable: "{% if idmap_domain | default(False) %}YES{% else %}NO{% endif %}"
+    nfsuserd_flags: "{% if idmap_domain | default(False) %}-domain {{idmap_domain}} {% endif %}-usermax 10000"
   notify: freebsd restart nfs all
 
 - name: rpcbind started

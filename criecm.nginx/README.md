@@ -88,8 +88,6 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 * `error_loglevel (info)`
 * `www_default_root (platform dependant)`
 * `nginx_log_dir (/var/log/nginx)`
-* `nginx_modules ([])`
-  nginx dynamic modules to include
 * `sites ([])`
   list of sites dicts (see below)
 * `nginx_status_path ('/nginx_status')`

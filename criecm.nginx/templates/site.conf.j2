@@ -47,8 +47,8 @@ server {
 {% endif %}
 {% endif %}
 
-{% if site.upload_max_meg | default(False) %}
-	client_max_body_size {{ ( site.upload_max_meg * 1.3 ) | int }}m;
+{% if site.upload_max_meg | default(0) > 0 %}
+	client_max_body_size {{ ( site.upload_max_meg | int * 1.3 ) | round(0,'ceil') | int }}m;
 {% endif %}
 
 {% if proxified_by %}

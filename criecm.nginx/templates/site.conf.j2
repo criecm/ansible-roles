@@ -23,7 +23,7 @@ upstream {{ upstream }} {
 server {
 	listen 80;
 	server_name	{{ site.name }}{% if site.aliases | count > 0 %} {{ site.aliases | join(" ") }}{% endif %};
-	redirect permanent / https://{{ site.name }}/;
+	rewrite ^(.*) https://{{ site.name }}$1 permanent;
 }
 {% endif %}
 

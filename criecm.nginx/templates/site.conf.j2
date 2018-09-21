@@ -34,8 +34,8 @@ server {
 {% else %}
 	listen	{{ site.listen }}{% if site.tls_cert %} ssl{% endif %};
 {% if site.tls_cert %}
-	ssl_certificate {{ tls_certs_dir }}/{{ site.tls_cert | regex_replace(".*/","") }};
-	ssl_certificate_key {{ tls_certs_dir }}/private/{{ site.tls_key | regex_replace(".*/","") }};
+	ssl_certificate {{ tls_certs_dir }}/{{ site.name }}.crt;
+	ssl_certificate_key {{ tls_certs_dir }}/private/{{ site.name }}.key;
 {% if site.x509_stapling_chain %}
 	ssl_trusted_certificate {{ tls_certs_dir }}/{{ site.x509_stapling_chain | basename}};
 	ssl_stapling    on;

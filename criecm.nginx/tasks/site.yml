@@ -53,6 +53,11 @@
   when: not statrootdir.stat.exists
 
 - block:
+  - name: mkdir
+    file:
+      path: '{{ tls_certs_dir }}/private'
+      state: directory
+      mode: '0711'
   - name: x509 cert
     copy:
       src: '{{ site.tls_cert }}'

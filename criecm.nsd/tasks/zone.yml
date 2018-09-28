@@ -1,7 +1,7 @@
 ---
 - include_vars: zone.yml
 
-- name: get zone pattern
+- name: 'get zone pattern {{ zone.name }}'
   shell: 'nsd-control zonestatus {{ zone.name }}'
   failed_when: False
   check_mode: False
@@ -9,12 +9,12 @@
   register: z
   when: 'zone.pattern != ""'
 
-- name: delete zone
+- name: 'delete zone {{ zone.name }}'
   command: 'nsd-control delzone {{ zone.name }}'
   when: 'zone.pattern != "" and z.rc == 0 and zone.pattern in nsd_patterns_list and "	pattern: "+zone.pattern not in z.stdout_lines'
   notify: reconfig nsd
 
-- name: add zone
+- name: 'add zone {{ zone.name }}'
   command: 'nsd-control addzone {{ zone.name }} {{ zone.pattern }}'
   when: 'zone.pattern != "" and z.rc == 1 and zone.pattern in nsd_patterns_list'
   register: zadd

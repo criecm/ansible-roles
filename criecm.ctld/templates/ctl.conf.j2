@@ -38,16 +38,24 @@ target {{ iscsi_targets[target].iqn | default(iqn) }}:{{ target | default(iscsi_
 {%   for opt in iscsi_targets[target].opts | default({}) %}
   {{ opt }} {{ iscsi_targets[target].opts[opt] }}
 {%   endfor %}
-{%   for lun in iscsi_targets[target].luns.keys() %}
-  lun {{ lun }} {
-{%     for item in iscsi_targets[target].luns[lun].keys() %}
-    {{ item }} {{ iscsi_targets[target].luns[lun][item] }}
+{%   for lunid in iscsi_targets[target].luns.keys() %}
+{% set lun = iscsi_targets[target].luns[lunid] %}
+  lun {{ lunid }} {
+    device-id {{ lun["device-id"] | default(inventory_hostname+'%04d' | format(lunid)) }}
+    path {{ lun.path }}
+{%     if "opts" in lun.keys() %}
+{%       set opts=lun.opts %}
+{%     else %}
+{%       set opts={ "option vendor":"FreeBSD" } %}
+{%     endif %}
+{%     for opt in opts.keys() %}
+    {{ opt }} {{ opts[opt] }}
 {%     endfor %}
-{%     if not "option vendor" in iscsi_targets[target].luns[lun].keys() %}
+{%     if not "option vendor" in opts.keys() %}
     option vendor FreeBSD
 {%     endif %}
-{%     if not "serial" in iscsi_targets[target].luns[lun].keys() %}
-    serial {{ inventory_hostname }}{{ '%04d' | format(lun) }}
+{%     if not "serial" in opts.keys() %}
+    serial {{ inventory_hostname }}{{ '%04d' | format(lunid) }}
 {%     endif %}
   }
 {%   endfor %}

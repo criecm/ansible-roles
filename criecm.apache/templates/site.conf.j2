@@ -4,12 +4,13 @@
 {% if "aliases" in site and site.aliases | count() > 0 %}
 {%   for alias in site.aliases %}
   ServerAlias {{alias}}
+
 {%   endfor %}
 {% endif %}
 
 {% if site.default_index %}
   DirectoryIndex {{ site.default_index }}
-{% endif %}
+{%- endif %}
 
 {% if site.rootdir %}
   DocumentRoot {{ site.rootdir }}
@@ -19,54 +20,62 @@
   </Directory>
 {% endif %}
 
-{% if "tls_cert" in site and "tls_key" in onesite %}
+{%- if "tls_cert" in site and "tls_key" in onesite %}
+  # TLS config
   SSLEngine on
   SSLCertificateFile {{ tls_dir }}/{{ site.tls_cert }}
   SSLCertificateKeyFile {{ tls_dir }}/private/{{ site.tls_key }}
 
 {%   if "hsts" in site %}
+  # + HSTS
   Header unset Strict-Transport-Security
   Header set Strict-Transport-Security "max-age={{ site.hsts }}"
-{%   endif %}
+{%-   endif %}
 
 {%   if "backends" in site %}
+  # reverse-proxy HTTPS
   RequestHeader set X-Forwarded-Proto "https"
   RequestHeader set X-Forwarded-Port "443"
 {%   endif %}
-{% endif %}
+{%- endif %}
 
 {% if "backends" in site %}
+  # keep host name in request
   ProxyPreserveHost On
 {%   if site.backends | count() > 1 %}
+  # set cookie for sticky-sessions
   Header add Set-Cookie "{{ site.id }}B=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
   <Proxy balancer://{{ site.id }}>
-	{% for backend in site.backends %}
-	BalancerMember {{ backend }}
-	{% endfor %}
-	Require all granted
-	ProxySet stickysession={{ site.id }}B timeout=3
+{%     for backend in site.backends %}
+    BalancerMember {{ backend }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
+
+{%     endfor %}
+    Require all granted
+    ProxySet stickysession={{ site.id }}B timeout=3
   </Proxy>
   ProxyPass / balancer://{{ site.id }}/
   ProxyPassReverse / balancer://{{ site.id }}/
 
 {%     if admin_from %}
-<Location /balancer-manager>
-	SetHandler balancer-manager
+  # balancer-manager from admin ip's
+  <Location /balancer-manager>
+    SetHandler balancer-manager
 {%       for net in admin_from %}
-	Require ip {{ net }}
+    Require ip {{ net }}
 {%       endfor %}
-</Location>
-ProxyPass /balancer-manager !
+  </Location>
+  ProxyPass /balancer-manager !
 {%     endif %}
 
 {%     if monitoring_from | count > 0 and site.status_path %}
-<Location {{ site.status_path }}>
-	SetHandler server-status
+  # status URL from monitoring
+  <Location {{ site.status_path }}>
+    SetHandler server-status
 {%       for net in monitoring_from %}
-	Require ip {{ net }}
+    Require ip {{ net }}
 {%       endfor %}
-</Location>
-{%     endif %}
+  </Location>
+{%-     endif %}
 
 {%   elif site.backends | count() == 1 %}
   <Proxy {{ site.backends[0] }}>
@@ -80,9 +89,11 @@ ProxyPass /balancer-manager !
 {% if "apache_includes" in site and site.apache_includes | count > 0 %}
 {%   for include in site.apache_includes %}
   Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
+
 {%   endfor %}
 {% else %}
 {%   for prefix in site.prefixes %}
+  # prefix {{ prefix.path }}
   <Location {{ prefix.path }}>
 {%     if prefix.allow_from_nets | default([]) | count > 0 %}
 {%       for net in prefix.allow_from_nets %}
@@ -98,8 +109,8 @@ ProxyPass /balancer-manager !
 
 </VirtualHost>
 
-{% if site.tls and site.tls_redir %}
-<VirtualHost {% if site.listen | search(':') %}{{ site.listen | regex_replace(':.*',':80') }}{% else %}*:80{% endif %}>
+{%- if site.tls and site.tls_redir %}
+<VirtualHost {% if site.listen is search(':') %}{{ site.listen | regex_replace(':.*',':80') }}{% else %}*:80{% endif %}>
   Redirect permanent "/" "https://{{ site.name }}{% if not site.listen | regex_search(':?443$') %}:{{ site.listen | regex_replace('.*:','') }}{% endif %}/"
 </VirtualHost>
 {% endif %}

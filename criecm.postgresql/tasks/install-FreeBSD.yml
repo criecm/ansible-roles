@@ -7,13 +7,14 @@
     - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-server
     - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-pltcl
     - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-contrib
+    - 'py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-pip'
   register: install_pg
 
 - name: install psycopg2 python module
-  pkgng:
-    name: py27-psycopg2
+  pip:
+    executable: 'pip-{{ ansible_python.version.major }}.{{ ansible_python.version.minor }}'
+    name: psycopg2
     state: present
-
  
 - name: login.conf
   blockinfile:
@@ -63,6 +64,15 @@
     - { key: postgresql_dbdir, value: '{{ pg_basedir }}/{{ pg_datasubdir }}' }
     - { key: postgresql_class, value: '{{ pg_class }}' }
   notify: restart postgresql
+
+- name: syslog dirs
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - /usr/local/etc/syslog.d
+    - /usr/local/etc/newsyslog.conf.d
+  when: pg_logdest == "syslog"
 
 - name: syslog postgresql
   copy:

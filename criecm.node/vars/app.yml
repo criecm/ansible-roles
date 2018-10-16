@@ -8,5 +8,6 @@ default_node_app:
   syslog_tag: '{{ oneapp.name }}'
   use_syslog: False
   script: app.js
+  env: developement
 
 node_app: '{{ default_node_app | combine(oneapp) }}'

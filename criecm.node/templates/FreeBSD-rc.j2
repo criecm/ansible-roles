@@ -10,18 +10,19 @@
 
 name={{ node_app.name }}
 desc="node app $name"
-rcvar=${name}_enable
+rcvar=${{ '{' }}name{{ '}' }}_enable
 
-load_rc_config ${name}
+load_rc_config ${{ '{' }}name{{ '}' }}
 
-{{ node_app.name }}_enable="${{ '{' }}{{ node_app.name }}_enable:-NO}"
-{{ node_app.name }}_script="${{ '{' }}{{ node_app.name }}_script:-{{ node_app.path }}/{{ node_app.script }}}"
+{{ node_app.name }}_enable="${{ '{' }}{{ node_app.name }}_enable:-NO{{ '}' }}"
+{{ node_app.name }}_script="${{ '{' }}{{ node_app.name }}_script:-{{ node_app.path }}/{{ node_app.script }}{{ '}' }}"
 {{ node_app.name }}_chdir="{{ node_app.path }}"
 {{ node_app.name }}_procname="node_{{ node_app.name }}"
+{{ node_app.name }}_env="NODE_ENV={{ node_app.env | default('prod') }}"
 
 pidfile="/var/run/{{ node_app.name }}.pid"
 command=/usr/sbin/daemon
-command_args="-rP $pidfile -u {{ node_app.user }} {% if ,ode_app.use_syslog }}-T '{{ node_app.syslog_tag | default(node_app.name) }}' {% endif %}-t '{{ node_app.name }}' /usr/local/bin/node ${{ '{' }}{{ node_app.name }}_script}"
+command_args="-rP $pidfile -u {{ node_app.user }} {% if node_app.use_syslog %}-T '{{ node_app.syslog_tag | default(node_app.name) }}' {% endif %}-t '{{ node_app.name }}' /usr/local/bin/node ${{ '{' }}{{ node_app.name }}_script{{ '}' }}"
 
 start_precmd()
 {

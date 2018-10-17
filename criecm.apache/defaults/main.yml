@@ -16,6 +16,8 @@ default_enabled_modules:
   - authz_owner
   - auth_basic
   - auth_digest
+  - deflate
+  - negotiation
   - reqtimeout
   - filter
   - mime
@@ -23,12 +25,10 @@ default_enabled_modules:
   - setenvif
   - expires
   - headers
-  - version
   - autoindex
   - status
   - dir
   - alias
-  - unixd
   - rewrite
   - info
 
@@ -66,7 +66,6 @@ default_disabled_modules:
   - include
   - substitute
   - sed
-  - deflate
   - proxy_html
   - ldap
   - log_debug
@@ -102,11 +101,12 @@ default_disabled_modules:
   - suexec
   - dav_fs
   - vhost_alias
-  - negotiation
   - imagemap
   - actions
   - speling
   - userdir
+  - version
+  - unixd
 
 sites: []
 

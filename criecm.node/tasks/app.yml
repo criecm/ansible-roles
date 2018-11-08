@@ -16,6 +16,7 @@
     repo: '{{ node_app.gitsrc }}'
     dest: '{{ node_app.path }}'
     update: '{{ node_app.update | default(True) | bool }}'
+    force: '{{ node_app.update | default(True) | bool }}'
   when: '"gitsrc" in node_app'
   register: gitted
 
@@ -49,7 +50,14 @@
     dest: '/usr/local/etc/rc.d/{{ node_app.name }}'
     mode: '0755'
 
-- name: restart app
+- name: enable+start service
+  service:
+    name: '{{ node_app.name }}'
+    enables: yes
+    state: started
+  register: startapp
+
+- name: restart app if needed
   block:
     - name: stop app
       service:
@@ -60,4 +68,4 @@
       service:
         name: '{{ node_app.name }}'
         state: started
-  when: gitted.changed or confs.changed
+  when: ( gitted.changed or confs.changed ) and not startapp.changed

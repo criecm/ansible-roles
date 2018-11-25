@@ -13,6 +13,10 @@ include_locations:
   - 'templates/nginx'
   - '{{ playbook_dir }}/files/nginx'
 
+ips: '{% if "listen" in onesite %}{{ onesite.listen.split(" ") | map("regex_replace",":[0-9]*$","") | list }}{% else %}[{{ "*" }}{% if ansible_all_ipv6_addresses | count > 0 %},{{ "[::]" }}{% endif %}]{% endif %}'
+
+port: '{% if "listen" in onesite and onesite.listen is search(":[0-9]a$+") %}{{ onesite.listen | regex_replace("^.*:([0-9]+)$","\\1") }}{% else %}{% if "tls_cert" in onesite %}443{% else %}80{% endif %}{% endif %}'
+
 # site par defaut
 default_site:
   id: default
@@ -21,8 +25,9 @@ default_site:
   nginx_includes: []
   rootdir: '{{ onesite_home | default("/home/"+onesite.id) }}/{{ onesite.id }}'
   rootsrc: ''
-  listen: '{% if "tls_cert" in onesite %}443{% else %}80{% endif %}'
+  listen_ips: '{{ ips }}'
   tls: '{% if "tls_cert" in onesite %}True{% endif %}'
+  http2: '{% if "http2" in onesite %}{{ onesite.http2 }}{% else %}{{ do_http2 }}{% endif %}'
   tls_hsts: '{% if "tls_cert" in onesite %}31536000{% else %}0{% endif %}'
   tls_redirect: False
   tls_cert: ''

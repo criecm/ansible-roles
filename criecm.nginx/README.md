@@ -114,6 +114,8 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   keep logs locally
 * `do_local_access_log (do_local_log)`;
   keeps access log locally
+* `do_http2 (False)`
+  activate http2 when using tls
 * `mysite ('')`:
   if defined, will only process this `site.id`
 * `nginx_default_site ('default')`
@@ -151,7 +153,7 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
   files or templates included inside `server {}` block
   see *Files / Templates locations* for path
 
-##### TLS / HTTP2 (all or none)
+##### TLS / HTTP2
 
 * `tls_hsts` (31536000 if `x509_cert`, else 0)
   if > 0, add Strict-Transport-Security header
@@ -164,6 +166,8 @@ nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
 * `x509_stapling_chain` ('')
   complete ca chain for stapling
   (from root CA to last intermediate)
+* `http2 (do_http2)`
+  activate http2 when using tls
 
 ## Files / Templates locations
 

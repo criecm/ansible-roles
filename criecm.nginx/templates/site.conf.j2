@@ -29,13 +29,15 @@ server {
 
 server {
 {% if "listen" in site %}
-{%   for l in site.listen.split(" ") %}
+# from site.listen {{ site.listen }}
+{%   for l in site.listen.split("\s+") %}
         listen {{ l }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%   endfor %}
 {% else %}
 {%   if proxified_by %}
 	listen 80;
 {%   else %}
+# from site.listen_ips {{ site.listen_ips }}
 {%     for ip in site.listen_ips %}
 	listen	{{ ip }}:{{ port }} {% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%     endfor %}
@@ -98,4 +100,3 @@ server {
 
 	error_page	500 502 503 504	/50x.html;
 }
-{% endif %}

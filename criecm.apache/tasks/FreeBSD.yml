@@ -6,20 +6,20 @@
       - '{{ apache_freebsd_modules }}'
     state: present
 
-- block:
-  - name: enable modules
-    lineinfile:
-      dest: '{{ apache_etcdir }}/httpd.conf'
-      line: 'LoadModule {{ item }}_module libexec/apache24/mod_{{ item }}.so'
-      regexp: 'LoadModule\s+{{ item }}_module\s+.*'
-      insertafter: '{{ item }}_module'
-    with_items: '{{ default_enabled_modules | union(apache_enabled_modules) | difference(default_disabled_modules | difference(apache_enabled_modules) | union(apache_disabled_modules)) }}'
-  - name: disable modules
-    lineinfile:
-      dest: '{{ apache_etcdir }}/httpd.conf'
-      regexp: '^\s*LoadModule\s+{{ item }}_module\s+libexec/apache24/mod_{{ item }}.so\s*$'
-      state: absent
-    with_items: '{{ default_disabled_modules | difference(apache_enabled_modules) | union(apache_disabled_modules) }}'
+- name: enable modules
+  lineinfile:
+    dest: '{{ apache_etcdir }}/httpd.conf'
+    line: 'LoadModule {{ item }}_module libexec/apache24/mod_{{ item }}.so'
+    regexp: 'LoadModule\s+{{ item }}_module\s+.*'
+    insertafter: '{{ item }}_module'
+  with_items: '{{ default_enabled_modules | union(apache_enabled_modules) | difference(default_disabled_modules
+              | difference(apache_enabled_modules) | union(apache_disabled_modules)) }}'
+- name: disable modules
+  lineinfile:
+    dest: '{{ apache_etcdir }}/httpd.conf'
+    regexp: '^\s*LoadModule\s+{{ item }}_module\s+libexec/apache24/mod_{{ item }}.so\s*$'
+    state: absent
+  with_items: '{{ default_disabled_modules | difference(apache_enabled_modules) | union(apache_disabled_modules) }}'
 
 - name: enable apache24
   lineinfile:

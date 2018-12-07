@@ -6,9 +6,11 @@
 #   vars:
 #     vhost: '{{  site }}'
 
-- include_vars: '{{ ansible_os_family }}.yml'
+- name: os vars
+  include_vars: '{{ ansible_os_family }}.yml'
 
-- include_vars: site.yml
+- name: site vars
+  include_vars: site.yml
 
 - name: apache sites
   include_tasks: site.yml

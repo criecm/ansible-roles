@@ -3,7 +3,7 @@
   ServerName {{ site.name }}
 {% if "aliases" in site and site.aliases | count() > 0 %}
 {%   for alias in site.aliases %}
-  ServerAlias {{alias}}
+  ServerAlias {{ alias }}
 
 {%   endfor %}
 {% endif %}

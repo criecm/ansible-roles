@@ -10,9 +10,9 @@
 
 - include_vars: site.yml
 
-- include_tasks: site.yml
+- name: apache sites
+  include_tasks: site.yml
   with_items:
     - '{{ vhost }}'
   loop_control:
     loop_var: onesite
-

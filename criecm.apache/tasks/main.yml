@@ -3,8 +3,11 @@
   include_vars: '{{ ansible_os_family }}.yml'
   tags: apache, vars
 
-- set_fact:
-    do_sys: '{% if "criecm" in ansible_local and "apache" in ansible_local.criecm and ansible_local.criecm.apache.version | default(0) >= apache_role_version and not do_sysadm | default(False) %}no{% else %}yes{% endif %}'
+- name: compute do_sys
+  set_fact:
+    do_sys: '{% if "criecm" in ansible_local and "apache" in ansible_local.criecm and
+             ansible_local.criecm.apache.version | default(0) >= apache_role_version and
+             not do_sysadm | default(False) %}no{% else %}yes{% endif %}'
   tags: apache, vars, config
 
 - name: install and enable apache
@@ -29,7 +32,9 @@
       dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | basename }}'
       mode: '0644'
     with_flattened:
-      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_includesdir+"/*.conf") | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
+      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique
+        | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_includesdir+"/*.conf")
+        | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
       - '{{ ["apache/"+apache_includesdir+"/*.conf"] | map("fileglob") | list }}'
   - name: conf modules
     copy:
@@ -38,14 +43,18 @@
       mode: '0644'
     with_flattened:
       - '{{ ["apache/"+apache_modsconfdir+"/*.conf"] | map("fileglob") | list }}'
-      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_modsconfdir+"/*.conf") | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
+      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique
+        | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_modsconfdir+"/*.conf")
+        | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
   - name: conf .inc's
     copy:
       src: '{{ item }}'
       dest: '{{ apache_etcdir }}/{{ item | regex_replace(".*/([^/]+)$","\1") }}'
       mode: '0644'
     with_flattened:
-      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/*.inc") | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
+      - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique
+        | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/*.inc") | map("fileglob") |
+        | reject("equalto",[]) | map("flatten") | list }}'
       - '{{ ["apache/*.inc"] | map("fileglob") | list }}'
   - name: conf include sites
     template:

@@ -17,5 +17,3 @@
     command: 'a2dismod {{ item }}'
     when: '"{{ item }}.load" in lsmods.stdout_lines'
     with_items: '{{ default_disabled_modules | difference(apache_enabled_modules) | union(apache_disabled_modules) }}'
-
-

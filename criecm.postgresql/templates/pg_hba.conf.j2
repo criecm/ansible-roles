@@ -14,4 +14,3 @@ host	all	{{ pg_admin_user }}	{{ pg_admin_host | default("all") }}	md5
 host	u.db	u.name		db.host	md5
 {% endfor %}
 
-

@@ -27,4 +27,3 @@ pg_maintenance_users: []
 pg_dbs: []
 
 pg_syslog_facility: 'local3'
-

@@ -1,13 +1,10 @@
 ---
 - name:
   pkgng:
-    name: '{{ package }}'
+    name:
+      - apache24
+      - '{{ apache_freebsd_modules }}'
     state: present
-  with_items:
-    - apache24
-    - '{{ apache_freebsd_modules }}'
-  loop_control:
-    loop_var: package
 
 - block:
   - name: enable modules

@@ -1,13 +1,12 @@
 ---
 - name: install postgresql
   pkgng:
-    name: '{{ item }}'
+    name:
+      - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-server
+      - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-pltcl
+      - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-contrib
+      - 'py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-pip'
     state: present
-  with_items:
-    - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-server
-    - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-pltcl
-    - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-contrib
-    - 'py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-pip'
   register: install_pg
 
 - name: install psycopg2 python module
@@ -88,4 +87,3 @@
     content: |
       /var/log/postgresql.log  root:{{ pg_group }}  640 7 1000  @T00  X
   when: pg_logdest == "syslog"
-

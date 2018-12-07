@@ -55,7 +55,7 @@
     dest: '{{ pg_basedir }}/{{ pg_datasubdir }}/pg_hba.conf'
     mode: '0640'
     group: '{{ pg_group }}'
-  when: pg_init.changed | default(False)
+  when: not pg_db_exists.stat.exists
   notify: reload postgresql
 
 - name: start if needed
@@ -64,7 +64,11 @@
     state: started
 
 # DBs in local facts
-- file: dest='{{ etcprefix }}/etc/ansible/facts.d' state=directory
+- name: facts.d dir
+  file:
+    dest: '{{ etcprefix }}/etc/ansible/facts.d'
+    state: directory
+
 - name: install pg facts for DB
   copy:
     dest: '{{ etcprefix }}/etc/ansible/facts.d/pg_dbs.fact'
@@ -73,15 +77,17 @@
     src: templates/pg.fact.j2
 
 # default admins
-- postgresql_user:
+- name: 'pg user {{ pg_admin_user }}'
+  postgresql_user:
     name: '{{ pg_admin_user }}'
     password: '{{ pg_admin_password }}'
     role_attr_flags: 'SUPERUSER'
     state: present
-  when: pg_admin_user != "" and pg_admin_password != "" and pg_init.changed | default(False)
+  when: pg_admin_user and pg_admin_password and pg_init.changed | default(False)
 
 # admin users
-- postgresql_user:
+- name: pg users
+  postgresql_user:
     name: '{{ item.name }}'
     db: '{{ item.db | default(omit) }}'
     priv: '{{ item.priv | default(omit) }}'
@@ -100,5 +106,3 @@
   with_items:
     - '{{ pg_dbs }}'
   when: 'pg_dbs | count > 0'
-
-

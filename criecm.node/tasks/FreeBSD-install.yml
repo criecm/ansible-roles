@@ -1,9 +1,7 @@
 ---
 - pkgng:
-    name: '{{ item }}'
+    name:
+      - 'node{{ node_version }}'
+      - 'npm-node{{ node_version }}'
+      - 'git'
     state: present
-  with_items:
-    - 'node{{ node_version }}'
-    - 'npm-node{{ node_version }}'
-    - 'git'
-

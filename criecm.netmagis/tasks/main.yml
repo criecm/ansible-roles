@@ -2,15 +2,14 @@
 # install netmagis
 - name: installe netmagis
   pkgng:
-    name: '{{item}}'
+    name:
+      - netmagis-database
+      - netmagis-servers
+      - netmagis-utils
+      - netmagis-www
+      - fcgiwrap
+      - rancid3
     state: present
-  with_items:
-    - netmagis-database
-    - netmagis-servers
-    - netmagis-utils
-    - netmagis-www
-    - fcgiwrap
-    - rancid3
   tags: pkg, netmagis
 
 - name: patch netmagis/cas

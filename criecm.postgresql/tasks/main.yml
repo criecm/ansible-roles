@@ -72,7 +72,7 @@
 - name: install pg facts for DB
   copy:
     dest: '{{ etcprefix }}/etc/ansible/facts.d/pg_dbs.fact'
-    mode: '4750'
+    mode: 'u=srwx,g=rx,o-rwx'
     owner: '{{ pg_owner }}'
     src: templates/pg.fact.j2
 
@@ -83,7 +83,7 @@
     password: '{{ pg_admin_password }}'
     role_attr_flags: 'SUPERUSER'
     state: present
-  when: pg_admin_user and pg_admin_password and pg_init.changed | default(False)
+  when: pg_admin_user and pg_admin_password and not pg_db_exists.stat.exists
 
 # admin users
 - name: pg users

@@ -53,7 +53,7 @@
         mode: '0644'
       with_flattened:
         - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique
-          | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/*.inc") | map("fileglob") |
+          | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/*.inc") | map("fileglob")
           | reject("equalto",[]) | map("flatten") | list }}'
         - '{{ ["apache/*.inc"] | map("fileglob") | list }}'
     - name: conf include sites

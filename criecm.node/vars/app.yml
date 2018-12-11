@@ -4,7 +4,8 @@ default_node_app:
   name: '{{ oneapp.name | mandatory }}'
   user: '{{ oneapp.name | mandatory }}'
   path: '/home/{{ oneapp.name }}/{{ oneapp.name }}'
-  update: '{{ node_update_git | default(False) }}'
+  update: '{{ node_update_git }}'
+  force: '{{ node_force_git }}'
   syslog_tag: '{{ oneapp.name }}'
   use_syslog: False
   script: app.js

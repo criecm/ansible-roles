@@ -1,5 +1,6 @@
 ---
-- pkgng:
+- name: 'install node v{{ node_version }}'
+  pkgng:
     name:
       - 'node{{ node_version }}'
       - 'npm-node{{ node_version }}'

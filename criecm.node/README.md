@@ -15,8 +15,10 @@ Install/run node apps on FreeBSD (could be easily adapted)
   node major version
 * `node_apps` ([])
   list of dicts for each app (see **app variables** below)
-* `node_update_git` (False)
+* `node_update_git` (True)
   update git sources if any
+* `node_force_git` (False)
+  update git sources overriding local changes
 
 ### app variables
 
@@ -27,8 +29,10 @@ Install/run node apps on FreeBSD (could be easily adapted)
 * `script` (app.js)
 * `gitsrc` ('')
   Git repository source
-* `update` (False)
-  Will update source code (or globally if `node_update_git`)
+* `update` (`node_update_git`)
+  Will update source code
+* `force` (`node_force_git`)
+  Will force source update
 * `confs` ([])
   List of config files, as dicts of {src=template,dest=dest}
   dest can be relative to `app.path`

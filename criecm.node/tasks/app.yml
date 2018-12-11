@@ -1,31 +1,36 @@
 ---
 - include_vars: app.yml
 
-- user:
+- name: 'user {{ node_app.user }}'
+  user:
     name: '{{ node_app.user }}'
     shell: /bin/sh
     home: '/home/{{ node_app.user }}'
     createhome: yes
 
-- file:
+- name: 'dir {{ node_app.path }}'
+  file:
     path: '{{ node_app.path }}'
     state: directory
 
-- name: git
+- name: 'git {{ node_app.gitsrc }}'
   git:
     repo: '{{ node_app.gitsrc }}'
     dest: '{{ node_app.path }}'
-    update: '{{ node_app.update | default(True) | bool }}'
+    update: '{{ node_app.update | bool }}'
+    force: '{{ node_app.force | bool }}'
   when: '"gitsrc" in node_app'
   register: gitted
 
-- file:
+- name: 'chown -R {{ node_app.user }} {{ node_app.path }}'
+  file:
     path: '{{ node_app.path }}'
     mode: 'u=rwX,g=rwX,o=rX'
     owner: '{{ node_app.user }}'
     recurse: yes
 
-- stat:
+- name: 'search package.json'
+  stat:
     path: '{{ node_app.path }}/package.json'
   register: node_has_package_json
 

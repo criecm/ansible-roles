@@ -29,15 +29,16 @@ server {
 
 server {
 {% if "listen" in site %}
-# from site.listen {{ site.listen }}
+# because site.listen {{ site.listen }}
 {%   for l in site.listen.split("\s+") %}
         listen {{ l }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%   endfor %}
 {% else %}
 {%   if proxified_by %}
+# because proxified_by={{ proxified_by }}
 	listen 80;
 {%   else %}
-# from site.listen_ips {{ site.listen_ips }}
+# because site.listen_ips {{ site.listen_ips }}
 {%     for ip in site.listen_ips %}
 	listen	{{ ip }}:{{ port }} {% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%     endfor %}
@@ -57,16 +58,19 @@ server {
 {% endif %}
 
 {% if "headers" in site %}
+# because of site.headers
 {%   for h in site.headers %}
        add_header {{ h.name }} "{{ h.value }}" always;
 {%   endfor %}
 {% endif %}
 
 {% if site.upload_max_meg | default(0) > 0 %}
+# because site.upload_max_meg={{ site.upload_max_meg }}
 	client_max_body_size {{ ( site.upload_max_meg | int * 1.3 ) | round(0,'ceil') | int }}m;
 {% endif %}
 
 {% if proxified_by %}
+# proxified_by={{ proxified_by }}
 {%   for net in proxified_by %}
 	set_real_ip_from {{ net }};
 {%   endfor %}
@@ -81,6 +85,7 @@ server {
 		index	{{ site.default_index | default("index.html index.htm") }};
 	}
 {%   if "backend" in site and "php" in site.backend %}
+# site.backend={{ site.backend }}
 	location ~ "^.*\.php(?:/.*)?" {
 		root	{{ site.rootdir }};
 		fastcgi_split_path_info ^(.+?\.php)(/.*)$;
@@ -95,6 +100,7 @@ server {
 {% include "status.inc.j2" %}
 
 {% for inc in site.nginx_includes %}
+# site.nginx_includes
 	include {{ inc | basename | regex_replace("\.j2$","") }};
 {% endfor %}
 

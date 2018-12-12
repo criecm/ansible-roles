@@ -17,8 +17,8 @@
   git:
     repo: '{{ node_app.gitsrc }}'
     dest: '{{ node_app.path }}'
-    update: '{{ node_app.update | bool }}'
-    force: '{{ node_app.force | bool }}'
+    update: '{{ node_app.gitupdate }}'
+    force: '{{ node_app.gitforce }}'
   when: '"gitsrc" in node_app'
   register: gitted
 

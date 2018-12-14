@@ -3,8 +3,8 @@
   pkgng:
     name:
       - apache24
-      - '{{ apache_freebsd_modules }}'
     state: present
+
 
 - name: pkg install modules
   pkgng:

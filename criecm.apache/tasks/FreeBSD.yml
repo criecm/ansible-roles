@@ -1,10 +1,16 @@
 ---
-- name:
+- name: pkg install apache
   pkgng:
     name:
       - apache24
       - '{{ apache_freebsd_modules }}'
     state: present
+
+- name: pkg install modules
+  pkgng:
+    name: '{{ apache_freebsd_modules }}'
+    state: present
+  when: apache_freebsd_modules | count > 0
 
 - name: enable modules
   lineinfile:

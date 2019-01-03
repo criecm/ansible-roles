@@ -1,10 +1,13 @@
 # criecm.ctld
 
-Install ctl daemon (kernel-mode iscsi target)
+* Creates ZFS volumes for defined targets (if they are in /dev/zvol AND volsuze is defined)
+
+* Configure ctl daemon (kernel-mode iscsi target)
 
 You may read https://www.freebsd.org/doc/handbook/network-iscsi.html
 
-## TODO
+## TODOs
+
 * auth (only no-auth one network for now)
 
 ## Requirements
@@ -57,7 +60,7 @@ iscsi_targets:
           option vendor: FreeBSDoption product: ZSan }
           option product: "zSan"
           option revision: 0002
-          size: 143G
+        volsize: 143G
   targettwo:
     luns:
       0:

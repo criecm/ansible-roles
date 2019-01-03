@@ -1,5 +1,20 @@
 ---
 # tasks file for criecm.ctld
+
+- name: 'zfs vol {{ z.path }}'
+  zfs:
+    name: '{{ z.path | replace("/dev/zvol/","") }}'
+    extra_zfs_properties:
+      volsize: '{{ z.volsize }}'
+    state: present
+  loop: '{{ iscsi_targets | json_query(jq) | flatten(levels=1) | selectattr("path","match","^/dev/zvol") | list }}'
+  loop_control:
+    loop_var: z
+  vars:
+    jq: "*.luns.*.{path: path, volsize: volsize}"
+  when: z.volsize | default(False)
+  notify: reload ctld
+
 - name: ctl.conf template
   template:
     src: '{{ item }}'

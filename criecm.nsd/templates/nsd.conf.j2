@@ -14,7 +14,7 @@ server:
 remote-control:
 	control-enable: yes
 	control-port: 8952
-{% if is_jail %}
+{% if is_jail and not jail_has_vnet | default(False) %}
 {% if ansible_all_ipv4_addresses | count > 0 %}
 	control-interface: {{ ansible_all_ipv4_addresses[0] }}
 {% else %}

@@ -6,7 +6,8 @@
     dest: /etc/rc.conf
   with_items:
     - 'nfs_server_enable="YES"'
-    - '{{ mynfsd_flags | default(omit) }}'
+    - 'nfs_server_flags="{{ mynfsd_flags }}"'
+    - '{% if nfsv4_enable %}nfsv4_server_enable="YES"{% else %}omit{% endif %}'
   notify: restart freebsd nfs server
   when: ansible_os_family == "FreeBSD"
   tags: nfs,rc

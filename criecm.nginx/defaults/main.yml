@@ -1,0 +1,39 @@
+---
+www_user: 'www'
+www_group: 'www'
+nginx_processes: 1
+error_loglevel: 'info'
+www_default_root: '/var/www/default'
+nginx_log_dir: '/var/log/nginx'
+do_tls: False
+do_http2: False
+nginx_status_path: /nginx_status
+nginx_includes: []
+nginx_mods_includes: []
+
+# eg:
+# proxified_by:
+#   - 192.168.0.1/32
+#   - ...
+proxified_by: []
+
+nginx_modules: []
+
+sites: []
+
+monitoring_from:
+  - 127.0.0.1
+
+admin_from: []
+
+tls_certs_dir: /etc/ssl
+
+nginx_debian_package: nginx
+
+syslog_facility: local5
+
+do_local_log: True
+
+mysite: ''
+
+syslog_server: False

@@ -1,0 +1,58 @@
+# {{ ansible_managed }}
+user	{{ www_user }};
+worker_processes	{{ nginx_processes }};
+
+{% if do_local_log %}
+error_log	{{ nginx_log_dir }}/nginx-error.log info;
+{% endif %}
+{% if syslog_server %}
+error_log syslog:server={{ syslog_server }},facility={{ syslog_facility }},tag=nginx;
+{% endif %}
+
+include modules.d/*.conf;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+	include mime.types;
+	types {
+		text/plain	log;
+	}
+
+	default_type	application/octet-stream;
+
+	log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+	{% if do_local_access_log | default(do_local_log) %}
+	access_log	{{ nginx_log_dir }}/access.log combined;
+	{% endif %}
+	{% if syslog_server %}
+	access_log syslog:server={{ syslog_server }},facility=local5 combined;
+	{% endif %}
+
+	server_tokens	off;
+
+	# https://thoughts.t37.net/optimisations-nginx-bien-comprendre-sendfile-tcp-nodelay-et-tcp-nopush-2ab3f33432ca
+	# si fichiers statiques, les deux:
+	#sendfile	on;
+	#tcp_nopush	on;
+	#sendfile_max_chunk 512k;
+	tcp_nodelay on;
+
+	keepalive_timeout	65;
+
+	log_not_found off;
+
+	gzip on;
+	gzip_min_length	1100;
+	gzip_buffers	4 8k;
+	gzip_types	text/plain text/css application/javascript;
+
+	include conf.d/*.conf;
+
+	include servers.d/*.conf;
+}

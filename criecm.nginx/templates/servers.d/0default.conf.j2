@@ -1,0 +1,11 @@
+server {
+	listen	80 default_server;
+	server_name	_;
+	location / {
+		root	{{ www_default_root }};
+		index	index.html index.htm;
+	}
+{% include "globalstatus.inc.j2" %}
+
+	error_page	500 502 503 504	/50x.html;
+}

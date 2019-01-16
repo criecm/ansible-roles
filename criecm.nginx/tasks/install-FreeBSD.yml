@@ -1,0 +1,25 @@
+---
+- name: install nginx
+  pkgng:
+    name: nginx
+    state: present
+
+- name: enable nginx
+  lineinfile:
+    dest: /etc/rc.conf
+    line: 'nginx_enable="YES"'
+    regexp: '^nginx_enable'
+    state: present
+
+- name: newsyslog.conf.d dir
+  file:
+    dest: '{{ etcprefix }}/etc/newsyslog.conf.d'
+    state: directory
+  when: do_local_log
+
+- name: freebsd newsyslog
+  template:
+    src: newsyslog_nginx.conf.j2
+    dest: '{{ etcprefix }}/etc/newsyslog.conf.d/nginx.conf'
+  when: do_local_log
+

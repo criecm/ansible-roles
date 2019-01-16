@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  author: Geoffroy Desvernay
+  description: nginx webserver and sites
+  company: Ecole Centrale Marseille
+
+  license: BSD
+
+  min_ansible_version: 2.5
+
+  platforms:
+    - name: FreeBSD
+      versions:
+        - 11.2
+        - 11.1
+        - 10.4
+    - name: Debian
+      versions:
+        - stretch
+
+dependencies: []
+

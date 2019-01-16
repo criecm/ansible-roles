@@ -1,0 +1,148 @@
+---
+- include_vars: '{{ item }}'
+  with_first_found:
+    - '{{ ansible_os_family }}.yml'
+  tags: vars, nginx
+
+- block:
+  - name: servers.d dir
+    file:
+      dest: '{{ nginx_etcdir }}/{{ item }}'
+      state: directory
+      mode: '0750'
+      owner: root
+    with_items:
+      - servers.d
+      - modules.d
+      - conf.d
+    notify: restart nginx
+  - name: default config
+    template:
+      src: nginx.conf.j2
+      dest: '{{ nginx_etcdir }}/nginx.conf'
+    notify: restart nginx
+  - name: default config parts
+    template:
+      src: '{{ item }}.j2'
+      dest: '{{ nginx_etcdir }}/{{ item }}'
+      force: no
+    with_items:
+      - servers.d/0default.conf
+    notify: restart nginx
+    when: nginx_default_site | default(False) | bool
+  tags: nginx, config
+
+- include_tasks: '{{ item }}'
+  with_first_found:
+    - 'install-{{ ansible_os_family }}.yml'
+  tags: vars, nginx
+
+# logs dir
+- name: log dir
+  file:
+    dest: '{{ nginx_log_dir }}'
+    mode: '0750'
+    state: directory
+  when: 'nginx_log_dir != ""'
+  tags: nginx, config
+
+# reverse-proxy if any
+- block:
+  - name: config reverse-proxy
+    lineinfile:
+      dest: '{{ nginx_etcdir }}/fastcgi_params'
+      line: '{{ item.line }}'
+      regexp: '{{ item.regexp }}'
+      state: present
+    with_items:
+      - { line: 'fastcgi_param  HTTPS $myhttps if_not_empty;', regexp: '^fastcgi_param\s+HTTPS' }
+      - { line: 'fastcgi_param  REQUEST_SCHEME $myscheme if_not_empty;', regexp: '^fastcgi_param\s+REQUEST_SCHEME' }
+      - { line: 'fastcgi_param  SERVER_PORT $myport if_not_empty;', regexp: '^fastcgi_param\s+SERVER_PORT' }
+    notify: restart nginx
+  - name:
+    template:
+      src: realip.conf.j2
+      dest: '{{ nginx_etcdir }}/conf.d/realip.conf'
+    notify: restart nginx
+  when: 'proxified_by | length != 0'
+  tags: nginx, config
+
+- include_tasks: '{{ item }}'
+  with_first_found:
+    - 'mods-{{ ansible_os_family }}.yml'
+  tags: nginx,config
+
+- name: nginx modconfs
+  template:
+    src: '{{ item }}'
+    dest: '{{ nginx_etcdir }}/modules.d/{{ item | basename | regex_replace("\.j2$","") }}'
+    mode: '0640'
+    group: '{{ www_group }}'
+  with_items: '{{ nginx_mods_includes }}'
+  notify: restart nginx
+  tags: nginx, config
+
+# nginx_includes if any
+- name: nginx includes
+  template:
+    src: '{{ item }}'
+    dest: '{{ nginx_etcdir }}/conf.d/{{ item | basename | regex_replace("\.j2$","") }}'
+    mode: '0640'
+    group: '{{ www_group }}'
+  with_items: '{{ nginx_includes }}'
+  notify: restart nginx
+  tags: nginx, config
+
+# x509 - global part
+- block:
+  - name: x509 global config
+    template:
+      src: tls.conf.j2
+      dest: '{{ nginx_etcdir }}/conf.d/tls.conf'
+      mode: '0644'
+  - name: check dhparam
+    stat:
+      path: /etc/ssl/dhparam4096.pem
+    register: stat_dh
+  - name: create dhparam
+    command: 'openssl dhparam -out /etc/ssl/dhparam4096.pem 4096'
+    when: not stat_dh.stat.exists
+  - name: mkdir private
+    file:
+      state: directory
+      mode: '0700'
+      path: '{{ tls_certs_dir }}/private'
+  when: do_tls
+  tags: nginx, config
+
+- name: enable nginx
+  service:
+    name: nginx
+    enabled: yes
+    state: started
+  tags: nginx, rc
+
+- name: sites
+  include_tasks: site.yml
+  with_items: '{{ sites }}'
+  loop_control:
+    loop_var: onesite
+  when: '(not "backend" in onesite) and not nginx_sites_done | default(False) and ( mysite == "" or mysite == onesite.id )'
+  tags: nginx, sites
+
+- name: monitor tmp var
+  set_fact:
+    tmpmon:
+      - proto: http
+        name: '{{ ansible_fqdn }}'
+        path: /nginx_status
+        type: nginx_status
+
+- name: register to_monitor
+  set_fact:
+    to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
+    cacheable: yes
+
+- name: debug monitor
+  debug:
+    var: to_monitor

@@ -54,15 +54,14 @@
     dest: '/usr/local/etc/rc.d/{{ node_app.name }}'
     mode: '0755'
 
-- name: restart app
-  block:
-    - name: stop app
-      service:
-        name: '{{ node_app.name }}'
-        state: stopped
-      failed_when: False
-    - name: start app
-      service:
-        name: '{{ node_app.name }}'
-        state: started
+- name: stop app
+  service:
+    name: '{{ node_app.name }}'
+    state: stopped
+  failed_when: False
   when: gitted.changed or confs.changed
+
+- name: start app
+  service:
+    name: '{{ node_app.name }}'
+    state: started

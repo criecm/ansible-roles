@@ -44,7 +44,7 @@
     login_class: '{{ pg_class | default(omit) }}'
     home: '{{ pg_owner_home }}'
 
-- name: zfs props
+- name: zfs
   zfs:
     name: '{{ pg_zfs_base }}/{{ pg_datasubdir }}'
     state: present

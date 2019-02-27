@@ -373,7 +373,7 @@ log_directory = '{{ pg_logdir | default("pg_log") }}'		# directory where log fil
 
 # These are relevant when logging to syslog:
 syslog_facility = {{ pg_syslog_facility | default('LOCAL0') }}
-#syslog_ident = 'postgres'
+syslog_ident = '{{ inventory_hostname }}'
 #syslog_sequence_numbers = on
 #syslog_split_messages = on
 

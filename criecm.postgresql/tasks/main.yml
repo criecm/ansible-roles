@@ -84,6 +84,9 @@
     role_attr_flags: 'SUPERUSER'
     state: present
   when: pg_admin_user and pg_admin_password and not pg_db_exists.stat.exists
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su
 
 # admin users
 - name: pg users
@@ -96,6 +99,9 @@
     state: present
   with_items: '{{ pg_users | union(pg_maintenance_users) }}'
   when: pg_init.changed | default(False)
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su
 
 # DBs
 - name: new dbs
@@ -106,3 +112,6 @@
   with_items:
     - '{{ pg_dbs }}'
   when: 'pg_dbs | count > 0'
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su

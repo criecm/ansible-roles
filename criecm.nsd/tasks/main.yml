@@ -1,6 +1,6 @@
 ---
-
-- include_vars: '{{ includefile }}'
+- name: OS vars
+  include_vars: '{{ includefile }}'
   with_first_found:
     - files:
         - '{{ ansible_os_family }}.yml'
@@ -9,7 +9,8 @@
     loop_var: includefile
   tags: nsd, vars
 
-- include_tasks: '{{ includefile }}'
+- name: OS tasks
+  include_tasks: '{{ includefile }}'
   with_first_found:
     - files:
         - '{{ ansible_os_family }}.yml'
@@ -33,7 +34,7 @@
 - name: init nsd-control
   shell: 'nsd-control-setup'
   when: not nsdcontrolkey.stat.exists
-  tags: config, nsd
+  tags: config, nsd, skip_ansible_lint
 
 - name: dir conf.d
   file:
@@ -63,7 +64,7 @@
     mode: '2770'
     owner: root
     group: '{{ nsd_group }}'
-  tags: config, nsd
+  tags: config, nsd, skip_ansible_lint
 
 - name: nsd.conf
   template:
@@ -80,10 +81,10 @@
     name: nsd
     state: started
 
-- name: restart nsd now
+- name: reload nsd now
   command: nsd-control reconfig
   when: nsdcfg.changed
-  tags: config, nsd
+  tags: config, nsd, skip_ansible_lint
 
 - include_tasks: zone.yml
   with_items: '{{ nsd_zones }}'
@@ -91,15 +92,17 @@
     loop_var: nsd_zone
   tags: nsd, zones
 
-- name: to_monitor
+- name: push to to_monitor fact
   block:
-  - set_fact:
+  - name: tmpmon
+    set_fact:
       tmpmon:
         - proto: dns
           name: 'nsd {{ ansible_fqdn }}'
           port: '{{ nsd_port }}'
           host: '{{ inventory_hostname }}'
           type: dns
-  - set_fact:
+  - name: to_monitor
+    set_fact:
       to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
       cacheable: yes

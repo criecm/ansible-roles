@@ -21,6 +21,8 @@
 
 - name: debian initrd
   shell: update-initramfs -k all -u
+  tags:
+    - skip_ansible_lint
 
 - name: debian restart nfs all
   service:

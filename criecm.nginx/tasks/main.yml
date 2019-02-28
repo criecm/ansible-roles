@@ -1,38 +1,41 @@
 ---
-- include_vars: '{{ item }}'
+- name: OS vars
+  include_vars: '{{ item }}'
   with_first_found:
     - '{{ ansible_os_family }}.yml'
   tags: vars, nginx
 
-- block:
-  - name: servers.d dir
-    file:
-      dest: '{{ nginx_etcdir }}/{{ item }}'
-      state: directory
-      mode: '0750'
-      owner: root
-    with_items:
-      - servers.d
-      - modules.d
-      - conf.d
-    notify: restart nginx
-  - name: default config
-    template:
-      src: nginx.conf.j2
-      dest: '{{ nginx_etcdir }}/nginx.conf'
-    notify: restart nginx
-  - name: default config parts
-    template:
-      src: '{{ item }}.j2'
-      dest: '{{ nginx_etcdir }}/{{ item }}'
-      force: no
-    with_items:
-      - servers.d/0default.conf
-    notify: restart nginx
-    when: nginx_default_site | default(False) | bool
+- name: default confs
+  block:
+    - name: servers.d dir
+      file:
+        dest: '{{ nginx_etcdir }}/{{ item }}'
+        state: directory
+        mode: '0750'
+        owner: root
+      with_items:
+        - servers.d
+        - modules.d
+        - conf.d
+      notify: restart nginx
+    - name: default config
+      template:
+        src: nginx.conf.j2
+        dest: '{{ nginx_etcdir }}/nginx.conf'
+      notify: restart nginx
+    - name: default config parts
+      template:
+        src: '{{ item }}.j2'
+        dest: '{{ nginx_etcdir }}/{{ item }}'
+        force: no
+      with_items:
+        - servers.d/0default.conf
+      notify: restart nginx
+      when: nginx_default_site | default(False) | bool
   tags: nginx, config
 
-- include_tasks: '{{ item }}'
+- name: OS tasks
+  include_tasks: '{{ item }}'
   with_first_found:
     - 'install-{{ ansible_os_family }}.yml'
   tags: vars, nginx
@@ -46,33 +49,34 @@
   when: 'nginx_log_dir != ""'
   tags: nginx, config
 
-# reverse-proxy if any
-- block:
-  - name: config reverse-proxy
-    lineinfile:
-      dest: '{{ nginx_etcdir }}/fastcgi_params'
-      line: '{{ item.line }}'
-      regexp: '{{ item.regexp }}'
-      state: present
-    with_items:
-      - { line: 'fastcgi_param  HTTPS $myhttps if_not_empty;', regexp: '^fastcgi_param\s+HTTPS' }
-      - { line: 'fastcgi_param  REQUEST_SCHEME $myscheme if_not_empty;', regexp: '^fastcgi_param\s+REQUEST_SCHEME' }
-      - { line: 'fastcgi_param  SERVER_PORT $myport if_not_empty;', regexp: '^fastcgi_param\s+SERVER_PORT' }
-    notify: restart nginx
-  - name:
-    template:
-      src: realip.conf.j2
-      dest: '{{ nginx_etcdir }}/conf.d/realip.conf'
-    notify: restart nginx
+- name: reverse-proxy
+  block:
+    - name: config reverse-proxy
+      lineinfile:
+        dest: '{{ nginx_etcdir }}/fastcgi_params'
+        line: '{{ item.line }}'
+        regexp: '{{ item.regexp }}'
+        state: present
+      with_items:
+        - { line: 'fastcgi_param  HTTPS $myhttps if_not_empty;', regexp: '^fastcgi_param\s+HTTPS' }
+        - { line: 'fastcgi_param  REQUEST_SCHEME $myscheme if_not_empty;', regexp: '^fastcgi_param\s+REQUEST_SCHEME' }
+        - { line: 'fastcgi_param  SERVER_PORT $myport if_not_empty;', regexp: '^fastcgi_param\s+SERVER_PORT' }
+      notify: restart nginx
+    - name: realip.conf
+      template:
+        src: realip.conf.j2
+        dest: '{{ nginx_etcdir }}/conf.d/realip.conf'
+      notify: restart nginx
   when: 'proxified_by | length != 0'
   tags: nginx, config
 
-- include_tasks: '{{ item }}'
+- name: OS modules
+  include_tasks: '{{ item }}'
   with_first_found:
     - 'mods-{{ ansible_os_family }}.yml'
   tags: nginx,config
 
-- name: nginx modconfs
+- name: modules.d/ confs
   template:
     src: '{{ item }}'
     dest: '{{ nginx_etcdir }}/modules.d/{{ item | basename | regex_replace("\.j2$","") }}'
@@ -82,7 +86,6 @@
   notify: restart nginx
   tags: nginx, config
 
-# nginx_includes if any
 - name: nginx includes
   template:
     src: '{{ item }}'
@@ -93,25 +96,25 @@
   notify: restart nginx
   tags: nginx, config
 
-# x509 - global part
-- block:
-  - name: x509 global config
-    template:
-      src: tls.conf.j2
-      dest: '{{ nginx_etcdir }}/conf.d/tls.conf'
-      mode: '0644'
-  - name: check dhparam
-    stat:
-      path: /etc/ssl/dhparam4096.pem
-    register: stat_dh
-  - name: create dhparam
-    command: 'openssl dhparam -out /etc/ssl/dhparam4096.pem 4096'
-    when: not stat_dh.stat.exists
-  - name: mkdir private
-    file:
-      state: directory
-      mode: '0700'
-      path: '{{ tls_certs_dir }}/private'
+- name: x509 - global part
+  block:
+    - name: x509 global config
+      template:
+        src: tls.conf.j2
+        dest: '{{ nginx_etcdir }}/conf.d/tls.conf'
+        mode: '0644'
+    - name: check dhparam
+      stat:
+        path: /etc/ssl/dhparam4096.pem
+      register: stat_dh
+    - name: create dhparam
+      command: 'openssl dhparam -out /etc/ssl/dhparam4096.pem 4096'
+      when: not stat_dh.stat.exists
+    - name: mkdir private
+      file:
+        state: directory
+        mode: '0700'
+        path: '{{ tls_certs_dir }}/private'
   when: do_tls
   tags: nginx, config
 

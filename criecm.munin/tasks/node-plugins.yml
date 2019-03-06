@@ -8,7 +8,7 @@
 - name: snmp plugin
   file:
     src: '{{ munin_dist_plugins }}/snmp__if_multi'
-    dest: '{{ munin_etcdir }}/plugins/snmp_{{ ansible_fqdn | regex_replace("\.","_") }}_if_multi'
+    dest: '{{ munin_etcdir }}/plugins/snmp_localhost_if_multi'
     state: link
   when: not is_jail
   notify: restart munin node

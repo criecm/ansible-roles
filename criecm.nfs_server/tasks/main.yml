@@ -1,16 +1,19 @@
 ---
+# NFS services
 - name: rc conf
   lineinfile:
-    line: '{{ item }}'
-    regexp: "^{{ item | regex_replace('=.*$','=') }}"
+    line: '{{ item.key }}="{{ item.value }}"'
+    regexp: "^{{ item.key }}="
     dest: /etc/rc.conf
-  with_items:
-    - 'nfs_server_enable="YES"'
-    - 'nfs_server_flags="{{ mynfsd_flags }}"'
-    - '{% if nfsv4_enable %}nfsv4_server_enable="YES"{% else %}omit{% endif %}'
-  notify: restart freebsd nfs server
+  when: item.value != ''
+  with_dict:
+    nfs_server_enable: 'YES'
+    nfs_server_flags: '{{ mynfsd_flags }}'
+    mountd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p 4046 -l"
+    mountd_enable: "YES"
+    nfsv4_server_enable: '{% if nfsv4_enable %}"YES"{% else %}"NO"{% endif %}'
+  notify: freebsd restart nfs server
   when: ansible_os_family == "FreeBSD"
-  tags: nfs,rc
 
 - name: exports
   copy:
@@ -19,6 +22,7 @@
     content: |
       V4: / -sec=sys
   tags: nfs,exports
+  when: nfsv4_enable
 
 - name: mkdir & co
   include_tasks: share.yml

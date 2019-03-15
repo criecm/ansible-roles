@@ -75,7 +75,15 @@
     Require ip {{ net }}
 {%       endfor %}
   </Location>
-{%-     endif %}
+{%-    endif %}
+
+{%     if monitoring_from | count > 0 and site.fcgi_status_path %}
+  <Location {{ site.fcgi_status_path }}>
+{%       for net in monitoring_from %}
+    Require ip {{ net }}
+{%       endfor %}
+  </Location>
+{%-    endif %}
 
 {%   elif site.backends | count() == 1 %}
   <Proxy {{ site.backends[0] }}>

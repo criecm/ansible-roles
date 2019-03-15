@@ -30,5 +30,6 @@ default_site:
   prefixes:
     - path: /
       allow_from_nets: []
+  fcgi_status_path: ''
 
 site: '{{ default_site | combine(onesite) }}'

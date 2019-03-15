@@ -110,17 +110,24 @@
 
 # monitoring
 - block:
-  - name: monitor tmp var
+  - name: status_path tmp var
     set_fact:
       tmpmon:
         - proto: '{% if site.tls_key | default(False) or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
           name: '{{ site.name }}'
           path: '{{ site.status_path }}'
           type: apache-status
-  - name: add fcgi_status_path to to_monitor
+  - name: fcgi_status_path tmp var
     set_fact:
-      to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
+      tmpmonfcgi:
+        - proto: '{% if site.tls_key | default(False) or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
+          name: '{{ site.name }}'
+          path: '{{ site.fcgi_status_path }}'
+          type: '{{ site.backend | default ("http_status") }}'
+    when: '"fcgi_status_path" in site and site.fcgi_status_path != ""'
+
+  - name: add status_pathes to to_monitor
+    set_fact:
+      to_monitor: '{{ to_monitor | default([]) | union(tmpmon) | union( tmpmonfcgi | default({}) ) }}'
       cacheable: yes
   when: '"status_path" in site and site.status_path != ""'
-
-

@@ -35,6 +35,7 @@ default_site:
   x509_stapling_chain: ''
   backends: []
   default_index: 'index.html index.htm index.txt'
+  status_path: '{{ nginx_status_path }}'
   nginx_done: True
 
 #site: '{{ default_site | combine(onesite) }}'

@@ -49,6 +49,17 @@
   when: 'nginx_log_dir != ""'
   tags: nginx, config
 
+- name: get status
+  shell: 'nginx -V 2>&1 | grep -o with-http_stub_status_module'
+  failed_when: False
+  check_mode: False
+  changed_when: False
+  register: status_mod
+
+- name: fact has_status
+  set_fact:
+    has_status: '{% if status_mod.rc == 0 %}True{% else %}False{% endif %}'
+
 - name: reverse-proxy
   block:
     - name: config reverse-proxy

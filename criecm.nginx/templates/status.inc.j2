@@ -10,3 +10,13 @@
 		fastcgi_pass {% if upstream %}{{ upstream }}{% else %}{% if site.fcgisocket | match("\/.*") %}unix:{% endif %}{{ site.fcgisocket }}{% endif %};
 	}
 {% endif %}
+
+{% if site.status_path %}
+	location = {{ site.status_path }} {
+{% for net in monitoring_from | intersect(admin_from) %}
+		allow {{ net }};
+{% endfor %}
+		status;
+		deny all;
+	}
+{% endif %}

@@ -128,6 +128,6 @@
 
   - name: add status_pathes to to_monitor
     set_fact:
-      to_monitor: '{{ to_monitor | default([]) | union(tmpmon) | union( tmpmonfcgi | default({}) ) }}'
+      to_monitor: '{{ to_monitor | default([]) | union(tmpmon) | union( tmpmonfcgi | default([]) ) }}'
       cacheable: yes
   when: '"status_path" in site and site.status_path != ""'

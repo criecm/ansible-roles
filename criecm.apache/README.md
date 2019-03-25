@@ -101,6 +101,8 @@ siteconf_locations:
 
 # used for apache_includes vars:
 include_locations:
+  - '{{ item }}.j2'
+  - '{{ item }}'
   - '{{ playbook_dir }}/templates/{{ id }}/apache/{{ item }}.j2'
   - '{{ playbook_dir }}/files/{{ id }}/apache/{{ item }}'
   - 'templates/apache/{{ item }}.j2'

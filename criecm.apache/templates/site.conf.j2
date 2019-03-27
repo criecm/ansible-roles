@@ -39,10 +39,32 @@
 {%   endif %}
 {%- endif %}
 
+{% if "apache_includes" in site and site.apache_includes | count > 0 %}
+{%   for include in site.apache_includes %}
+  Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
+
+{%   endfor %}
+{% else %}
+{%   for prefix in site.prefixes %}
+  # prefix {{ prefix.path }}
+  <Location {{ prefix.path }}>
+{%     if prefix.allow_from_nets | default([]) | count > 0 %}
+{%       for net in prefix.allow_from_nets %}
+    Require ip {{ net }}
+{%       endfor %}
+    Require all denied
+{%     else %}
+    Require all granted
+{%     endif %}
+  </Location>
+{%   endfor %}
+{% endif %}
+
 {% if "backends" in site %}
   # keep host name in request
   ProxyPreserveHost On
 {%   if site.backends | count() > 1 %}
+  # load balancer
   # set cookie for sticky-sessions
   Header add Set-Cookie "{{ site.id }}B=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
   <Proxy balancer://{{ site.id }}>
@@ -67,52 +89,33 @@
   ProxyPass /balancer-manager !
 {%     endif %}
 
-{%     if monitoring_from | count > 0 and site.status_path %}
-  # status URL from monitoring
-  <Location {{ site.status_path }}>
-    SetHandler server-status
-{%       for net in monitoring_from %}
-    Require ip {{ net }}
-{%       endfor %}
-  </Location>
-{%-    endif %}
-
-{%     if monitoring_from | count > 0 and site.fcgi_status_path %}
-  <Location {{ site.fcgi_status_path }}>
-{%       for net in monitoring_from %}
-    Require ip {{ net }}
-{%       endfor %}
-  </Location>
-{%-    endif %}
-
 {%   elif site.backends | count() == 1 %}
-  <Proxy {{ site.backends[0] }}>
+  # simple reverse-proxy
+  <Proxy {{ site.backends[0] | regex_replace(" .*$","")}}>
     Require all granted
   </Proxy>
-  ProxyPass / {{ site.backends[0] }}/
-  ProxyPassReverse / {{ site.backends[0] }}/
+  ProxyPass / {{ site.backends[0] | regex_replace(" .*$","") }}/{% if site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+
+  ProxyPassReverse / {{ site.backends[0] | regex_replace(" .*$","") }}/
+{%   endif %}
+{%   if monitoring_from | count > 0 and site.fcgi_status_path %}
+  # monitoring
+  <Location {{ site.fcgi_status_path }}>
+{%     for net in monitoring_from %}
+    Require ip {{ net }}
+{%     endfor %}
+  </Location>
 {%   endif %}
 {% endif %}
 
-{% if "apache_includes" in site and site.apache_includes | count > 0 %}
-{%   for include in site.apache_includes %}
-  Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
-
-{%   endfor %}
-{% else %}
-{%   for prefix in site.prefixes %}
-  # prefix {{ prefix.path }}
-  <Location {{ prefix.path }}>
-{%     if prefix.allow_from_nets | default([]) | count > 0 %}
-{%       for net in prefix.allow_from_nets %}
+{% if monitoring_from | count > 0 and site.status_path %}
+  # status URL from monitoring
+  <Location {{ site.status_path }}>
+    SetHandler server-status
+{%   for net in monitoring_from %}
     Require ip {{ net }}
-{%       endfor %}
-    Require all denied
-{%     else %}
-    Require all granted
-{%     endif %}
-  </Location>
 {%   endfor %}
+  </Location>
 {% endif %}
 
 </VirtualHost>

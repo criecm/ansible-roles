@@ -1,6 +1,6 @@
 # nginx
 
-nginx web server, with one to many websites, for FreeBSD 10,11 and Debian 7,8
+nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 8,9
 
 * `conf.d/` ready
 * `modules.d/*.conf` for dynamic modules

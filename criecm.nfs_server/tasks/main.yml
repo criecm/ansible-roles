@@ -12,7 +12,7 @@
     mountd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p 4046 -l"
     mountd_enable: "YES"
     nfsv4_server_enable: '{% if nfsv4_enable %}"YES"{% else %}"NO"{% endif %}'
-  notify: freebsd restart nfs server
+  notify: restart freebsd nfs server
   when: ansible_os_family == "FreeBSD"
 
 - name: exports

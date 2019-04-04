@@ -12,3 +12,6 @@
   service:
     name: postgresql
     state: reloaded
+
+- name: newsyslog
+  command: 'newsyslog -C'

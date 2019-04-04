@@ -85,5 +85,6 @@
     force: no
     dest: /usr/local/etc/newsyslog.conf.d/postgresql.conf
     content: |
-      /var/log/postgresql.log  root:{{ pg_group }}  640 7 1000  @T00  X
+      /var/log/postgresql.log  root:{{ pg_group }}  640 7 1000  @T00  CX
   when: pg_logdest == "syslog"
+  notify: newsyslog

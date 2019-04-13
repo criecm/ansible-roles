@@ -60,6 +60,7 @@
   service:
     name: '{{ munin_asyncd_service }}'
     enabled: yes
+    stase: started
   when: munin_async
   notify:
     - restart munin node

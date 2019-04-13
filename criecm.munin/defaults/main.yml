@@ -19,3 +19,5 @@ munin_aggr_templates: []
 
 munin_async: False
 munin_async_key: ''
+
+munin_host_dir: '{{ munin_etcdir }}/munin-conf.d'

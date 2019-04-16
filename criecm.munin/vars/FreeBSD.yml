@@ -1,4 +1,7 @@
 ---
+prefix: /usr/local
+etcprefix: /usr/local
+
 munin_etcdir: /usr/local/etc/munin
 
 munin_default_dbdir: /var/db/munin

@@ -1,4 +1,5 @@
 ---
+prefix: /usr/local
 munin_service: munin_node
 munin_dist_plugins: /usr/local/libexec/munin/plugins
 

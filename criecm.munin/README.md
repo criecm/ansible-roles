@@ -10,12 +10,6 @@ FreeBSD or Debian
 
 ## Variables (default value)
 
-### required if not using criecm.common
-  * `prefix` (/usr) may come from criecm.common
-    /usr or /usr/local, needed when calling node-plugins.yml directly
-  * `etcprefix` ('') may come from criecm.common
-    path to prepend to /etc (eg: /usr/local on FreeBSD)
-
 ### usefull
   * `munin_plugins` ([])
     list of plugin files to link. Can be folowwed by a space and plugin name
@@ -48,12 +42,6 @@ FreeBSD or Debian
 Aggretation templates found in templates/munin/aggr/* will be installed as 'ansible-aggr-{{ part of basename before . }}' on munin_host
 
 Note you'll have to call criecm.munin on munin_host explicitely to install them
-
-## Dependencies
-
-Needs (pick one):
-  * criecm.common role
-  * `prefix` and `etcprefix` variables
 
 ## Example Playbook
 

@@ -122,6 +122,10 @@
 
 {% if site.tls and site.tls_redir %}
 <VirtualHost {% if site.listen is search(':') %}{{ site.listen | regex_replace(':.*',':80') }}{% else %}*:80{% endif %}>
+  ServerName {{ site.name }}
+{% if "aliases" in site and site.aliases | count() > 0 %}
+{%   for alias in site.aliases %}
+  ServerAlias {{ alias }}
   Redirect permanent "/" "https://{{ site.name }}{% if not site.listen | regex_search(':?443$') %}:{{ site.listen | regex_replace('.*:','') }}{% endif %}/"
 </VirtualHost>
 {% endif %}

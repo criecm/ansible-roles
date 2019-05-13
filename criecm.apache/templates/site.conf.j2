@@ -126,6 +126,9 @@
 {% if "aliases" in site and site.aliases | count() > 0 %}
 {%   for alias in site.aliases %}
   ServerAlias {{ alias }}
+
+{%   endfor %}
+{% endif %}
   Redirect permanent "/" "https://{{ site.name }}{% if not site.listen | regex_search(':?443$') %}:{{ site.listen | regex_replace('.*:','') }}{% endif %}/"
 </VirtualHost>
 {% endif %}

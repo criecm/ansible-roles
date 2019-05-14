@@ -59,8 +59,8 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
 ### optional (sane defaults)
 * `rootdir (system-dependant/{{name}})`:
   You have to populate it elsewhere (criecm.php-fpm does it from vars, or in your playbook)
-* `listen (*:80 or *:443)`
-  [IP:]port or port to listen (default depends of `tls_cert` presence)
+* `listen ([*:80] or [*:443])`
+  list of [IP:]port or port to listen (default depends of `tls_cert` presence)
 * `user (system dependant default)`
 * `group (user)`
 * `status_path (/apache-status)`:

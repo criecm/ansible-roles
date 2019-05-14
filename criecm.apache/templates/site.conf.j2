@@ -1,5 +1,5 @@
 # {{ ansible_managed }}
-<VirtualHost {% if site.listen is search(':') %}{{ site.listen }}{% else %}*:{{ site.listen }}{% endif %}>
+<VirtualHost {% if site.listen | join(" ") is search(':') %}{{ site.listen | join(" ") }}{% else %}{% for l in site.listen %}*:{{ l }} {% endfor %}{% endif %}>
   ServerName {{ site.name }}
 {% if "aliases" in site and site.aliases | count() > 0 %}
 {%   for alias in site.aliases %}
@@ -29,7 +29,7 @@
 {%   if "hsts" in site %}
   # + HSTS
   Header unset Strict-Transport-Security
-  Header set Strict-Transport-Security "max-age={{ site.hsts }}"
+  Header set Strict-Transport-Security "max-age={{ hsts_max_age | default('31536000') }}"
 {%-   endif %}
 
 {%   if "backends" in site %}
@@ -44,21 +44,24 @@
   Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
 
 {%   endfor %}
-{% else %}
-{%   for prefix in site.prefixes %}
+{% endif %}
+
+{% for prefix in site.prefixes %}
   # prefix {{ prefix.path }}
   <Location {{ prefix.path }}>
-{%     if prefix.allow_from_nets | default([]) | count > 0 %}
-{%       for net in prefix.allow_from_nets %}
+{%   if prefix.allow_from_nets | default([]) | count > 0 %}
+{%     for net in prefix.allow_from_nets %}
     Require ip {{ net }}
-{%       endfor %}
+{%     endfor %}
     Require all denied
-{%     else %}
+{%   else %}
     Require all granted
-{%     endif %}
+{%   endif %}
+{% if "backends" in site %}
+    ProxyPass {{ prefix.path }}/ balancer://{{ site.id }}{{ prefix.path }}/
+    ProxyPassReverse {{ prefix.path }}/ balancer://{{ site.id }}{{ prefix.path }}/
   </Location>
-{%   endfor %}
-{% endif %}
+{% endfor %}
 
 {% if "backends" in site %}
   # keep host name in request
@@ -75,8 +78,10 @@
     Require all granted
     ProxySet stickysession={{ site.id }}B timeout=3
   </Proxy>
+{%     if not "prefixes" in site %}
   ProxyPass / balancer://{{ site.id }}/
   ProxyPassReverse / balancer://{{ site.id }}/
+{%     endif %}
 
 {%     if admin_from %}
   # balancer-manager from admin ip's
@@ -121,11 +126,14 @@
 </VirtualHost>
 
 {% if site.tls and site.tls_redir %}
-<VirtualHost {% if site.listen is search(':') %}{{ site.listen | regex_replace(':.*',':80') }}{% else %}*:80{% endif %}>
+<VirtualHost {% for l in site.listen %}{% if l is search(':') %}{{ l | regex_replace(':.*',':80') }} {% else %}*:80{% endif %}{% endfor %}>
   ServerName {{ site.name }}
 {% if "aliases" in site and site.aliases | count() > 0 %}
 {%   for alias in site.aliases %}
   ServerAlias {{ alias }}
-  Redirect permanent "/" "https://{{ site.name }}{% if not site.listen | regex_search(':?443$') %}:{{ site.listen | regex_replace('.*:','') }}{% endif %}/"
+
+{%   endfor %}
+{% endif %}
+  Redirect permanent "/" "https://{{ site.name }}{% if not site.listen | join(" ") | regex_search(':?443') %}:{{ site.listen | join(" ") | regex_replace('.*:','') }}{% endif %}/"
 </VirtualHost>
 {% endif %}

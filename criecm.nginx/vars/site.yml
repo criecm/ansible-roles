@@ -13,9 +13,9 @@ include_locations:
   - 'templates/nginx'
   - '{{ playbook_dir }}/files/nginx'
 
-ips: '{% if "listen" in onesite %}{{ onesite.listen.split(" ") | map("regex_replace",":[0-9]*$","") | list }}{% else %}["*"{% if ansible_all_ipv6_addresses | count > 0 %},"[::]"{% endif %}]{% endif %}'
+ips: '{% if "listen" in onesite %}{{ onesite.listen | map("regex_replace",":[0-9]*$","") | list }}{% else %}["*"{% if ansible_all_ipv6_addresses | count > 0 %},"[::]"{% endif %}]{% endif %}'
 
-port: '{% if "listen" in onesite and onesite.listen is search(":[0-9]a$+") %}{{ onesite.listen | regex_replace("^.*:([0-9]+)$","\\1") }}{% else %}{% if site.tls | default(False) %}443{% else %}80{% endif %}{% endif %}'
+port: '{% if "listen" in onesite and onesite.listen | join(" ") is search(":[0-9]a$+") %}{{ onesite.listen | join(" ") | regex_replace("^.*:([0-9]+)$","\\1") }}{% else %}{% if site.tls | default(False) %}443{% else %}80{% endif %}{% endif %}'
 
 # site par defaut
 default_site:

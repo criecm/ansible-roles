@@ -141,8 +141,8 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 8,9
 
 * `rootdir` (/home/{{id}}/{{id}})
   web root
-* `listen` (80|443)
-  port or ip:port's to listen to, space-separated
+* `listen` ([80|443])
+  list of port or ip:port's to listen to
 * `default_index ('index.html index.htm')`
 
 #### optional (no default)

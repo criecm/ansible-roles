@@ -52,9 +52,8 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
 * `backends ([])`:
   eg: ``` - 'ajp://jentest1.nettest.egim:8009 route=jentest1 timeout=20 loadfactor=100'```
   - if only one is defined, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html 
-    eg: ``` - 'http://my.backend.local:8080/'
   - if more than one, see https://httpd.apache.org/docs/2.4/mod/mod_proxy_balancer.html
-    eg: 
+  - if you define `prefixes`, backends will only be used for them.
 
 ### optional (sane defaults)
 * `rootdir (system-dependant/{{name}})`:
@@ -67,8 +66,9 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
   will present apache status page to `monitoring_from` and `admin_from` nets, if they are populated
   and `status_path` is not empty
 * `prefixes ([{path: /}])`:
-  list of pathes allowed on this virtualhost. You may list IP networks allowed in `allow_from_nets` element
-  skipped if `apache_includes` is defined/not empty
+  list of pathes allowed on this virtualhost, with
+    `allow_from_nets ([])` listing IP(v4|v6) prefixes allowed
+    `apache_includes ([])` as in sites
 
 ### options (none by default)
 * `aliases ([])`:
@@ -80,6 +80,13 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
   files writeable by group
 * `grwdirs ([])`
   dirs writable by site's group
+* `cache ([])`
+  cache lines (Added after "CacheEnable")
+* `redirectmatch ([])`
+  list of redirections dicts:
+    `regex`: path selector
+    `dest`: destination
+    `type (temp)`: "permanent", "temp", 302, 30x, …
 
 ### TLS : https support
 * `tls_cert ([])`:
@@ -160,4 +167,6 @@ include_locations:
               - 192.0.2.128/25
               - 2001:db8:cafe:f001::/64
           - path: /publicapp
+	cache:
+          - 'disk "/publicapp"'
 ```

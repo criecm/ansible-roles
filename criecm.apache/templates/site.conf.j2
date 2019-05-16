@@ -2,6 +2,7 @@
 <VirtualHost {% if site.listen | join(" ") is search(':') %}{{ site.listen | join(" ") }}{% else %}{% for l in site.listen %}*:{{ l }} {% endfor %}{% endif %}>
   ServerName {{ site.name }}
 {% if "aliases" in site and site.aliases | count() > 0 %}
+  # aliases
 {%   for alias in site.aliases %}
   ServerAlias {{ alias }}
 
@@ -38,30 +39,6 @@
   RequestHeader set X-Forwarded-Port "443"
 {%   endif %}
 {%- endif %}
-
-{% if "apache_includes" in site and site.apache_includes | count > 0 %}
-{%   for include in site.apache_includes %}
-  Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
-
-{%   endfor %}
-{% endif %}
-
-{% for prefix in site.prefixes %}
-  # prefix {{ prefix.path }}
-  <Location {{ prefix.path }}>
-{%   if prefix.allow_from_nets | default([]) | count > 0 %}
-{%     for net in prefix.allow_from_nets %}
-    Require ip {{ net }}
-{%     endfor %}
-    Require all denied
-{%   else %}
-    Require all granted
-{%   endif %}
-{% if "backends" in site %}
-    ProxyPass {{ prefix.path }}/ balancer://{{ site.id }}{{ prefix.path }}/
-    ProxyPassReverse {{ prefix.path }}/ balancer://{{ site.id }}{{ prefix.path }}/
-  </Location>
-{% endfor %}
 
 {% if "backends" in site %}
   # keep host name in request
@@ -111,6 +88,64 @@
 {%     endfor %}
   </Location>
 {%   endif %}
+{% endif %}
+
+{% if "apache_includes" in site and site.apache_includes | count > 0 %}
+  # site.apache_includes
+{%   for include in site.apache_includes %}
+  Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
+
+{%   endfor %}
+{% endif %}
+
+{% for prefix in site.prefixes %}
+  # prefix {{ prefix.path }}
+  <Location {{ prefix.path }}/>
+{%   if "apache_includes" in prefix and prefix.apache_includes | count > 0 %}
+    # prefix."{{ prefix.path }}".apache_includes
+{%     for include in prefix.apache_includes %}
+    Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
+
+{%     endfor %}
+{%   endif %}
+
+{%   if prefix.allow_from_nets | default([]) | count > 0 %}
+    # prefix."{{ prefix.path }}".allow_from_nets
+{%     for net in prefix.allow_from_nets %}
+    Require ip {{ net }}
+{%     endfor %}
+    Require all denied
+{%   else %}
+{%     if not "apache_includes" in prefix %}
+    Require all granted
+{%     endif %}
+{%   endif %}
+{%   if "backends" in site %}
+{%     if site.backends | count() > 1 %}
+    ProxyPass {{ prefix.path }}/ balancer://{{ site.id }}{{ prefix.path }}/
+    ProxyPassReverse {{ prefix.path }}/ balancer://{{ site.id }}{{ prefix.path }}/
+{%     elif site.backends | count() == 1 %}
+    ProxyPass {{ prefix.path }}/ {{ site.backends[0] | regex_replace(" .*$","") }}/{{ prefix.path }}/{% if site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+    ProxyPassReverse {{ prefix.path }}/ {{ site.backends[0] | regex_replace(" .*$","") }}/{{ prefix.path }}/
+{%     endif %}
+{%   endif %}
+  </Location>
+{% endfor %}
+
+{% if "cache" in site %}
+# site.cache: {{ site.cache | count() }} items
+{% for c in site.cache %}
+  CacheEnable {{ c }}
+
+{% endfor %}
+{% endif %}
+
+{% if "redirectmatch" in site %}
+# site.redirectmatch: {{ site.redirectmatch | count() }} items
+{% for red in site.redirectmatch %}
+  RedirectMatch {{ site.redirectmatch.type | default("temp") }} "{{ site.redirectmatch.regex }}" {{ site.redirectmatch.dest }}
+
+{% endfor %}
 {% endif %}
 
 {% if monitoring_from | count > 0 and site.status_path %}

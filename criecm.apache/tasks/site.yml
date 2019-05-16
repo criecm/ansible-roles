@@ -16,8 +16,8 @@
   template:
     dest: '{{ apache_etcdir }}/{{ item | basename | regex_replace(".j2$","") }}'
     src: '{{ lookup("first_found", include_locations) }}'
-  with_items: '{{ site.apache_includes }}'
-  when: '"apache_includes" in site'
+  loop: '{{ [site] | json_query("[?apache_includes].apache_includes") | union([site]  | json_query("[?prefixes].prefixes[].apache_includes")) | list | flatten | unique }}'
+  when: '"apache_includes" in site or "prefixes" in site'
 
 - name: conf includes
   copy:

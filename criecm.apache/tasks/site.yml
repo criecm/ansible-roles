@@ -102,10 +102,10 @@
 - name: Listen in Zsites.conf
   lineinfile:
     dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/Zsites.conf'
-    line: 'Listen {{ site.listen }}'
-    regexp: 'Listen {{ site.listen | regex_escape() }}'
+    line: 'Listen {{ item }}'
+    regexp: 'Listen {{ item | regex_escape() }}'
     insertafter: 'Listen'
-  loop: '{{ lookup("flattened",[site.listen]) }}'
+  loop: '{{ lookup("flattened",[site.listen],wantlist=True) }}'
   when: '( ansible_os_family == "FreeBSD" and not item | regex_search("80$") ) or
         ( not item | regex_search("(80|443)$") )'
 

@@ -100,7 +100,7 @@
 
 {% for prefix in site.prefixes %}
   # prefix {{ prefix.path }}
-  <Location {{ prefix.path }}/>
+  <Location {{ prefix.path }}>
 {%   if "apache_includes" in prefix and prefix.apache_includes | count > 0 %}
     # prefix."{{ prefix.path }}".apache_includes
 {%     for include in prefix.apache_includes %}
@@ -122,11 +122,13 @@
 {%   endif %}
 {%   if "backends" in site %}
 {%     if site.backends | count() > 1 %}
-    ProxyPass {{ prefix.path }}/ balancer://{{ site.id }}{{ prefix.path }}/
-    ProxyPassReverse {{ prefix.path }}/ balancer://{{ site.id }}{{ prefix.path }}/
+    ProxyPass balancer://{{ site.id }}{{ prefix.path }}
+    
+    ProxyPassReverse balancer://{{ site.id }}{{ prefix.path }}
 {%     elif site.backends | count() == 1 %}
-    ProxyPass {{ prefix.path }}/ {{ site.backends[0] | regex_replace(" .*$","") }}/{{ prefix.path }}/{% if site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
-    ProxyPassReverse {{ prefix.path }}/ {{ site.backends[0] | regex_replace(" .*$","") }}/{{ prefix.path }}/
+    ProxyPass {{ site.backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}{% if site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+    
+    ProxyPassReverse {{ site.backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}
 {%     endif %}
 {%   endif %}
   </Location>

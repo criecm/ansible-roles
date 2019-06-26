@@ -30,7 +30,7 @@
 {%   if "hsts" in site %}
   # + HSTS
   Header unset Strict-Transport-Security
-  Header set Strict-Transport-Security "max-age={{ hsts_max_age | default('31536000') }}"
+  Header set Strict-Transport-Security "max-age={{ site.hsts | default('31536000') }}"
 {%-   endif %}
 
 {%   if "backends" in site %}

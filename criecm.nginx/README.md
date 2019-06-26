@@ -155,7 +155,7 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 8,9
 
 ##### TLS / HTTP2
 
-* `tls_hsts` (31536000 if `x509_cert`, else 0)
+* `hsts` (31536000 if `x509_cert`, else 0)
   if > 0, add Strict-Transport-Security header
 * `tls_redir` (False)
   if True, redirect all http requests to https

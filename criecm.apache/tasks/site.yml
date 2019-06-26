@@ -43,6 +43,7 @@
       depth: 2
       repo: '{{ site.gitroot }}'
       dest: '{{ site.rootdir }}'
+      version: '{{ site.gitrootversion | default("master") }}'
     when: '"gitroot" in onesite'
   - name: mkdir root dir
     file:

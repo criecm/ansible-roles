@@ -87,6 +87,10 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
     `regex`: path selector
     `dest`: destination
     `type (temp)`: "permanent", "temp", 302, 30x, …
+* `gitroot ()`
+  git repo to clone in rootdir
+* `gitrootversion ("master")`
+  git tag/branch/commit for gitroot
 
 ### TLS : https support
 * `tls_cert ([])`:

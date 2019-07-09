@@ -9,7 +9,7 @@
   with_dict:
     nfs_server_enable: 'YES'
     nfs_server_flags: '{{ mynfsd_flags }}'
-    mountd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p 4046 -l"
+    mountd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p 4046 {{ mountd_add_flags }}"
     mountd_enable: "YES"
     nfsv4_server_enable: '{% if nfsv4_enable %}YES{% else %}NO{% endif %}'
   notify: restart freebsd nfs server

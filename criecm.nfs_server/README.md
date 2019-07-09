@@ -19,6 +19,8 @@ Role Variables
   directory to share
   * `nfsshares` ([]) MANDATORY
   list of /etc/exports lines (without path)
+* `mountd_add_flags ("-l")`
+  flags to pass to mountd (man mountd)
 
 Dependencies
 ------------

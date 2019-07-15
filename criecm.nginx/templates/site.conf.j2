@@ -21,7 +21,12 @@ upstream {{ upstream }} {
 {% endif %}
 {% if site.tls_redir | default(False) and not proxified_by %}
 server {
+{% if ansible_os_family == "FreeBSD" %}
+	listen *:80;
+	listen [::]:80;
+{% else %}
 	listen 80;
+{% endif %}
 	server_name	{{ site.name }}{% if site.aliases | count > 0 %} {{ site.aliases | join(" ") }}{% endif %};
 	rewrite ^(.*) https://{{ site.name }}$1 permanent;
 }

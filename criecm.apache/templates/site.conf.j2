@@ -55,7 +55,7 @@
     Require all granted
     ProxySet stickysession={{ site.id }}B timeout=3
   </Proxy>
-{%     if not "prefixes" in site %}
+{%     if site.prefixes | count() == 1 and site.prefixes[0].path is regex('^/$') %}
   ProxyPass / balancer://{{ site.id }}/
   ProxyPassReverse / balancer://{{ site.id }}/
 {%     endif %}
@@ -71,7 +71,7 @@
   ProxyPass /balancer-manager !
 {%     endif %}
 
-{%   elif site.backends | count() == 1 %}
+{%   elif site.backends | count() == 1 and site.prefixes | count() == 1 and site.prefixes[0].path is regex('^/$') %}
   # simple reverse-proxy
   <Proxy {{ site.backends[0] | regex_replace(" .*$","")}}>
     Require all granted
@@ -120,16 +120,16 @@
     Require all granted
 {%     endif %}
 {%   endif %}
-{%   if "backends" in site %}
-{%     if site.backends | count() > 1 %}
+{%   if "backends" in site and site.backends | count() > 1 %}
+{%     if site.prefixes | count() == 1 or site.prefixes[0].path is not regex('^/$') %}
     ProxyPass balancer://{{ site.id }}{{ prefix.path }}
     
     ProxyPassReverse balancer://{{ site.id }}{{ prefix.path }}
-{%     elif site.backends | count() == 1 %}
+{%     endif %}
+{%   elif site.backends | count() == 1 %}
     ProxyPass {{ site.backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}{% if site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
     
     ProxyPassReverse {{ site.backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}
-{%     endif %}
 {%   endif %}
   </Location>
 {% endfor %}

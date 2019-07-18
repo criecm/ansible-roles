@@ -41,7 +41,12 @@ server {
 {% else %}
 {%   if proxified_by %}
 # because proxified_by={{ proxified_by }}
+{% if ansible_os_family == "FreeBSD" %}
+	listen *:80;
+	listen [::]:80;
+{% else %}
 	listen 80;
+{% endif %}
 {%   else %}
 # because site.listen_ips {{ site.listen_ips }}
 {%     for ip in site.listen_ips %}

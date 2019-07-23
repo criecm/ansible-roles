@@ -12,6 +12,11 @@
 ---
 - include_vars: site.yml
 
+- set_fact:
+    site: '{{ default_site | combine(onesite) }}'
+
+- debug: var=site
+
 - name: site includes
   template:
     dest: '{{ apache_etcdir }}/{{ item | basename | regex_replace(".j2$","") }}'
@@ -26,6 +31,8 @@
     mode: '0644'
   with_fileglob:
     - 'apache/{{ site.id }}/{{ apache_includesdir }}/*.conf'
+  loop_control:
+    label: '{{ apache_etcdir }}/{{ apache_includesdir }}/{{ item | basename | regex_replace(".*/([^/]+)$","\1") }}'
 
 # app root dir
 - block:
@@ -91,8 +98,6 @@
       dest: '{{ tls_dir }}/private/{{ site.tls_key }}'
       mode: '0644'
   when: '"tls_key" in site'
-
-- debug: var=site
 
 - name: site apache config
   template:

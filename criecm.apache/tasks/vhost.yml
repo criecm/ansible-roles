@@ -9,8 +9,13 @@
 - name: os vars
   include_vars: '{{ ansible_os_family }}.yml'
 
-- name: site vars
-  include_vars: site.yml
+- name: full role if needed
+  include_role:
+    name: criecm.apache
+  vars:
+    sites: [ '{{ vhost }}']
+  when: '"criecm" not in ansible_local or "apache" not in ansible_local.criecm or ansible_local.criecm.apache.version | int < apache_role_version | int'
+  register: fulldone
 
 - name: apache sites
   include_tasks: site.yml
@@ -18,3 +23,4 @@
     - '{{ vhost }}'
   loop_control:
     loop_var: onesite
+  when: not fulldone.changed

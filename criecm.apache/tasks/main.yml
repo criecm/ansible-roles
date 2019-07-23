@@ -26,6 +26,9 @@
         - '{{ apache_modsconfdir }}'
         - '{{ apache_sitesdir }}'
         - '{{ apache_includesdir }}'
+      loop_control:
+        label: '{{ item }}'
+
     - name: conf includes
       copy:
         src: '{{ item }}'
@@ -36,6 +39,9 @@
           | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_includesdir+"/*.conf")
           | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
         - '{{ ["apache/"+apache_includesdir+"/*.conf"] | map("fileglob") | list }}'
+      loop_control:
+        label: '{{ item }}'
+
     - name: conf modules
       copy:
         src: '{{ item }}'
@@ -46,6 +52,8 @@
         - '{{ group_names | union([inventory_hostname,inventory_hostname | regex_replace("[0-9]*$","")]) | unique
           | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/"+apache_modsconfdir+"/*.conf")
           | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
+      loop_control:
+        label: '{{ item }}'
     - name: conf .inc's
       copy:
         src: '{{ item }}'
@@ -56,6 +64,8 @@
           | list | map("regex_replace","^(?P<grp>.*)$","\g<grp>/apache/*.inc") | map("fileglob")
           | reject("equalto",[]) | map("flatten") | list }}'
         - '{{ ["apache/*.inc"] | map("fileglob") | list }}'
+      loop_control:
+        label: '{{ item }}'
     - name: conf include sites
       template:
         dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/Zsites.conf'
@@ -70,6 +80,8 @@
         - '{{ inventory_hostname }}/apache/default_root'
         - '{{ inventory_hostname | regex_replace("[0-9]*$","") }}/apache/default_root'
         - 'apache/default_root'
+      loop_control:
+        label: '{{ item }}'
   tags: apache, config
   when: do_sys
 

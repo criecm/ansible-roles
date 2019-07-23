@@ -1,7 +1,12 @@
+{% if "backends" in site and site.backends %}
+{% set backends = site.backends %}
+{% else %}
+{% set backends = [] %}
+{% endif %}
 # {{ ansible_managed }}
 <VirtualHost {% if site.listen | join(" ") is search(':') %}{{ site.listen | join(" ") }}{% else %}{% for l in site.listen %}*:{{ l }} {% endfor %}{% endif %}>
   ServerName {{ site.name }}
-{% if "aliases" in site and site.aliases | count() > 0 %}
+{% if "aliases" in site %}
   # aliases
 {%   for alias in site.aliases %}
   ServerAlias {{ alias }}
@@ -40,15 +45,16 @@
 {%   endif %}
 {%- endif %}
 
-{% if "backends" in site %}
+{% if backends | count() > 0 %}
+  # backends: {{ backends | join(",") }}
   # keep host name in request
   ProxyPreserveHost On
-{%   if site.backends | count() > 1 %}
+{%   if backends | count() > 1 %}
   # load balancer
   # set cookie for sticky-sessions
   Header add Set-Cookie "{{ site.id }}B=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
   <Proxy balancer://{{ site.id }}>
-{%     for backend in site.backends %}
+{%     for backend in backends %}
     BalancerMember {{ backend }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
 
 {%     endfor %}
@@ -71,14 +77,15 @@
   ProxyPass /balancer-manager !
 {%     endif %}
 
-{%   elif site.backends | count() == 1 and site.prefixes | count() == 1 and site.prefixes[0].path is regex('^/$') %}
-  # simple reverse-proxy
-  <Proxy {{ site.backends[0] | regex_replace(" .*$","")}}>
+{%   elif backends | count() == 1 and site.prefixes | count() == 1 and site.prefixes[0].path is regex('^/$') %}
+  # simple reverse-proxy (backends = {{ backends[0] }})
+  <Proxy {{ backends[0] | regex_replace(" .*$","")}}>
     Require all granted
   </Proxy>
-  ProxyPass / {{ site.backends[0] | regex_replace(" .*$","") }}/{% if site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+  ProxyPass / {{ backends[0] | regex_replace(" .*$","") }}/{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
 
-  ProxyPassReverse / {{ site.backends[0] | regex_replace(" .*$","") }}/
+  ProxyPassReverse / {{ backends[0] | regex_replace(" .*$","") }}/
+
 {%   endif %}
 {%   if monitoring_from | count > 0 and site.fcgi_status_path %}
   # monitoring
@@ -90,7 +97,18 @@
 {%   endif %}
 {% endif %}
 
-{% if "apache_includes" in site and site.apache_includes | count > 0 %}
+{% if "backend" in site and site.backend == "php-fpm" %}
+  # backend = php-fpm, fcgisocket = {{ site.fcgisocket }}
+  <FilesMatch ".*\.php$">
+{% if site.fcgisocket is match ("^/") %}
+    SetHandler "proxy:unix:{{ site.fcgisocket }}|fcgi://localhost/"
+{% else %}
+    SetHandler "proxy:fcgi://fcgisocket"
+{% endif %}
+  </FilesMatch>
+{% endif %}
+
+{% if "apache_includes" in site %}
   # site.apache_includes
 {%   for include in site.apache_includes %}
   Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
@@ -120,16 +138,16 @@
     Require all granted
 {%     endif %}
 {%   endif %}
-{%   if "backends" in site and site.backends | count() > 1 %}
+{%   if "backends" in site and backends | count() > 1 %}
 {%     if site.prefixes | count() == 1 or site.prefixes[0].path is not regex('^/$') %}
     ProxyPass balancer://{{ site.id }}{{ prefix.path }}
     
     ProxyPassReverse balancer://{{ site.id }}{{ prefix.path }}
 {%     endif %}
-{%   elif site.backends | count() == 1 %}
-    ProxyPass {{ site.backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}{% if site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+{%   elif backends | count() == 1 %}
+    ProxyPass {{ backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
     
-    ProxyPassReverse {{ site.backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}
+    ProxyPassReverse {{ backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}
 {%   endif %}
   </Location>
 {% endfor %}
@@ -165,7 +183,7 @@
 {% if site.tls and site.tls_redir %}
 <VirtualHost {% for l in site.listen %}{% if l is search(':') %}{{ l | regex_replace(':.*',':80') }} {% else %}*:80{% endif %}{% endfor %}>
   ServerName {{ site.name }}
-{% if "aliases" in site and site.aliases | count() > 0 %}
+{% if "aliases" in site %}
 {%   for alias in site.aliases %}
   ServerAlias {{ alias }}
 

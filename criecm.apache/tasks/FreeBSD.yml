@@ -17,7 +17,7 @@
     dest: '{{ apache_etcdir }}/httpd.conf'
     line: 'LoadModule {{ item }}_module libexec/apache24/mod_{{ item }}.so'
     regexp: 'LoadModule\s+{{ item }}_module\s+.*'
-    insertafter: '{{ item }}_module'
+    insertafter: '^LoadModule'
   with_items: '{{ default_enabled_modules | union(apache_enabled_modules) | difference(default_disabled_modules
               | difference(apache_enabled_modules) | union(apache_disabled_modules)) }}'
 - name: disable modules

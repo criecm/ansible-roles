@@ -1,5 +1,7 @@
-{% if site.backends | count > 0 %}
-{%   set upstream = site.id %}
+{% if "upstream" in site %}
+{%   set upstream = site.upstream %}
+{% else %}
+{%   if site.backends | count > 0 %}
 upstream {{ upstream }} {
 {%   for srv in site.backends %}
 	server {{ srv }};
@@ -8,16 +10,17 @@ upstream {{ upstream }} {
 	sticky cookie {{ site.id }}LBID expires=1h path=/;
 {%   endif %}
 }
-{% elif "fcgisocket" in site %}
-{%   set upstream = site.id %}
-{%   if site.fcgisocket | regex_search("^\/") %}
-{%     set server = "unix:"+site.fcgisocket %}
-{%   else %}
-{%     set server = site.fcgisocket %}
-{%   endif %}
+{%   elif "fcgisocket" in site %}
+{%     set upstream = site.id %}
+{%     if site.fcgisocket | regex_search("^\/") %}
+{%       set server = "unix:"+site.fcgisocket %}
+{%     else %}
+{%       set server = site.fcgisocket %}
+{%     endif %}
 upstream {{ upstream }} {
-	server {{ server }};
+	  server {{ server }};
 }
+{%   endif %}
 {% endif %}
 {% if site.tls_redir | default(False) and not proxified_by %}
 server {
@@ -60,7 +63,7 @@ server {
 	ssl_stapling    on;
 	ssl_stapling_verify     on;
 {%       endif %}
-{%       if site.hsts | default(31536000) > 0 %}
+{%       if site.hsts | int | default(31536000) > 0 %}
 	add_header Strict-Transport-Security "max-age={{ site.hsts | default(31536000) }}";
 {%       endif %}
 {%     endif %}

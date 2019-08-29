@@ -73,7 +73,7 @@
       src: '{{ site.x509_stapling_chain }}'
       dest: '{{ tls_certs_dir }}/{{ site.x509_stapling_chain | basename }}'
       mode: '0644'
-  when: '"tls_cert" in site and site.tls_cert != ""'
+  when: '"tls_cert" in site and site.tls_cert != "" and site.x509_stapling_chain != ""'
 
 - block:
   - name: x509 cert
@@ -92,7 +92,7 @@
       dest: '/etc/ssl/{{ site.name }}_stapling.pem'
       mode: '0644'
     when: 'site.x509_stapling_chain != ""'
-  when: '"tls_cert" in site and site.tls_cert != ""'
+  when: '"tls_cert" in site and site.tls_cert != "" and site.x509_stapling_chain != ""'
 
 - name: site config
   template:

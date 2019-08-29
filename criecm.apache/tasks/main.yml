@@ -101,7 +101,6 @@
   loop_control:
     loop_var: onesite
   when: mysite == '' or mysite == onesite.id
-  notify: restart apache
   tags: apache, sites
 
 - name: start apache

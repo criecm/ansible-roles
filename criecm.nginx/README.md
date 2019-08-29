@@ -152,6 +152,8 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 8,9
 * `nginx_includes`
   files or templates included inside `server {}` block
   see *Files / Templates locations* for path
+* `upstream`
+  allows to fix upstream name (for reuse in template/prefixes)
 
 ##### TLS / HTTP2
 

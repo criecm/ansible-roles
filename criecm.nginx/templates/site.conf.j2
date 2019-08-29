@@ -1,8 +1,13 @@
+## upstream
 {% if "upstream" in site %}
 {%   set upstream = site.upstream %}
+# upstream=site.upstream={{ site.upstream }}
 {% else %}
-{%   if site.backends | count > 0 %}
+# upstream=site.id={{ site.id }}
+{% if site.backends | count > 0 %}
+# upstream={{ upstream }}
 upstream {{ upstream }} {
+# site.backends={{ site.backends }}
 {%   for srv in site.backends %}
 	server {{ srv }};
 {%   endfor %}
@@ -10,21 +15,18 @@ upstream {{ upstream }} {
 	sticky cookie {{ site.id }}LBID expires=1h path=/;
 {%   endif %}
 }
-{%   elif "fcgisocket" in site %}
-{%     set upstream = site.id %}
-{%     if site.fcgisocket | regex_search("^\/") %}
-{%       set server = "unix:"+site.fcgisocket %}
-{%     else %}
-{%       set server = site.fcgisocket %}
-{%     endif %}
+{% elif "fcgisocket" in site %}
+# no site.backends but "fcgisocket" in site
+{%   set upstream = upstream | default(site.id) %}
 upstream {{ upstream }} {
-	  server {{ server }};
+	  server {% if site.fcgisocket | regex_search("^\/") %}unix:{% endif %}{{ site.fcgisocket }};
 }
-{%   endif %}
 {% endif %}
 {% if site.tls_redir | default(False) and not proxified_by %}
+## redirect http to https
+# site.tls_redir | default(False) and not proxified_by
 server {
-{% if ansible_os_family == "FreeBSD" %}
+{% if ansible_os_family in [ "FreeBSD", "OpenBSD" ] %}
 	listen *:80;
 	listen [::]:80;
 {% else %}
@@ -37,21 +39,21 @@ server {
 
 server {
 {% if "listen" in site %}
-# because site.listen {{ site.listen | join(" ")}}
+# site.listen={{ site.listen }}
 {%   for l in site.listen %}
         listen {{ l }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%   endfor %}
 {% else %}
 {%   if proxified_by %}
-# because proxified_by={{ proxified_by }}
-{% if ansible_os_family == "FreeBSD" %}
+# proxified_by={{ proxified_by }}
+{% if ansible_os_family in [ "FreeBSD", "OpenBSD" ] %}
 	listen *:80;
 	listen [::]:80;
 {% else %}
 	listen 80;
 {% endif %}
 {%   else %}
-# because site.listen_ips {{ site.listen_ips }}
+# site.listen_ips={{ site.listen_ips }}
 {%     for ip in site.listen_ips %}
 	listen	{{ ip }}:{{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%     endfor %}
@@ -71,14 +73,14 @@ server {
 {% endif %}
 
 {% if "headers" in site %}
-# because of site.headers
+# site.headers={{ site.headers }}
 {%   for h in site.headers %}
        add_header {{ h.name }} "{{ h.value }}" always;
 {%   endfor %}
 {% endif %}
 
 {% if site.upload_max_meg | default(0) > 0 %}
-# because site.upload_max_meg={{ site.upload_max_meg }}
+# site.upload_max_meg={{ site.upload_max_meg }}
 	client_max_body_size {{ ( site.upload_max_meg | int * 1.3 ) | round(0,'ceil') | int }}m;
 {% endif %}
 

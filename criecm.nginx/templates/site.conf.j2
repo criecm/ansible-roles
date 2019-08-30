@@ -4,6 +4,9 @@
 # upstream=site.upstream={{ site.upstream }}
 {% else %}
 # upstream=site.id={{ site.id }}
+{%   set upstream = site.id %}
+{% endif %}
+
 {% if site.backends | count > 0 %}
 # upstream={{ upstream }}
 upstream {{ upstream }} {

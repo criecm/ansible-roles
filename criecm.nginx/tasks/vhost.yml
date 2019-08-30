@@ -9,10 +9,7 @@
 - name: OS vars
   include_vars: '{{ ansible_os_family }}.yml'
 
-#- include_vars: site.yml
-
 - name: site tasks
   include_tasks: site.yml
   vars:
     onesite: '{{ vhost }}'
-  

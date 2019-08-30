@@ -1,8 +1,10 @@
 ---
 
-- include_vars: site.yml
+- name: site vars
+  include_vars: site.yml
 
-- set_fact:
+- name: site fact
+  set_fact:
     site: '{{ default_site | combine(onesite) }}'
 
 - name: site includes
@@ -114,5 +116,6 @@
       cacheable: yes
   when: '"fcgi_status_path" in site and site.fcgi_status_path != ""'
 
-- set_fact:
+- name: nginx_sites_done fact
+  set_fact:
     nginx_sites_done: True

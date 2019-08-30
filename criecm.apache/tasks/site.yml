@@ -5,14 +5,16 @@
 # Le fichier de conf sera copié (si .j2 c'est un template):
 #   dans /etc/apache2/sites-enables/sitexmple.conf
 #   depuis (first match wins) {{ siteconf_locations }} dans vars/site.yml:
- 
+#
 # les 'includes' seront copiés: (ex. pour 'file1.inc'):
 #   dans /etc/apache2/file1.inc
 #   depuis (first match wins) {{ include_locations }} dans vars/site.yml:
 ---
-- include_vars: site.yml
+- name: site vars
+  include_vars: site.yml
 
-- set_fact:
+- name: site fact
+  set_fact:
     site: '{{ default_site | combine(onesite) }}'
 
 - debug: var=site

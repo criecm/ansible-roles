@@ -16,6 +16,4 @@
 - name: munin master
   include_tasks: master.yml
   when: munin_host | bool and munin_role == 'master' or (munin_host not in ansible_play_batch and munin_aggr_templates | count > 0)
-  delegate_to: '{% if munin_host != inventory_hostname %}{{ munin_host }}{% else %}omit{% endif %}'
-#  delegate_facts: True
   tags: munin-master,vars

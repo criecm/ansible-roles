@@ -1,0 +1,104 @@
+---
+# tasks file for criecm.mongodb
+- name: check install
+  stat:
+    path: '{{ mongo_dbpath }}/admin'
+  register: mongoadmin
+
+- name: install
+  pkgng:
+    name:
+      - mongodb40
+      - py36-pymongo
+    state: present
+  register: mongopkg
+
+- name: zfs
+  zfs:
+    name: '{{ mongo_zfs }}'
+    state: present
+    extra_zfs_properties:
+      compression: on
+      mountpoint: '{{ mongo_dbpath }}'
+  register: mongonewzfs
+  when: mongo_zfs is defined
+
+- name: chown
+  file:
+    path: '{{ mongo_dbpath }}'
+    owner: mongodb
+    group: mongodb
+    recurse: yes
+  when: not mongoadmin.stat.exists or mongonewzfs.changed
+
+- name: check root
+  mongodb_user:
+    name: '{{ mongo_root_user }}'
+    database: 'admin'
+    login_database: admin
+    login_password: '{{ mongo_root_pass }}'
+    login_user: '{{ mongo_root_user }}'
+    update_password: on_create
+  register: mongoroot
+  ignore_errors: True
+
+- name: (re)set root
+  block:
+    - name: stop mongodb
+      service:
+        name: mongod
+        state: stopped
+    - name: temp config
+      copy:
+        dest: '{{ etcprefix }}/etc/mongodb.conf'
+        content: |
+          storage:
+              dbPath: '{{ mongo_dbpath }}'
+              directoryPerDB: true
+          systemLog:
+              destination: syslog
+              verbosity: 1
+        backup: yes
+    - name: start mongodb
+      service:
+        name: mongod
+        state: started
+        enabled: yes
+    - name: root user
+      mongodb_user:
+        name: '{{ mongo_root_user }}'
+        database: admin
+        password: '{{ mongo_root_pass }}'
+        roles:
+          - dbAdminAnyDatabase
+          - userAdminAnyDatabase
+        update_password: on_create
+  when: not mongoadmin.stat.exists or mongoroot.failed
+
+- name: config
+  copy:
+    dest: '{{ etcprefix }}/etc/mongodb.conf'
+    content: |
+      storage:
+          dbPath: {{ mongo_dbpath }}
+          directoryPerDB: true
+      systemLog:
+          destination: syslog
+          verbosity: 1
+      net:
+          {% if mongo_bindips is defined %}
+          bindIp: '{{ mongo_bindips }}'
+          {% endif %}
+          port: {{ mongo_port | default("27017") }}
+      security:
+          authorization: enabled
+  notify: restart mongodb
+
+- debug:
+    var: mongos
+
+- name: mongos
+  include_tasks: 'mongo.yml'
+  loop: '{{ mongo_global_users + mongos }}'
+  loop_control:
+    loop_var: mongo

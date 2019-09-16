@@ -1,0 +1,12 @@
+---
+- name: 'mongo {{ mongo.name }}'
+  mongodb_user:
+    name: '{{ mongo.name }}'
+    database: '{{ mongo.database }}'
+    password: '{{ mongo.password }}'
+    login_user: '{{ mongo_root_user }}'
+    login_password: '{{ mongo_root_pass }}'
+    replica_set: '{{ mongo.replica_set | default(omit) }}'
+    update_password: '{{ mongo_update_password | default(omit) }}'
+    roles: '{{ mongo.roles | default("readWrite") }}'
+

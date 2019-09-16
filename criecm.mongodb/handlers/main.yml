@@ -1,0 +1,7 @@
+---
+# handlers file for criecm.mongodb
+- name: restart mongodb
+  service:
+    name: mongod
+    state: restarted
+

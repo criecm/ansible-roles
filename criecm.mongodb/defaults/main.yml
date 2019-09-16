@@ -1,0 +1,7 @@
+---
+# defaults file for criecm.mongodb
+mongo_dbpath: '/var/db/mongodb'
+mongo_root_user: root
+mongos: []
+etcprefix: /usr/local
+mongo_global_users: []

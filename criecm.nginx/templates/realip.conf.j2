@@ -1,7 +1,9 @@
 # {{ ansible_managed }}
-map $http_x_forwarded_proto $myhttps {
+map $http_x_forwarded_proto$scheme $myhttps {
         default   '';
         https    on;
+	httpshttp       on;
+        httpshttps      on;
 }
 
 map $http_x_forwarded_proto$scheme $myscheme {

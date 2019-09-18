@@ -37,6 +37,7 @@ default_site:
   default_index: 'index.html index.htm index.txt'
   status_path: '{{ nginx_status_path }}'
   nginx_done: True
+  proxified_by: '{{ proxified_by | default([]) }}'
 
 #site: '{{ default_site | combine(onesite) }}'
 

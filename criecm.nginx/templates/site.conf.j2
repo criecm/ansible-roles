@@ -25,9 +25,9 @@ upstream {{ upstream }} {
 	  server {% if site.fcgisocket | regex_search("^\/") %}unix:{% endif %}{{ site.fcgisocket }};
 }
 {% endif %}
-{% if site.tls_redir | default(False) and not proxified_by %}
+{% if site.tls_redir | default(False) and not site.proxified_by %}
 ## redirect http to https
-# site.tls_redir | default(False) and not proxified_by
+# site.tls_redir | default(False) and not site.proxified_by
 server {
 {% if ansible_os_family in [ "FreeBSD", "OpenBSD" ] %}
 	listen *:80;
@@ -47,8 +47,8 @@ server {
         listen {{ l }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%   endfor %}
 {% else %}
-{%   if proxified_by %}
-# proxified_by={{ proxified_by }}
+{%   if site.proxified_by %}
+# site.proxified_by={{ site.proxified_by }}
 {% if ansible_os_family in [ "FreeBSD", "OpenBSD" ] %}
 	listen *:80;
 	listen [::]:80;
@@ -87,9 +87,9 @@ server {
 	client_max_body_size {{ ( site.upload_max_meg | int * 1.6 ) | round(0,'ceil') | int }}m;
 {% endif %}
 
-{% if proxified_by %}
-# proxified_by={{ proxified_by }}
-{%   for net in proxified_by %}
+{% if site.proxified_by %}
+# site.proxified_by={{ site.proxified_by }}
+{%   for net in site.proxified_by %}
 	set_real_ip_from {{ net }};
 {%   endfor %}
 	real_ip_header X-Forwarded-For;

@@ -127,6 +127,7 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 8,9
   list of networks to be trusted as reverse-proxies:
   - HTTPS accelerator included via X-Forwarded-Proto header
   - original client IP kept via realip module
+  Can be overriden per site
 
 ### per-site variables (site.X)
 

@@ -54,47 +54,33 @@
     owner: root
   when: not statrootdir.stat.exists
 
-- block:
-  - name: mkdir
-    file:
-      path: '{{ tls_certs_dir }}/private'
-      state: directory
-      mode: '0711'
-  - name: x509 cert
-    copy:
-      src: '{{ site.tls_cert }}'
-      dest: '{{ tls_certs_dir }}/{{ site.name }}.crt'
-      mode: '0400'
-  - name: x509 key
-    copy:
-      src: '{{ site.tls_key }}'
-      dest: '{{ tls_certs_dir }}/private/{{ site.name }}.key'
-      mode: '0400'
-  - name: x509 chain
-    copy:
-      src: '{{ site.x509_stapling_chain }}'
-      dest: '{{ tls_certs_dir }}/{{ site.x509_stapling_chain | basename }}'
-      mode: '0644'
-  when: '"tls_cert" in site and site.tls_cert != "" and site.x509_stapling_chain != ""'
-
-- block:
-  - name: x509 cert
-    copy:
-      src: '{{ site.tls_cert }}'
-      dest: '/etc/ssl/{{ site.name }}.crt'
-      mode: '0400'
-  - name: x509 key
-    copy:
-      src: '{{ site.tls_key }}'
-      dest: '/etc/ssl/private/{{ site.name }}.key'
-      mode: '0400'
-  - name: x509 chain
-    copy:
-      src: '{{ site.x509_stapling_chain }}'
-      dest: '/etc/ssl/{{ site.name }}_stapling.pem'
-      mode: '0644'
-    when: 'site.x509_stapling_chain != ""'
-  when: '"tls_cert" in site and site.tls_cert != "" and site.x509_stapling_chain != ""'
+- name: x509 certs
+  block:
+    - name: mkdir
+      file:
+        path: '{{ tls_certs_dir }}/private'
+        state: directory
+        mode: '0711'
+    - name: x509 cert
+      copy:
+        src: '{{ site.tls_cert }}'
+        dest: '{{ tls_certs_dir }}/{{ site.name }}.crt'
+        mode: '0400'
+      notify: reload nginx
+    - name: x509 key
+      copy:
+        src: '{{ site.tls_key }}'
+        dest: '{{ tls_certs_dir }}/private/{{ site.name }}.key'
+        mode: '0400'
+      notify: reload nginx
+    - name: x509 chain
+      copy:
+        src: '{{ site.x509_stapling_chain }}'
+        dest: '{{ tls_certs_dir }}/{{ site.x509_stapling_chain | basename }}'
+        mode: '0644'
+      when: site.x509_stapling_chain != ""
+      notify: reload nginx
+  when: '"tls_cert" in site and site.tls_cert != ""'
 
 - name: site config
   template:
@@ -102,18 +88,19 @@
     src: '{{ lookup("first_found", siteconf_locations) }}'
   notify: reload nginx
 
-- block:
-  - name: create to_monitor entry
-    set_fact:
-      tmpmon:
-        - proto: '{% if site.tls_cert or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
-          name: '{{ site.name }}'
-          path: '{{ site.fcgi_status_path }}'
-          type: fcgi-status
-  - name: fcgi-status to_monitor
-    set_fact:
-      to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
-      cacheable: yes
+- name: monitoring
+  block:
+    - name: create to_monitor entry
+      set_fact:
+        tmpmon:
+          - proto: '{% if site.tls_cert or (proxified_by | count > 0) %}https{% else %}http{% endif %}'
+            name: '{{ site.name }}'
+            path: '{{ site.fcgi_status_path }}'
+            type: fcgi-status
+    - name: fcgi-status to_monitor
+      set_fact:
+        to_monitor: '{{ to_monitor | default([]) | union(tmpmon) }}'
+        cacheable: yes
   when: '"fcgi_status_path" in site and site.fcgi_status_path != ""'
 
 - name: nginx_sites_done fact

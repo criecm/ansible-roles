@@ -9,4 +9,3 @@
     replica_set: '{{ mongo.replica_set | default(omit) }}'
     update_password: '{{ mongo_update_password | default(omit) }}'
     roles: '{{ mongo.roles | default("readWrite") }}'
-

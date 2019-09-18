@@ -36,13 +36,18 @@
     name: '{{ mongo_root_user }}'
     database: 'admin'
     login_database: admin
+    password: '{{ mongo_root_pass }}'
     login_password: '{{ mongo_root_pass }}'
     login_user: '{{ mongo_root_user }}'
-    update_password: on_create
+    roles:
+      - dbAdminAnyDatabase
+      - userAdminAnyDatabase
   register: mongoroot
   ignore_errors: True
 
-- name: (re)set root
+- debug: var=mongoroot
+
+- name: (re)set root using localhost exception
   block:
     - name: stop mongodb
       service:
@@ -73,6 +78,10 @@
           - dbAdminAnyDatabase
           - userAdminAnyDatabase
         update_password: on_create
+    - name: restart mongodb
+      service:
+        name: mongod
+        state: restarted
   when: not mongoadmin.stat.exists or mongoroot.failed
 
 - name: config
@@ -86,9 +95,9 @@
           destination: syslog
           verbosity: 1
       net:
-          {% if mongo_bindips is defined %}
+      {% if mongo_bindips is defined %}
           bindIp: '{{ mongo_bindips }}'
-          {% endif %}
+      {% endif %}
           port: {{ mongo_port | default("27017") }}
       security:
           authorization: enabled
@@ -102,3 +111,4 @@
   loop: '{{ mongo_global_users + mongos }}'
   loop_control:
     loop_var: mongo
+    label: '{{ mongo.name }}'

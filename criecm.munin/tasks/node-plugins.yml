@@ -3,7 +3,9 @@
   shell: 'munin-node-configure --shell | fgrep -v plugins/if_ | fgrep -v plugins/sendmail_ | sh'
   args:
     creates: '{{ munin_etcdir }}/plugins/load'
-  notify: restart munin node
+  notify:
+    - restart munin node
+    - restart munin asyncd
 
 - name: snmp plugin
   file:
@@ -11,7 +13,9 @@
     dest: '{{ munin_etcdir }}/plugins/snmp_localhost_if_multi'
     state: link
   when: not is_jail
-  notify: restart munin node
+  notify:
+    - restart munin node
+    - restart munin asyncd
 
 - name: additional plugins
   file:
@@ -19,18 +23,24 @@
     dest: '{{ munin_etcdir }}/plugins/{% if item|regex_search(" ") %}{{ item | regex_replace(".* ","") }}{% else %}{{ item | basename }}{% endif %}'
     state: link
   with_items: '{{ munin_plugins }}'
-  notify: restart munin node
+  notify:
+    - restart munin node
+    - restart munin asyncd
 
 - name: munin config blobs
   copy:
     dest: '{{ munin_etcdir }}/plugin-conf.d/{{ item.key }}'
     content: '{{ item.value }}'
   with_dict: '{{ munin_configs }}'
-  notify: restart munin node
+  notify:
+    - restart munin node
+    - restart munin asyncd
 
 - name: munin config files
   copy:
     dest: '{{ munin_etcdir }}/plugin-conf.d/{{ item | basename }}'
     src: '{{ item }}'
   with_items: '{{ munin_config_files }}'
-  notify: restart munin node
+  notify:
+    - restart munin node
+    - restart munin asyncd

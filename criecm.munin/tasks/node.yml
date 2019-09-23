@@ -28,9 +28,6 @@
   tags: munin-node
 
 - include_tasks: node-plugins.yml
-  notify:
-    - restart munin node
-    - restart munin asyncd
   tags: munin-node
 
 - name: munin-async user

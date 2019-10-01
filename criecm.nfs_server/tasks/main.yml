@@ -5,7 +5,6 @@
     line: '{{ item.key }}="{{ item.value }}"'
     regexp: "^{{ item.key }}="
     dest: /etc/rc.conf
-  when: item.value != ''
   with_dict:
     nfs_server_enable: 'YES'
     nfs_server_flags: '{{ mynfsd_flags }}'
@@ -13,7 +12,7 @@
     mountd_enable: "YES"
     nfsv4_server_enable: '{% if nfsv4_enable %}YES{% else %}NO{% endif %}'
   notify: restart freebsd nfs server
-  when: ansible_os_family == "FreeBSD"
+  when: ansible_os_family == "FreeBSD" and item.value != ''
 
 - name: exports
   copy:

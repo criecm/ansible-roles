@@ -1,6 +1,7 @@
 ---
 # defaults file for criecm.postgresql
-pg_version: 9.6
+pg_version: 11
+pg_upgrade: False
 
 pg_basedir: '{% if ansible_os_family == "FreeBSD" %}/var/db/postgres{% else %}/var/lib/postgresql{% endif %}'
 pg_datasubdir: '{% if ansible_os_family == "FreeBSD" %}data{{ pg_version | regex_replace("\.","") }}{% else %}{{ pg_version }}{% endif %}'

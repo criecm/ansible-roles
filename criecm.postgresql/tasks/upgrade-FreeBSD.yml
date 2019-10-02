@@ -1,0 +1,158 @@
+- name: get dbdir
+  shell: 'sysrc postgresql_data || sysrc postgresql_dbdir'
+  changed_when: False
+  register: dbdir
+  check_mode: False
+
+- name: set dbdirs facts
+  set_fact:
+    olddbdir: '{{ dbdir.stdout | regex_replace("^.*: ","") }}'
+    newdbdir: '{{ pg_basedir }}/{{ pg_datasubdir }}'
+
+- name: version change but not dbdir
+  fail:
+    msg: 'Upgrade wanted (pg_vers={{ pg_vers }},pg_old_vers={{ pg_old_vers }}) but olddbdir({{ olddbdir }}) == newdbdir({{ newdbdir }}) !!!'
+  when: pg_vers != pg_old_vers and olddbdir is match(newdbdir)
+
+- name: dir for postgres binaries backup
+  file:
+    path: '{{ olddbdir }}/packages'
+    state: directory
+  check_mode: False
+
+- name: backup postgres binaries
+  command: 'pkg create {{ item }}'
+  loop: '{{ pkgs_installed.stdout_lines }}'
+  args:
+    chdir: '{{ olddbdir }}/packages'
+    creates: '{{ olddbdir }}/packages/{{ item }}.txz'
+  check_mode: False
+
+- name: stat existing dump
+  stat:
+    path: '{{ pg_tmp_dump | default("/tmp/pg.sql") }}'
+  register: lastdump
+
+- name: last cold dump
+  block:
+    - name: stop pg
+      service:
+        name: postgresql
+        state: stopped
+
+    - name: listen 127.0.0.1 only
+      replace:
+        regexp: '^listen_addresses *= *(.*)$'
+        content: '#TMPANSIBLEUPGRADE# \1\nlisten_addresses = 127.0.0.1'
+        path: '{{ olddbdir }}/postgresql.conf'
+        backup: yes
+      register: tmpconf
+
+    - name: start pg for last dump
+      service:
+        name: postgresql
+        state: started
+
+    - name: dump server data
+      shell: 'pg_dumpall > {{ pg_tmp_dump | default("/tmp/pg.sql") }}'
+      changed_when: False
+      check_mode: False
+      when: pkgs_installed.stdout is search("postgresql[0-9]*-server")
+      register: dumpsrv
+      become: True
+      become_user: postgres
+      become_method: su
+
+    - name: stop pg
+      service:
+        name: postgresql
+        state: stopped
+
+    - name: restore postgresql.conf
+      copy:
+        dest: '{{ olddbdir }}/postgresql.conf'
+        src: '{{ tmpconf.backup_file }}'
+      when: '"backup_file" in tmpconf.keys()'
+  when: newdbdir is not match(olddbdir) and not lastdump.stat.exists
+
+- name: let's dump/restore !
+  block:
+    - name: stop postgresql
+      service:
+        name: postgresql
+        state: stopped
+
+    - name: replace packages names
+      command: 'pkg set -yn {{ item }}:{{ item | regex_replace("^postgresql"+pg_old_vers,"postgresql"+pg_vers) }}'
+      loop: '{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_vers+"-.*") | list }}'
+
+    - name: exclude contrib if vers > 10
+      set_fact:
+        pgpkgs: '{% if pg_vers > 10 %}{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_vers+"-.*") | reject("search","-contrib") | list }}{% else %}{{ pkgs_installed.stdout_lines }}{% endif %}'
+
+    - name: delete contrib if vers > 10
+      pkgng:
+        name: '{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_vers+"-contrib") | list }}'
+        state: absent
+      when: pg_vers > 10
+
+    - name: install new postgresql packages
+      command: 'pkg install -fR {{ pgpkgs | map("replace",pg_old_vers,pg_vers) | list | join(" ") }}'
+      register: installpkgs
+
+    - name: change dbdir
+      command: 'sysrc postgresql_data={{ newdbdir }}'
+      register: newdbdone
+      changed_when: newdbdone.rc == 0
+
+    - name: initdb to create new db files
+      command: /usr/local/etc/rc.d/postgresql initdb
+
+    - name: copy old postgresql.conf and pg_hba.conf
+      copy:
+        src: '{{ olddbdir }}/{{ item }}'
+        dest: '{{ newdbdir }}/{{ item }}'
+        remote_src: yes
+      loop:
+        - postgresql.conf
+        - pg_hba.conf
+      when: not ansible_check_mode
+
+    - name: restart
+      service:
+        name: postgresql
+        state: started
+
+    - name: restore data
+      command: 'psql -f {{ pg_tmp_dump | default("/tmp/pg.sql") }}'
+      become: True
+      become_user: postgres
+      become_method: su
+
+    - name: dump server data
+      shell: 'pg_dumpall > {{ pg_tmp_dump | default("/tmp/pg.sql") }}.after_upgrade'
+      changed_when: False
+      check_mode: False
+      register: dumpsrv2
+      become: True
+      become_user: postgres
+      become_method: su
+
+    - name: stat dumps
+      stat:
+        path: '{{ item }}'
+      register: dumps
+      loop:
+        - '{{ pg_tmp_dump | default("/tmp/pg.sql") }}'
+        - '{{ pg_tmp_dump | default("/tmp/pg.sql") }}.after_upgrade'
+
+    - name: delete tmp dump files
+      file:
+        path: '{{ item }}'
+        state: absent
+      loop:
+        - '{{ pg_tmp_dump | default("/tmp/pg.sql") }}'
+        - '{{ pg_tmp_dump | default("/tmp/pg.sql") }}.after_upgrade'
+      when: dumps.results[1].stat.size > dumps.results[0].stat.size / 2 | int
+      check_mode: False
+  when: newdbdir is not match(olddbdir)

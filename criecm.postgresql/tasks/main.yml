@@ -1,5 +1,5 @@
 ---
-- name: install
+- name: install/upgrade
   include_tasks: 'install-{{ ansible_os_family }}.yml'
 
 - name: log dir
@@ -71,7 +71,7 @@
     state: directory
 
 - name: install pg facts for DB
-  copy:
+  template:
     dest: '{{ etcprefix }}/etc/ansible/facts.d/pg_dbs.fact'
     mode: 'u=srwx,g=rx,o-rwx'
     owner: '{{ pg_owner }}'

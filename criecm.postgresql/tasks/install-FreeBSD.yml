@@ -1,20 +1,31 @@
 ---
-- name: install postgresql
-  pkgng:
-    name:
-      - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-server
-      - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-pltcl
-      - postgresql{{ pg_version | regex_replace("[^0-9]","") }}-contrib
-      - 'py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-pip'
-    state: present
-  register: install_pg
+- name: get postgres installed pkgs
+  shell: 'pkg info -ix postgresql'
+  register: pkgs_installed
+  changed_when: False
+  failed_when: False
+  check_mode: False
 
-- name: install psycopg2 python module
-  pip:
-    executable: 'pip-{{ ansible_python.version.major }}.{{ ansible_python.version.minor }}'
-    name: psycopg2
-    state: present
- 
+- name: facts current version
+  set_fact:
+    pg_old_vers: '{{ pkgs_installed.stdout_lines | select("match","postgresql[0-9]*-server") | list | first | regex_replace("^.*ql([0-9]*)-server.*","\1") }}'
+    pg_def_vers: '{{ pg_version | regex_replace("\.","") }}'
+    pg_vers: '{{ pg_version | regex_replace("\.","") }}'
+
+- name: facts set vers to avoid accidental upgrade
+  set_fact:
+    pg_vers: '{{ pg_old_vers }}'
+    pg_version: '{{ pkgs_installed.stdout_lines | select("match","postgresql"+pg_old_vers+"-server") | list | first | regex_replace("^.*ql[0-9]*-server-([0-9]*\.[0-9]*)\..*","\1") }}'
+    pg_datasubdir: 'data{{ pg_old_vers }}'
+  when: pg_old_vers and pg_old_vers is not match(pg_def_vers) and not pg_upgrade | bool
+
+- name: is_running ?
+  command: 'pgrep postgres'
+  register: pgrep
+  failed_when: False
+  check_mode: False
+  changed_when: False
+
 - name: login.conf
   blockinfile:
     dest: /etc/login.conf
@@ -44,6 +55,11 @@
     login_class: '{{ pg_class | default(omit) }}'
     home: '{{ pg_owner_home }}'
 
+- name: upgrade postgresql
+  include_tasks: upgrade-FreeBSD.yml
+  register: upgrade_pg
+  when: pg_old_vers and pg_old_vers != pg_vers
+
 - name: zfs
   zfs:
     name: '{{ pg_zfs_base }}/{{ pg_datasubdir }}'
@@ -51,18 +67,15 @@
     extra_zfs_properties:
       mountpoint: '{{ pg_basedir }}/{{ pg_datasubdir }}'
       recordsize: 8K
-  when: pg_zfs_base != ""
+  when: pg_zfs_base != "" and not pgrep.rc == 0
 
-- name: rc.conf
-  lineinfile:
-    dest: /etc/rc.conf
-    line: '{{ item.key }}="{{ item.value }}"'
-    regexp: '^{{ item.key }}='
-  with_items:
-    - { key: postgresql_enable, value: "YES" }
-    - { key: postgresql_dbdir, value: '{{ pg_basedir }}/{{ pg_datasubdir }}' }
-    - { key: postgresql_class, value: '{{ pg_class }}' }
-  notify: restart postgresql
+- name: dbdir chmod
+  file:
+    path: '{{ pg_basedir }}/{{ pg_datasubdir }}'
+    owner: '{{ pg_owner }}'
+    group: '{{ pg_group }}'
+    mode: '0700'
+    state: directory
 
 - name: syslog dirs
   file:
@@ -88,3 +101,38 @@
       /var/log/postgresql.log  root:{{ pg_group }}  640 7 1000  @T00  CX
   when: pg_logdest == "syslog"
   notify: newsyslog
+
+- name: install postgresql packages
+  pkgng:
+    name:
+      - 'postgresql{{ pg_vers }}-server'
+      - 'postgresql{{ pg_vers }}-pltcl'
+      - 'py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-pip'
+      - '{% if pg_version is version_compare("10","<=") %}postgresql{{ pg_vers }}-contrib{% else %}{{ omit }}{% endif %}'
+    state: present
+  register: install_pg
+  when: not upgrade_pg.changed and not pgrep.rc == 0 and not installpkgs | default(False)
+
+- name: rc.conf
+  lineinfile:
+    dest: /etc/rc.conf
+    line: '{{ item.key }}="{{ item.value }}"'
+    regexp: '^{{ item.key }}='
+  with_items:
+    - { key: postgresql_enable, value: "YES" }
+    - { key: postgresql_data, value: '{{ pg_basedir }}/{{ pg_datasubdir }}' }
+    - { key: postgresql_class, value: '{{ pg_class }}' }
+  notify: restart postgresql
+  when: not pg_old_vers
+
+- name: clean old postgresql_dbdir rc var
+  lineinfile:
+    dest: /etc/rc.conf
+    regexp: '^postgresql_dbdir='
+    state: absent
+
+- name: install psycopg2 python module
+  pip:
+    executable: 'pip-{{ ansible_python.version.major }}.{{ ansible_python.version.minor }}'
+    name: psycopg2
+    state: present

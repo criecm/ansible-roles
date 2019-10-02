@@ -11,6 +11,6 @@ host	all	{{ pg_admin_user }}	{{ pg_admin_host | default("all") }}	md5
 {% endif %}
 
 {% for u in pg_users | default([]) | union(pg_maintenance_users) %}
-host	{{ u.db	}} {{ u.name }}		{{ db.host }}	md5
+host	{{ u.db	| default("nodb") }} {{ u.name }}		{{ db.host | default("all") }}	md5
 {% endfor %}
 

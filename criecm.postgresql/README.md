@@ -1,6 +1,6 @@
 # PostgreSQL
 
-Install/setup postgresql on FreeBSD
+Install/upgrade/setup postgresql on FreeBSD
 
 ## Requirements
 
@@ -15,13 +15,15 @@ FreeBSD machine (or jail or ?)
   IP or network to allow admin user from in pg_hba.conf
 * `pg_allowed_hosts` ([])
   list of adresses allowed to connect to any DB with any user
-* `pg_version (9.6)`:
+* `pg_version (detected or 11)`:
+* `pg_upgrade (False)`:
+  Version changes won't occur unless you make it True and accept the risk
 * `pg_basedir (/var/db/postgres)`:
-* `pg_datasubdir (data96)`:
+* `pg_datasubdir (data{{ pg_version }})`:
 * `pg_owner (postgres)`:
 * `pg_group (postgres)`:
 * `pg_zfs_base ('')`:
-  if any, will create/set recordsize to 8K
+  if any, will create datasets/set recordsize to 8K
 * `pg_users ([])`:
   Users to be created, dict with keys 'db', 'name','password', 'priv'
   ( like in http://docs.ansible.com/ansible/latest/postgresql_user_module.html )
@@ -32,8 +34,11 @@ FreeBSD machine (or jail or ?)
   List of databases to create (list of dicts with keys 'name')
   eg:
     pg_dbs:
-      - { name: mydb, … }
+      - { name: mydb, owner: mydbuser }
       - { name: mydb2 }
+* `pg_tmp_dump (/tmp/pg.sql)`
+  When `pg_upgrade`, specify temp file path
+
 * `pg_config ({})`:
   dict of specifig config vars, added to postgresql.conf after templating
 
@@ -66,7 +71,23 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - { role: criecm.postgresql, pg_default_password: '42', pg_zfs_base: 'zdata/pgsql' }
+         - { role: criecm.postgresql, pg_admin_password: '42', pg_zfs_base: 'zdata/pgsql' }
+
+More complete
+
+    - hosts: dbhosts
+      roles:
+        - criecm.postgresql
+      vars:
+        pg_admin_password: '42'
+	pg_zfs_base: 'zdata/pgsql'
+	pg_dbs:
+	  - name: db1
+	    owner: app1
+	pg_users:
+	  - name: app1
+	    password: secret
+	    db: db1
 
 License
 -------

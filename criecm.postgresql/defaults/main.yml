@@ -3,6 +3,10 @@
 pg_version: 11
 pg_upgrade: False
 
+criecm_role_version: 1
+
+etcprefix: '{% if ansible_os_family == "FreeBSD" %}/usr/local{% endif %}'
+prefix: '{% if ansible_os_family == "FreeBSD" %}/usr/local{% else %}/usr{% endif %}'
 pg_basedir: '{% if ansible_os_family == "FreeBSD" %}/var/db/postgres{% else %}/var/lib/postgresql{% endif %}'
 pg_datasubdir: '{% if ansible_os_family == "FreeBSD" %}data{{ pg_version | regex_replace("\.","") }}{% else %}{{ pg_version }}{% endif %}'
 pg_logdir: /var/log/postgresql

@@ -15,7 +15,7 @@
     - '127.0.0.1'
   loop_control:
     loop_var: munin_server
-  when: not munin_async
+  when: not munin_async or munin_async_and_node
   tags: munin-node
 
 - name: listen localhost only
@@ -24,7 +24,7 @@
     line: 'host 127.0.0.1'
     regexp: '^host '
     insertafter: 'host'
-  when: munin_async
+  when: munin_async and not munin_async_and_node
   tags: munin-node
 
 - include_tasks: node-plugins.yml

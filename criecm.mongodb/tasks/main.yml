@@ -63,9 +63,10 @@
           systemLog:
               destination: syslog
               verbosity: 1
-          hostinfo:
-              system:
-                  memLimitMB: {{ mongo_memlimit | default(ansible_memtotal_mb / 2 | int) }}
+          storage:
+              wiredTiger:
+                  engineConfig:
+                      cacheSizeGB: '{{ mongo_memlimit / 1024 | default(ansible_memtotal_mb / 2) | int }}'
         backup: yes
     - name: start mongodb
       service:

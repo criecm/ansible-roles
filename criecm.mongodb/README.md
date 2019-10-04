@@ -25,6 +25,8 @@ Manage mongodb instance
   If defined, use this zfs for dbdir
 * `mongo_global_users ([])`
   Define users globally (eg: monitoring) - same format as `mongos`
+* `mongo_memlimit (RAM/2)`
+  Change what mongo thinks total RAM is.
 
 ## Dependencies
 

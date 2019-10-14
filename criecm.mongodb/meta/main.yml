@@ -1,6 +1,7 @@
 galaxy_info:
+  role_name: mongodb
   author: geoffroy desvernay
-  description: Yet another sysadmin
+  description: mongodb FreeBSD
   company: Ecole Centrale de Marseille
 
   # If the issue tracker for your role is not on github, uncomment the

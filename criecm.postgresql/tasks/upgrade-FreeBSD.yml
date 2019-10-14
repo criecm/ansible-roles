@@ -82,22 +82,26 @@
         name: postgresql
         state: stopped
 
-    - name: replace packages names
-      command: 'pkg set -yn {{ item }}:{{ item | regex_replace("^postgresql"+pg_old_vers,"postgresql"+pg_vers) }}'
-      loop: '{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_vers+"-.*") | list }}'
-
-    - name: exclude contrib if vers > 10
-      set_fact:
-        pgpkgs: '{% if pg_vers > 10 %}{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_vers+"-.*") | reject("search","-contrib") | list }}{% else %}{{ pkgs_installed.stdout_lines }}{% endif %}'
-
     - name: delete contrib if vers > 10
       pkgng:
-        name: '{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_vers+"-contrib") | list }}'
+        name: '{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_old_vers+"-contrib") | list }}'
         state: absent
-      when: pg_vers > 10
+      when: pg_vers | int > 10
+      register: pkgrm
+
+    - name: relist pkgs
+      shell: 'pkg info -ix postgresql'
+      register: pkgs_installed
+      changed_when: False
+      failed_when: False
+      check_mode: False
+
+    - name: replace packages names
+      command: 'pkg set -yn postgresql{{ pg_old_vers }}-{{ item }}:postgresql{{ pg_vers }}-{{ item }}'
+      loop: '{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_old_vers+"-.*") | list | map("regex_replace","^postgresql"+pg_old_vers+"-([^-]+)-[0-9].*$","\1") | list }}'
 
     - name: install new postgresql packages
-      command: 'pkg install -fR {{ pgpkgs | map("replace",pg_old_vers,pg_vers) | list | join(" ") }}'
+      command: 'pkg install -yfR {{ pkgs_installed.stdout_lines | map("regex_replace",pg_old_vers+"(-[^-]+)-[0-9].*$",pg_vers+"\1") | list | join(" ") }}'
       register: installpkgs
 
     - name: change dbdir

@@ -8,14 +8,17 @@
 
 - name: facts current version
   set_fact:
-    pg_old_vers: '{{ pkgs_installed.stdout_lines | select("match","postgresql[0-9]*-server") | list | first | regex_replace("^.*ql([0-9]*)-server.*","\1") }}'
+    pg_old_vers: '{{ pkgs_installed.stdout_lines | select("match","postgresql[0-9]*-server") 
+    | list | first | regex_replace("^.*ql([0-9]*)-server.*","\1") }}'
     pg_def_vers: '{{ pg_version | regex_replace("\.","") }}'
     pg_vers: '{{ pg_version | regex_replace("\.","") }}'
 
 - name: facts set vers to avoid accidental upgrade
   set_fact:
     pg_vers: '{{ pg_old_vers }}'
-    pg_version: '{{ pkgs_installed.stdout_lines | select("match","postgresql"+pg_old_vers+"-server") | list | first | regex_replace("^.*ql[0-9]*-server-([0-9]*\.[0-9]*)\..*","\1") }}'
+    pg_version: '{{ pkgs_installed.stdout_lines 
+    | select("match","postgresql"+pg_old_vers+"-server") 
+    | list | first | regex_replace("^.*ql[0-9]*-server-([0-9]*\.[0-9]*)\..*","\1") }}'
     pg_datasubdir: 'data{{ pg_old_vers }}'
   when: pg_old_vers and pg_old_vers is not match(pg_def_vers) and not pg_upgrade | bool
 
@@ -67,7 +70,7 @@
     extra_zfs_properties:
       mountpoint: '{{ pg_basedir }}/{{ pg_datasubdir }}'
       recordsize: 8K
-  when: pg_zfs_base != "" and not pgrep.rc == 0
+  when: pg_zfs_base | lenght > 0 and not pgrep.rc == 0
 
 - name: dbdir chmod
   file:

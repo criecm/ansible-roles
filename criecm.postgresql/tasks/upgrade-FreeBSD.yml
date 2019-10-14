@@ -90,7 +90,7 @@
       register: pkgrm
 
     - name: relist pkgs
-      shell: 'pkg info -ix postgresql'
+      command: 'pkg info -ix postgresql'
       register: pkgs_installed
       changed_when: False
       failed_when: False
@@ -98,7 +98,9 @@
 
     - name: replace packages names
       command: 'pkg set -yn postgresql{{ pg_old_vers }}-{{ item }}:postgresql{{ pg_vers }}-{{ item }}'
-      loop: '{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_old_vers+"-.*") | list | map("regex_replace","^postgresql"+pg_old_vers+"-([^-]+)-[0-9].*$","\1") | list }}'
+      loop: '{{ pkgs_installed.stdout_lines 
+      | map("regex_search","^postgresql"+pg_old_vers+"-.*") | list 
+      | map("regex_replace","^postgresql"+pg_old_vers+"-([^-]+)-[0-9].*$","\1") | list }}'
 
     - name: install new postgresql packages
       command: 'pkg install -yfR {{ pkgs_installed.stdout_lines | map("regex_replace",pg_old_vers+"(-[^-]+)-[0-9].*$",pg_vers+"\1") | list | join(" ") }}'

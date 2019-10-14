@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: postgresql
   author: Geoffroy Desvernay
   description: postgresql server + DBs
   company: Ecole Centrale Marseille
@@ -13,6 +14,6 @@ galaxy_info:
         - all
 
   galaxy_tags:
-    - mariadb
+    - postgresql
 
 dependencies: []

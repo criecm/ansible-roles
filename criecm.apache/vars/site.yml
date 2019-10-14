@@ -35,4 +35,3 @@ default_site:
     - path: /
       allow_from_nets: []
   fcgi_status_path: ''
-

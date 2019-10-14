@@ -1,18 +1,18 @@
 ---
 galaxy_info:
+  role_name: apache
   author: Geoffroy Desvernay
   description: apache webserver and sites
   company: Ecole Centrale Marseille
 
   license: BSD
 
-  min_ansible_version: 2.6
+  min_ansible_version: 2.8
 
   platforms:
     - name: FreeBSD
       versions:
-        - 11.2
-        - 12.0
+        - all
     - name: Debian
       versions:
         - jessie

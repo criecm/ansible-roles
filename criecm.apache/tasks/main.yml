@@ -100,7 +100,7 @@
   with_items: '{{ sites }}'
   loop_control:
     loop_var: onesite
-  when: mysite == '' or mysite == onesite.id
+  when: mysite | lenght > 0 or mysite == onesite.id
   tags: apache, sites
 
 - name: start apache

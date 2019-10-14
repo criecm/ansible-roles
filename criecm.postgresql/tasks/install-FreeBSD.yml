@@ -70,7 +70,7 @@
     extra_zfs_properties:
       mountpoint: '{{ pg_basedir }}/{{ pg_datasubdir }}'
       recordsize: 8K
-  when: pg_zfs_base | lenght > 0 and not pgrep.rc == 0
+  when: pg_zfs_base | length > 0 and not pgrep.rc == 0
 
 - name: dbdir chmod
   file:

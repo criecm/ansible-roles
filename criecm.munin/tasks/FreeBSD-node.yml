@@ -3,4 +3,3 @@
   pkgng:
     name: munin-node
     state: present
-

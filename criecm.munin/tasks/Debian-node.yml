@@ -1,9 +1,11 @@
 ---
-- apt:
+- name: apt install munin-node
+  apt:
     name: munin-node
     state: present
 
-- apt:
+- name: apt install munin-async
+  apt:
     name: munin-async
     state: present
   when: munin_async

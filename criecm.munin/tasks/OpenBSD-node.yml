@@ -3,4 +3,3 @@
   openbsd_pkg:
     name: munin-node
     state: present
-

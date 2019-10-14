@@ -1,4 +1,5 @@
 ---
-- apt:
+- name: apt install
+  apt:
     name: munin
     state: present

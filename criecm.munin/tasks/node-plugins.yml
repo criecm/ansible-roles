@@ -1,6 +1,7 @@
 ---
 - name: enable default plugins
-  shell: 'munin-node-configure --shell | fgrep -v plugins/if_ | fgrep -v plugins/sendmail_ | sh'
+  shell: 'set -o pipefail
+  munin-node-configure --shell | fgrep -v plugins/if_ | fgrep -v plugins/sendmail_ | sh'
   args:
     creates: '{{ munin_etcdir }}/plugins/load'
   notify:

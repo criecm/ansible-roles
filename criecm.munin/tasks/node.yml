@@ -76,6 +76,5 @@
       {% endif %}
     force: no
   delegate_to: '{{ munin_host }}'
-  when: munin_host != ''
+  when: munin_host | lenght > 0
   tags: munin-node
-

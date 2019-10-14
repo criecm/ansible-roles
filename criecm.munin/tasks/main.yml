@@ -10,7 +10,7 @@
 
 - name: munin node
   include_tasks: node.yml
-  when: munin_host != ''
+  when: munin_host | lenght > 0
   tags: munin-node,vars
 
 - name: munin master

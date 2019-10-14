@@ -9,7 +9,8 @@
     regexp: '^rrdcached_socket'
     insertafter: '^include'
 
-- user:
+- name: munin user
+  user:
     name: munin
     group: munin
     generate_ssh_key: yes
@@ -48,4 +49,3 @@
 #    state: absent
 #  when: do_cleanup and alist.rc == 0 and item not in ialist.stdout_lines | map(attribute="item") | list()
 #  with_items: '{{ alist.files | regex_replace("^.*ansible-aggr-","") }}'
-

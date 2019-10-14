@@ -134,10 +134,10 @@
           name: '{{ site.name }}'
           path: '{{ site.fcgi_status_path }}'
           type: '{{ site.backend | default ("http_status") }}'
-    when: '"fcgi_status_path" in site and site.fcgi_status_path | lenght > 0'
+    when: '"fcgi_status_path" in site and site.fcgi_status_path | length > 0'
 
   - name: add status_pathes to to_monitor
     set_fact:
       to_monitor: '{{ to_monitor | default([]) | union(tmpmon) | union( tmpmonfcgi | default([]) ) }}'
       cacheable: yes
-  when: '"status_path" in site and site.status_path | lenght > 0'
+  when: '"status_path" in site and site.status_path | length > 0'

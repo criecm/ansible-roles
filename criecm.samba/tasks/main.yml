@@ -45,12 +45,10 @@
     state: directory
   tags: samba, config
 
-- name: ansible_shares.conf
-  template:
-    src: ansible_shares.conf.j2
-    dest: '{{ smbconf_path }}.d/ansible_shares.conf'
-  tags: samba, shares, config
-  notify: reload samba
+- name: remove ansible_shares.conf
+  file:
+    path: '{{ smbconf_path }}.d/ansible_shares.conf'
+    state: absent
 
 - name: smb.conf
   template:

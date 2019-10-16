@@ -1,6 +1,5 @@
 # {{ ansible_managed }}
-
-{% for share in group_shares | union(shares) %}
+# {{ share }}
 {% if "cifs" in share and share.cifs %}
 [{{ share.name }}]
   path = {{ share.path }}
@@ -9,4 +8,3 @@
 {%   endfor %}
 
 {% endif %}
-{% endfor %}

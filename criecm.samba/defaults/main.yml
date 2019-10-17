@@ -1,6 +1,6 @@
 ---
 # defaults file for criecm.samba
-smb_domain:
+smb_domain: ''
 
 smb_ips: []
 smb_allow:

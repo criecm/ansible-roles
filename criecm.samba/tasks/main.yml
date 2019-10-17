@@ -63,7 +63,8 @@
 
 - name: save ldap passwd (IDMAP)
   command: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'
-  when: newconf.changed and smb_domain | length > 0 and ( smb_ldap_adminpw | length > 0 or smb_ldap_readpw | length > 0 ) and is_dc and not smb_is_pdc
+  when: newconf.changed and smb_domain | length > 0
+    and ( smb_ldap_adminpw is defined or smb_ldap_readpw is defined ) and is_dc and not smb_is_pdc
   tags: samba, config
 
 - name: save ldap adminpw

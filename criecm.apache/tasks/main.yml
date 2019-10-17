@@ -100,7 +100,7 @@
   with_items: '{{ sites }}'
   loop_control:
     loop_var: onesite
-  when: mysite | length > 0 or mysite == onesite.id
+  loop: '{% if mysite | length > 0 %}{{ sites | selectattr("id","match",mysite+"$") | list }}{% else %}{{ sites }}{% endif %}'
   tags: apache, sites
 
 - name: start apache

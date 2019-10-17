@@ -149,5 +149,8 @@ lm announce = no
 {% endif %}
 
 include = {{ smbconf_path }}.d/local.conf
-include = {{ smbconf_path }}.d/ansible_shares.conf
-
+{% for share in (shares + group_shares) %}
+{% if 'cifs' in share and share.cifs %}
+include = {{ smbconf_path }}.d/ansible_{{ share.name }}.conf
+{% endif %}
+{% endfor %}

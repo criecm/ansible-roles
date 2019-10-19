@@ -37,3 +37,9 @@ do_local_log: True
 mysite: ''
 
 syslog_server: False
+
+# https://thoughts.t37.net/optimisations-nginx-bien-comprendre-sendfile-tcp-nodelay-et-tcp-nopush-2ab3f33432ca
+nginx_sendfile: 'on'
+nginx_tcp_nopush: 'on'
+nginx_aio: 'off'
+nginx_tcp_nodelay: 'on'

@@ -120,6 +120,14 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 8,9
   if defined, will only process this `site.id`
 * `nginx_default_site ('default')`
   set it to '' to prevent default site to be installed
+* `nginx_aio (off)`
+  use aio (asynchronous file I/O (AIO) on FreeBSD and Linux) - for big files
+* `nginx_sendfile (on)`
+  use sendfile (mmap files)
+* `nginx_tcp_nopush (on)`
+  use tcp_nopush (you want it with sendfile for zero-copy)
+* `nginx_tcp_nodelay (on)`
+  use tcp_nodelay (do not wait for tcp packets to be filled)
 
 ### if behind reverse-proxy
 

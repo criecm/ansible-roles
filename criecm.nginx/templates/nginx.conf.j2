@@ -30,6 +30,7 @@ http {
 	{% if do_local_access_log | default(do_local_log) %}
 	access_log	{{ nginx_log_dir }}/access.log combined;
 	{% endif %}
+
 	{% if syslog_server %}
 	access_log syslog:server={{ syslog_server }},facility=local5 combined;
 	{% endif %}
@@ -37,11 +38,11 @@ http {
 	server_tokens	off;
 
 	# https://thoughts.t37.net/optimisations-nginx-bien-comprendre-sendfile-tcp-nodelay-et-tcp-nopush-2ab3f33432ca
-	# si fichiers statiques, les deux:
-	#sendfile	on;
-	#tcp_nopush	on;
+	sendfile	{{ nginx_sendfile }};
+	tcp_nopush	{{ nginx_tcp_nopush }};
+	aio	{{ nginx_aio }};
+	tcp_nodelay	{{ nginx_tcp_nodelay }};
 	#sendfile_max_chunk 512k;
-	tcp_nodelay on;
 
 	keepalive_timeout	65;
 

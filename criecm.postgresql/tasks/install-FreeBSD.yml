@@ -8,8 +8,8 @@
 
 - name: facts current version
   set_fact:
-    pg_old_vers: '{{ pkgs_installed.stdout_lines | select("match","postgresql[0-9]*-server") 
-    | list | first | regex_replace("^.*ql([0-9]*)-server.*","\1") }}'
+    pg_old_vers: '{% if pkgs_installed.stdout_lines | count > 0 %}{{ pkgs_installed.stdout_lines | select("match","postgresql[0-9]*-server")
+        | list | first | regex_replace("^.*ql([0-9]*)-server.*","\1") }}{% endif %}'
     pg_def_vers: '{{ pg_version | regex_replace("\.","") }}'
     pg_vers: '{{ pg_version | regex_replace("\.","") }}'
 
@@ -20,7 +20,7 @@
     | select("match","postgresql"+pg_old_vers+"-server") 
     | list | first | regex_replace("^.*ql[0-9]*-server-([0-9]*\.[0-9]*)\..*","\1") }}'
     pg_datasubdir: 'data{{ pg_old_vers }}'
-  when: pg_old_vers and pg_old_vers is not match(pg_def_vers) and not pg_upgrade | bool
+  when: pg_old_vers | length > 0 and pg_old_vers is not match(pg_def_vers) and not pg_upgrade | bool
 
 - name: is_running ?
   command: 'pgrep postgres'
@@ -49,6 +49,11 @@
 - name: cap_mkdb
   command: '/usr/bin/cap_mkdb /etc/login.conf'
   when: loginconf.changed
+
+- name: postgres group
+  group:
+    name: '{{ pg_group }}'
+    state: present
 
 - name: postgres user
   user:
@@ -111,10 +116,15 @@
       - 'postgresql{{ pg_vers }}-server'
       - 'postgresql{{ pg_vers }}-pltcl'
       - 'py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-pip'
-      - '{% if pg_version is version_compare("10","<=") %}postgresql{{ pg_vers }}-contrib{% else %}{{ omit }}{% endif %}'
     state: present
   register: install_pg
   when: not upgrade_pg.changed and not pgrep.rc == 0 and not installpkgs | default(False)
+
+- name: 'install postgresql-contrib when version < 11'
+  pkgng:
+    name: 'postgresql{{ pg_vers }}-contrib'
+    state: present
+  when: install_pg.changed and pg_version is version("11","<")
 
 - name: rc.conf
   lineinfile:

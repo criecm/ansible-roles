@@ -26,11 +26,19 @@
     recurse: yes
   when: not pg_db_exists.stat.exists
 
+- name: enable service
+  service:
+    name: postgresql
+    enabled: yes
+
 # first install
 - name: init postgresql server
+#  command: 'service postgresql {% if ansible_os_family == "FreeBSD" %}one{% endif %}initdb'
   command: 'service postgresql initdb'
   when: not pg_db_exists.stat.exists
   register: pg_init
+  args:
+    warn: False
 
 # postgresql.conf
 - name: postgresql.conf.j2

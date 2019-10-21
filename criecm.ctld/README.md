@@ -1,6 +1,7 @@
 # criecm.ctld
 
-* Creates ZFS volumes for defined targets (if they are in /dev/zvol AND volsuze is defined)
+* Creates ZFS volumes for defined targets (if they are in /dev/zvol AND ( volsize is defined OR origin is defined))
+  usese criecm.zfs for this
 
 * Configure ctl daemon (kernel-mode iscsi target)
 

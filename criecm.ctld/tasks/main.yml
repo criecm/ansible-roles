@@ -1,20 +1,27 @@
 ---
 # tasks file for criecm.ctld
 
+- name: fail if needed
+  fail:
+    msg: "origin is not a snapshot or volsize doesn't match [0-9]+[MGT] for iscsi id {{ y.id }}"
+  loop: '{{ iscsi_targets | json_query(iscsi_json_query) | flatten(levels=1) | selectattr("path","match","^/dev/zvol") | list }}'
+  loop_control:
+    loop_var: y
+  when: ( y.origin is defined and y.origin and y.origin is not search("@") ) or ( y.volsize is defined and y.volsize and y.volsize is not match("[0-9]+[MGT]") )
+
 - name: zfs vol
   include_role:
     name: criecm.zfs
     tasks_from: zfs.yml
   vars:
-    jq: "*.luns.*.{path: path, origin: origin, volsize: volsize}"
-    zfs:
+    onezfs:
       zfsrc: '{{ z.path | replace("/dev/zvol/","") }}'
       origin: '{{ z.origin | default(omit) }}'
       volsize: '{{ z.volsize | default(omit) }}'
-  loop: '{{ iscsi_targets | json_query(jq) | flatten(levels=1) | selectattr("path","match","^/dev/zvol") | list }}'
+  loop: '{{ iscsi_targets | json_query(iscsi_json_query) | flatten(levels=1) | selectattr("path","match","^/dev/zvol") | list }}'
   loop_control:
     loop_var: z
-  when: z.origin | default("") | length > 0 or z.volsize | default("") | length > 0
+  when: ( z.origin is defined and z.origin and z.origin is search("@") ) or ( z.volsize is defined and z.volsize and z.volsize is match("[0-9]+[MGT]") )
 
 - name: ctl.conf template
   template:

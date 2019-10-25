@@ -86,6 +86,12 @@
   when: nsdcfg.changed
   tags: config, nsd, skip_ansible_lint
 
+- name: get zones patterns
+  shell: "nsd-control zonestatus | awk '/^zone:/{zone=$2}/pattern:/{printf(\"%s %s\\n\",zone,$2);}'"
+  register: zpatterns
+  check_mode: False
+  changed_when: False
+
 - include_tasks: zone.yml
   with_items: '{{ nsd_zones }}'
   loop_control:

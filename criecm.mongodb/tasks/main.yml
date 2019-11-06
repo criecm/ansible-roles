@@ -66,7 +66,7 @@
           storage:
               wiredTiger:
                   engineConfig:
-                      cacheSizeGB: '{{ mongo_memlimit / 1024 | default(ansible_memtotal_mb / 2) | int }}'
+                      cacheSizeGB: '{{ mongo_memlimit | default(ansible_memtotal_mb * 512) / 1024 | int }}'
         backup: yes
     - name: start mongodb
       service:

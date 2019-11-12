@@ -1,0 +1,13 @@
+---
+- name: 'pg user {{ pg_user.name }}'
+  postgresql_user:
+    name: '{{ pg_user.name }}'
+    db: '{{ pg_user.db | default(omit) }}'
+    priv: '{{ pg_user.priv | default(omit) }}'
+    role_attr_flags: '{{ pg_user.role_attr_flags | default(omit) }}'
+    password: '{{ pg_user.password | default(pg_user.name+pg_random | hash("sha256")) }}'
+    state: present
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su
+

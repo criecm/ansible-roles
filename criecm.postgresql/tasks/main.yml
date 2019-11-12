@@ -99,28 +99,17 @@
 
 # admin users
 - name: pg users
-  postgresql_user:
-    name: '{{ item.name }}'
-    db: '{{ item.db | default(omit) }}'
-    priv: '{{ item.priv | default(omit) }}'
-    role_attr_flags: '{{ item.role_attr_flags | default(omit) }}'
-    password: '{{ item.password | default(item.name+pg_random | hash("sha256")) }}'
-    state: present
-  with_items: '{{ pg_users | union(pg_maintenance_users) }}'
+  include_tasks: user.yml
+  loop_control:
+    loop_var: pg_user
+  loop: '{{ pg_users | union(pg_maintenance_users) }}'
   when: pg_init.changed | default(False)
-  become: True
-  become_user: '{{ pg_owner }}'
-  become_method: su
 
 # DBs
 - name: new dbs
-  postgresql_db:
-    name: '{{ item.name }}'
-    owner: '{{ item.owner | default(omit) }}'
-    state: present
-  with_items:
-    - '{{ pg_dbs }}'
+  include_tasks: db.yml
+  loop_control:
+    loop_var: pg_db
+  loop: '{{ pg_dbs }}'
   when: 'pg_dbs | count > 0'
-  become: True
-  become_user: '{{ pg_owner }}'
-  become_method: su
+

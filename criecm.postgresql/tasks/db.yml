@@ -1,0 +1,9 @@
+---
+- name: create DB
+  postgresql_db:
+    name: '{{ pg_db.name }}'
+    owner: '{{ pg_db.owner | default(omit) }}'
+    state: present
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su

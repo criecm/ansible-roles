@@ -104,8 +104,9 @@
 
 - name: site apache config
   template:
-    dest: '{{ apache_etcdir }}/{{ apache_sitesdir }}/{{ site.id }}.conf'
+    dest: '{{ apache_etcdir }}/{{ apache_sitesdir }}/{% if site.id == "default" %}0{% endif %}{{ site.id }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'
+    force: '{{ apache_rewrite_config | default(False) | bool }}'
   notify: restart apache
 
 - name: Listen in Zsites.conf

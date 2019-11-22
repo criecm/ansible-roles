@@ -12,7 +12,7 @@
 upstream {{ upstream }} {
 # site.backends={{ site.backends }}
 {%   for srv in site.backends %}
-	server {{ srv }};
+	server {{ srv | regex_replace("^.*://","") }};
 {%   endfor %}
 {%   if site.backends | count > 1 %}
 	sticky cookie {{ site.id }}LBID expires=1h path=/;
@@ -30,8 +30,12 @@ upstream {{ upstream }} {
 # site.tls_redir | default(False) and not site.proxified_by
 server {
 {% if ansible_os_family in [ "FreeBSD", "OpenBSD" ] %}
+{%   if ansible_all_ipv4_addresses | count > 0 %}
 	listen *:80;
+{%   endif %}
+{%   if ansible_all_ipv6_addresses | count > 0 %}
 	listen [::]:80;
+{%   endif %}
 {% else %}
 	listen 80;
 {% endif %}
@@ -101,6 +105,9 @@ server {
 	location / {
 		root	{{ site.rootdir }};
 		index	{{ site.default_index | default("index.html index.htm") }};
+{%   if "backends" in site and not ( "backend" in site and "php" in site.backend ) %}
+		proxy_pass {{ site.backends[0] | regex_replace("://.*","") }}://{{ upstream }};
+{%   endif %}
 	}
 {%   if "backend" in site and "php" in site.backend %}
 # site.backend={{ site.backend }}
@@ -135,7 +142,7 @@ server {
 {% for net in monitoring_from + admin_from | list | unique %}
 		allow {{ net }};
 {% endfor %}
-		status;
+		stub_status;
 		deny all;
 	}
 {% endif %}

@@ -43,3 +43,5 @@ nginx_sendfile: 'on'
 nginx_tcp_nopush: 'on'
 nginx_aio: 'off'
 nginx_tcp_nodelay: 'on'
+
+etcprefix: ''

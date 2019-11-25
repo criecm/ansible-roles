@@ -1,0 +1,18 @@
+[Unit]
+Description={{ node_app.name }} server
+#Requires=redis.service
+After=syslog.target network.target
+
+[Service]
+Environment="NODE_ENV={{ node_app.env | default('production') }}"
+WorkingDirectory={{ node_app.path }}
+ExecStart=/usr/bin/node {{ node_app.script }}
+Type=simple
+User={{ node_app.user }}
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+# Alias={{ node_app.name }}.service
+

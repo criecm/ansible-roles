@@ -29,6 +29,8 @@ Install/run node apps on FreeBSD (could be easily adapted)
 * `script` (app.js)
 * `gitsrc` ('')
   Git repository source
+* `gitversion ('master')`
+  Git repo tag/branch
 * `update` (`node_update_git`)
   Will update source code
 * `force` (`node_force_git`)

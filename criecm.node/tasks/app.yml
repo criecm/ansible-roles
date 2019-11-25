@@ -19,6 +19,7 @@
     dest: '{{ node_app.path }}'
     update: '{{ node_app.gitupdate }}'
     force: '{{ node_app.gitforce }}'
+    version: '{{ node_app.gitversion | default(omit) }}'
   when: '"gitsrc" in node_app'
   register: gitted
 
@@ -53,6 +54,17 @@
     src: FreeBSD-rc.j2
     dest: '/usr/local/etc/rc.d/{{ node_app.name }}'
     mode: '0755'
+  when: ansible_os_family == "FreeBSD"
+
+- name: install systemd unit
+  block:
+    - name: service template
+      template:
+        src: systemd.service.j2
+        dest: '/home/{{ node_app.user }}/{{ node_app.name }}.service'
+    - name: enable service
+      command: 'systemctl enable /home/{{ node_app.user }}/{{ node_app.name }}.service'
+  when: ansible_os_family == "Debian"
 
 - name: stop app
   service:

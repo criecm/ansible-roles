@@ -1,0 +1,8 @@
+---
+- name: 'install nodejs'
+  apt:
+    name:
+      - 'nodejs'
+      - 'npm'
+      - 'git'
+    state: present

@@ -43,12 +43,13 @@
   file:
     dest: '{{ smbconf_path }}.d'
     state: directory
-  tags: samba, config
+  tags: samba,shares,config
 
 - name: remove ansible_shares.conf
   file:
     path: '{{ smbconf_path }}.d/ansible_shares.conf'
     state: absent
+  tags: samba, config
 
 - name: smb.conf
   template:

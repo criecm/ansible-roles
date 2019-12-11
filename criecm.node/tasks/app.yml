@@ -39,6 +39,7 @@
   template:
     src: '{{ item.src }}'
     dest: '{{ item.dest | regex_replace("^([^/])",node_app.path+"/\1") }}'
+    force: '{{ node_force_conf | default(False) }}'
   with_items: '{{ node_app.confs | default([]) }}'
   register: confs
 

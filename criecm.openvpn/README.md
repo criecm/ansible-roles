@@ -4,14 +4,14 @@
   * openvpn_key_files
 
 ## files
- files/openvpn/openvpn.conf
- files/openvpn/ta.key
- files/openvpn/keys/{{ openvpn_key_files }}
+ files/openvpn/etc/openvpn.conf
+ files/openvpn/etc/ta.key
+ files/openvpn/etc/keys/{{ openvpn_key_files }}
 
 ## multi-profiles
 
 si `openvpn_configs` = [ 'udp','tcp' ]
 
 files:
-  - files/openvpn/openvpn_udp.conf
-  - files/openvpn/openvpn_tcp.conf
+  - files/openvpn/etc/openvpn_udp.conf
+  - files/openvpn/etc/openvpn_tcp.conf

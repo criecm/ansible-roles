@@ -83,7 +83,7 @@
     dest: '{{ etcprefix }}/etc/ansible/facts.d/pg_dbs.fact'
     mode: 'u=srwx,g=rx,o-rwx'
     owner: '{{ pg_owner }}'
-    src: templates/pg.fact.j2
+    src: pg.fact.j2
 
 # default admins
 - name: 'pg user {{ pg_admin_user }}'

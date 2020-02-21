@@ -72,6 +72,7 @@
       copy:
         dest: '{{ olddbdir }}/postgresql.conf'
         src: '{{ tmpconf.backup_file }}'
+        remote_src: True
       when: '"backup_file" in tmpconf.keys()'
   when: newdbdir is not match(olddbdir) and not lastdump.stat.exists
 
@@ -81,20 +82,6 @@
       service:
         name: postgresql
         state: stopped
-
-    - name: delete contrib if vers > 10
-      pkgng:
-        name: '{{ pkgs_installed.stdout_lines | map("regex_search","^postgresql"+pg_old_vers+"-contrib") | list }}'
-        state: absent
-      when: pg_vers | int > 10
-      register: pkgrm
-
-    - name: relist pkgs
-      command: 'pkg info -ix postgresql'
-      register: pkgs_installed
-      changed_when: False
-      failed_when: False
-      check_mode: False
 
     - name: replace packages names
       command: 'pkg set -yn postgresql{{ pg_old_vers }}-{{ item }}:postgresql{{ pg_vers }}-{{ item }}'

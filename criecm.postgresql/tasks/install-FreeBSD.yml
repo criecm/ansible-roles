@@ -115,16 +115,11 @@
     name:
       - 'postgresql{{ pg_vers }}-server'
       - 'postgresql{{ pg_vers }}-pltcl'
+      - 'postgresql{{ pg_vers }}-contrib'
       - 'py{{ ansible_python.version.major }}{{ ansible_python.version.minor }}-pip'
     state: present
   register: install_pg
   when: not upgrade_pg.changed and not pgrep.rc == 0 and not installpkgs | default(False)
-
-- name: 'install postgresql-contrib when version < 11'
-  pkgng:
-    name: 'postgresql{{ pg_vers }}-contrib'
-    state: present
-  when: install_pg.changed and pg_version is version("11","<")
 
 - name: rc.conf
   lineinfile:

@@ -50,7 +50,7 @@
 
 - name: copy openvpn state files
   copy:
-    src: 'openvpn/etc/{{ item }}-ipp.txt'
+    src: 'files/openvpn/etc/{{ item }}-ipp.txt'
     dest: '/usr/local/etc/openvpn/{{ item }}-ipp.txt'
     mode: '0600'
   with_items: '{{ openvpn_configs }}'
@@ -59,7 +59,7 @@
 
 - name: copy openvpn confs
   copy:
-    src: 'openvpn/etc/openvpn_{{ item }}.conf'
+    src: 'files/openvpn/etc/openvpn_{{ item }}.conf'
     dest: '/usr/local/etc/openvpn/openvpn_{{ item }}.conf'
     mode: '0600'
   with_items: '{{ openvpn_configs }}'
@@ -68,7 +68,7 @@
 
 - name: openvpn keys
   copy:
-    src: 'openvpn/etc/keys/{{ item }}'
+    src: 'files/openvpn/etc/keys/{{ item }}'
     dest: '/usr/local/etc/openvpn/keys/{{ item }}'
     mode: '0400'
   with_items: '{{ openvpn_key_files }}'

@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 # TYPE	DATABASE	USER	ADDRESS	METHOD
-local	all	{{ pg_owner }}		ident
+local	all	{{ pg_owner }}		trust
 
 {% for h in pg_allowed_hosts | default([]) %}
 host	all	all	{{ h }}	md5

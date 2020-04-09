@@ -50,7 +50,7 @@
   become: '{{ node_app.user }}'
   when: node_has_package_json.stat.exists and gitted.changed
 
-- name: install service
+- name: install freebsd service
   template:
     src: FreeBSD-rc.j2
     dest: '/usr/local/etc/rc.d/{{ node_app.name }}'
@@ -78,3 +78,4 @@
   service:
     name: '{{ node_app.name }}'
     state: started
+    enabled: yes

@@ -9,7 +9,7 @@
   pkgng:
     name:
       - mongodb40
-      - py36-pymongo
+      - py37-pymongo
     state: present
   register: mongopkg
 

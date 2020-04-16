@@ -13,6 +13,7 @@
     src: '{{ lookup("first_found", include_locations) }}/{{ item }}'
   with_items: '{{ site.nginx_includes }}'
   when: '"nginx_includes" in site'
+  ignore_errors: True
   notify: reload nginx
 
 - name: conf includes

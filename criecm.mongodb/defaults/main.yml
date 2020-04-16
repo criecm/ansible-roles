@@ -5,3 +5,6 @@ mongo_root_user: root
 mongos: []
 etcprefix: /usr/local
 mongo_global_users: []
+mongo_engine: mmapv1
+mongo_replication_set:
+mongo_auth: enabled

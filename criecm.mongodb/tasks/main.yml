@@ -45,6 +45,19 @@
   register: mongoroot
   ignore_errors: True
 
+- name: check fqdn in /etc/hosts
+  command: 'grep "^127\.0\..* {{ ansible_fqdn }}" /etc/hosts'
+  register: etchosts
+  changed_when: False
+  failed_when: false
+
+- name: patch /etc/hosts
+  replace:
+    path: /etc/hosts
+    regexp: '^(127\.0.*localhost.*)$'
+    replace: '\1 {{ ansible_fqdn }}'
+  when: etchosts.stdout_lines | count < 1
+
 - debug: var=mongoroot
 
 - name: (re)set root using localhost exception
@@ -57,22 +70,46 @@
       copy:
         dest: '{{ etcprefix }}/etc/mongodb.conf'
         content: |
+          # ansible
           storage:
               dbPath: '{{ mongo_dbpath }}'
               directoryPerDB: true
           systemLog:
               destination: syslog
-              verbosity: 1
+              verbosity: 0
+              syslogFacility: daemon
           storage:
+          {% if mongo_engine == "wiredTiger" %}
               wiredTiger:
                   engineConfig:
                       cacheSizeGB: '{{ mongo_memlimit | default(ansible_memtotal_mb * 512) / 1024 | int }}'
+          {% endif %}
+              engine: {{ mongo_engine }}
+          processManagement:
+              timeZoneInfo: /usr/share/zoneinfo
+          {% if mongo_replication_set %}
+          replication:
+            replSetName: {{ mongo_replication_set }}
+          {% endif %}
         backup: yes
     - name: start mongodb
       service:
         name: mongod
         state: started
         enabled: yes
+#    - name: init replicaset
+#      shell: "echo '{rs.initiate()}' | mongo"
+#      when: mongo_replication_set | default(False)
+    - name: initiate replication set
+      mongodb_replicaset:
+        replica_set: '{{ mongo_replication_set }}'
+        members:
+          - '{{ ansible_fqdn }}:27017'
+        validate: no
+      when: mongo_replication_set | default(False)
+    - name: wait for rs 
+      wait_for:
+        timeout: 15
     - name: root user
       mongodb_user:
         name: '{{ mongo_root_user }}'
@@ -86,25 +123,24 @@
       service:
         name: mongod
         state: restarted
+    - name: wait for rs 
+      wait_for:
+        timeout: 15
   when: not mongoadmin.stat.exists or mongoroot.failed
 
-- name: config
-  copy:
+- name: end config
+  blockinfile:
     dest: '{{ etcprefix }}/etc/mongodb.conf'
-    content: |
-      storage:
-          dbPath: {{ mongo_dbpath }}
-          directoryPerDB: true
-      systemLog:
-          destination: syslog
-          verbosity: 1
+    block: |
       net:
+          ipv6: true
       {% if mongo_bindips is defined %}
           bindIp: '{{ mongo_bindips }}'
       {% endif %}
           port: {{ mongo_port | default("27017") }}
       security:
-          authorization: enabled
+          authorization: {{ mongo_auth }}
+    marker: '# {mark} ANSIBLE BLOCK mongoconf'
   notify: restart mongodb
 
 - debug:

@@ -33,12 +33,12 @@
     - 'templates/{{ inventory_hostname }}/ctl.conf.j2'
     - 'files/{{ inventory_hostname }}/ctl.conf.j2'
     - 'templates/ctl.conf.j2'
-  notify: reload ctld
+  #notify: reload ctld
   tags: iscsi, config
 
-- name: enable ctld
-  service:
-    name: ctld
-    state: started
-    enabled: yes
-  tags: iscsi, config
+#- name: enable ctld
+#  service:
+#    name: ctld
+#    state: started
+#    enabled: yes
+#  tags: iscsi, config

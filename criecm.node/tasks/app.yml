@@ -72,10 +72,11 @@
     name: '{{ node_app.name }}'
     state: stopped
   failed_when: False
-  when: gitted.changed or confs.changed
+  when: node_start_app and gitted.changed or confs.changed
 
 - name: start app
   service:
     name: '{{ node_app.name }}'
     state: started
     enabled: yes
+  when: node_start_app

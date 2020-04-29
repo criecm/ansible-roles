@@ -5,3 +5,5 @@ node_version: 12
 node_update_git: True
 
 node_force_git: False
+
+node_start_app: True

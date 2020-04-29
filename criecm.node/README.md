@@ -21,6 +21,8 @@ Install/run node apps on FreeBSD (could be easily adapted)
   update git sources overriding local changes
 * `node_force_conf` (False)
   overwrite existing config files
+* `node_start_app (True)
+  Set to false to start/enable app by other way
 
 ### app variables
 

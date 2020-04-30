@@ -4,7 +4,7 @@ Description={{ node_app.name }} server
 After=syslog.target network.target
 
 [Service]
-Environment="NODE_ENV={{ node_app.env | default('production') }}"
+Environment="NODE_ENV={{ node_app.env | default('production') }}{% for envvar in node_app.envvars.keys() %} {{ envvar }}='{{ node_app.envvars[envvar] }}'{% endfor %}"
 WorkingDirectory={{ node_app.path }}
 ExecStart=/usr/bin/node {{ node_app.script }}
 Type=simple

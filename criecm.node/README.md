@@ -45,6 +45,10 @@ Install/run node apps on FreeBSD (could be easily adapted)
 * `use_syslog` (False)
   IP/name of syslog server (do enable syslog)
 * `syslog_tag` (`app.name`)
+* `env (developement)`
+  NODE_ENV value
+* `envvars ({})`
+  dict of environment variables
 
 ## Dependencies
 

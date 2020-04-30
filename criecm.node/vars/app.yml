@@ -10,5 +10,6 @@ default_node_app:
   use_syslog: False
   script: app.js
   env: developement
+  envvars: {}
 
 node_app: '{{ default_node_app | combine(oneapp) }}'

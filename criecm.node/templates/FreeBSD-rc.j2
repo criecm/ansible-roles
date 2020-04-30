@@ -18,7 +18,7 @@ load_rc_config ${{ '{' }}name{{ '}' }}
 {{ node_app.name }}_script="${{ '{' }}{{ node_app.name }}_script:-{{ node_app.path }}/{{ node_app.script }}{{ '}' }}"
 {{ node_app.name }}_chdir="{{ node_app.path }}"
 {{ node_app.name }}_procname="node_{{ node_app.name }}"
-{{ node_app.name }}_env="NODE_ENV={{ node_app.env | default('prod') }}"
+{{ node_app.name }}_env="NODE_ENV={{ node_app.env | default('prod') }}{% for envvar in node_app.envvars.keys() %} {{ envvar }}='{{ node_app.envvars[envvar] }}'{% endfor %}"
 
 pidfile="/var/run/{{ node_app.name }}.pid"
 command=/usr/sbin/daemon

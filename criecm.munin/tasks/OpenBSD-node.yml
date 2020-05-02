@@ -1,5 +1,8 @@
 ---
 - name: install OpenBSD node
   openbsd_pkg:
-    name: munin-node
+    name: '{{ item }}'
     state: present
+  loop:
+    - munin-node
+    - p5-Net-SNMP

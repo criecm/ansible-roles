@@ -70,7 +70,7 @@
     content: |
       [{{ ansible_fqdn }}]
       {% if munin_async %}
-      address ssh://munin-async@{{ inventory_hostname }}
+      address ssh://munin-async@{{ inventory_hostname }}{% if ansible_port | default(False) %}:{{ ansible_port }}{% endif %}
       {% else %}
       address {{ inventory_hostname }}
       {% endif %}

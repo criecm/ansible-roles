@@ -35,6 +35,11 @@
     path: '{{ node_app.path }}/package.json'
   register: node_has_package_json
 
+- name: 'search bower.json'
+  stat:
+    path: '{{ node_app.path }}/bower.json'
+  register: node_has_bower_json
+
 - name: config files
   template:
     src: '{{ item.src }}'
@@ -44,11 +49,43 @@
   register: confs
 
 - name: npm install
-  command: 'npm install'
-  args:
-    chdir: '{{ node_app.path }}'
-  become: '{{ node_app.user }}'
-  when: node_has_package_json.stat.exists and gitted.changed
+  npm:
+    path: '{{ node_app.path }}'
+    production: yes
+#  command: 'npm install --production'
+#  args:
+#    chdir: '{{ node_app.path }}'
+  become_user: '{{ node_app.user }}'
+  become: yes
+  become_method: su
+  when: node_has_package_json.stat.exists
+
+- name: bower
+  block:
+    - name: check bower
+      stat:
+        path: '{{ node_app.path }}/node_modules/.bin/bower'
+      register: bowerexe
+    - name: install bower
+      npm:
+        path: '{{ node_app.path }}'
+        name: bower
+        state: present
+        production: yes
+      become: yes
+      become_method: su
+      become_user: '{{ node_app.user }}'
+      when: not bowerexe.stat.exists
+    - name: bower install
+      bower:
+        path: '{{ node_app.path }}'
+        relative_execpath: node_modules/.bin
+        production: yes
+        state: present
+      become: yes
+      become_method: su
+      become_user: '{{ node_app.user }}'
+  when: node_has_bower_json.stat.exists
 
 - name: install freebsd service
   template:

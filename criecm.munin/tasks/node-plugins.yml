@@ -13,7 +13,7 @@
     src: '{{ munin_dist_plugins }}/snmp__if_multi'
     dest: '{{ munin_etcdir }}/plugins/snmp_localhost_if_multi'
     state: link
-  when: not is_jail
+  when: not ansible_virtualization_type == "jails"
   notify:
     - restart munin node
     - restart munin asyncd

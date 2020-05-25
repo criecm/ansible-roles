@@ -40,6 +40,7 @@
   template:
     src: '{{ item }}'
     dest: '{{ munin_etcdir }}/munin-conf.d/ansible-aggr-{{ item | basename | regex_replace("^([^\.]*).*","\1") }}.conf'
+    force: yes
   with_items: '{{ munin_aggr_templates }}'
 #  register: ialist
 

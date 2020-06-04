@@ -18,6 +18,8 @@
       zfsrc: '{{ z.path | replace("/dev/zvol/","") }}'
       origin: '{{ z.origin | default(omit) }}'
       volsize: '{{ z.volsize | default(omit) }}'
+      zfsprops:
+        volmode: dev
   loop: '{{ iscsi_targets | json_query(iscsi_json_query) | flatten(levels=1) | selectattr("path","match","^/dev/zvol") | list }}'
   loop_control:
     loop_var: z

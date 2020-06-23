@@ -8,7 +8,8 @@
 
 - name: facts current version
   set_fact:
-    pg_old_vers: '{% if pkgs_installed.stdout_lines | count > 0 %}{{ pkgs_installed.stdout_lines | select("match","postgresql[0-9]*-server")
+    pg_old_vers: '{% if pkgs_installed.stdout_lines | select("match","postgresql[0-9]*-server") 
+        | list | count > 0 %}{{ pkgs_installed.stdout_lines | select("match","postgresql[0-9]*-server")
         | list | first | regex_replace("^.*ql([0-9]*)-server.*","\1") }}{% endif %}'
     pg_def_vers: '{{ pg_version | regex_replace("\.","") }}'
     pg_vers: '{{ pg_version | regex_replace("\.","") }}'

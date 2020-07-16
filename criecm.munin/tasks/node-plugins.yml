@@ -4,6 +4,7 @@
   munin-node-configure --shell | fgrep -v plugins/if_ | fgrep -v plugins/sendmail_ | sh'
   args:
     creates: '{{ munin_etcdir }}/plugins/load'
+  when: not ansible_virtualization_type == "jails"
   notify:
     - restart munin node
     - restart munin asyncd

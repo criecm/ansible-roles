@@ -1,5 +1,0 @@
----
-- name: restart slapd
-  service:
-    name: '{{ slapd_service_name }}'
-    state: restarted

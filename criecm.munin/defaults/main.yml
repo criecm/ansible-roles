@@ -25,3 +25,5 @@ munin_host_dir: '{{ munin_etcdir }}/munin-conf.d'
 
 prefix: /usr
 etcprefix: ''
+
+munin_host: ''

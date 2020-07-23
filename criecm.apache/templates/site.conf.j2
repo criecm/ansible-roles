@@ -108,14 +108,6 @@
   </FilesMatch>
 {% endif %}
 
-{% if "apache_includes" in site %}
-  # site.apache_includes
-{%   for include in site.apache_includes %}
-  Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
-
-{%   endfor %}
-{% endif %}
-
 {% for prefix in site.prefixes %}
   # prefix {{ prefix.path }}
   <Location {{ prefix.path }}>
@@ -151,6 +143,14 @@
 {%   endif %}
   </Location>
 {% endfor %}
+
+{% if "apache_includes" in site %}
+  # site.apache_includes
+{%   for include in site.apache_includes %}
+  Include {{ apache_etcdir }}/{{ include | basename | regex_replace(".j2$","") }}
+
+{%   endfor %}
+{% endif %}
 
 {% if "cache" in site %}
 # site.cache: {{ site.cache | count() }} items

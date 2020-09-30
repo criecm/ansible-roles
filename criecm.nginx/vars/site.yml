@@ -12,6 +12,7 @@ include_locations:
   - '{{ playbook_dir }}/files/{{ inventory_hostname |regex_replace("[0-9]$","") }}/nginx'
   - 'templates/nginx'
   - '{{ playbook_dir }}/files/nginx'
+  - '{{ playbook_dir }}'
 
 ips: '{% if "listen" in onesite %}{{ onesite.listen | map("regex_replace",":[0-9]*$","") | list }}{% else %}["*"{% if ansible_all_ipv6_addresses | count > 0 %},"[::]"{% endif %}]{% endif %}'
 

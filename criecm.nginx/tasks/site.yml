@@ -10,10 +10,9 @@
 - name: site includes
   template:
     dest: '{{ nginx_etcdir }}/{{ item | basename | regex_replace("\.j2$","") }}'
-    src: '{{ lookup("first_found", include_locations) }}/{{ item }}'
+    src: '{{ lookup("first_found", include_locations | product(["/"+item]) | map("join") | list) }}'
   with_items: '{{ site.nginx_includes }}'
   when: '"nginx_includes" in site'
-  ignore_errors: True
   notify: reload nginx
 
 - name: conf includes

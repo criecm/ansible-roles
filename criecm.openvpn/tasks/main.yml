@@ -24,7 +24,7 @@
 - name: openvpn config dir
   file:
     dest: /usr/local/etc/openvpn
-    mode: '0700'
+    mode: '0701'
     state: directory
   tags: openvpn, config
 

@@ -41,6 +41,7 @@
 {%   if "backends" in site %}
   # reverse-proxy HTTPS
   RequestHeader set X-Forwarded-Proto "https"
+  RequestHeader set X-Forwarded-HTTPS "On"
   RequestHeader set X-Forwarded-Port "443"
 {%   endif %}
 {%- endif %}

@@ -47,7 +47,7 @@
     dest: '{{ pg_basedir }}/{{ pg_datasubdir }}/postgresql.conf'
     mode: '0640'
     group: '{{ pg_group }}'
-    force: '{{ force_conf | default(False) }}'
+    force: '{{ force_conf | default(False) or not pg_db_exists.stat.exists }}'
     backup: yes
   notify: restart postgresql
 

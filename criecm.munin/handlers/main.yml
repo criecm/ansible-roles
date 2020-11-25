@@ -9,3 +9,4 @@
   service:
     name: '{{ munin_asyncd_service }}'
     state: restarted
+  ignore_errors: yes

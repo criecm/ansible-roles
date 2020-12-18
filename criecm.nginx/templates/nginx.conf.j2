@@ -40,7 +40,9 @@ http {
 	# https://thoughts.t37.net/optimisations-nginx-bien-comprendre-sendfile-tcp-nodelay-et-tcp-nopush-2ab3f33432ca
 	sendfile	{{ nginx_sendfile }};
 	tcp_nopush	{{ nginx_tcp_nopush }};
+{% if ansible_os_family == "FreeBSD" %}
 	aio	{{ nginx_aio }};
+{% endif %}
 	tcp_nodelay	{{ nginx_tcp_nodelay }};
 	#sendfile_max_chunk 512k;
 

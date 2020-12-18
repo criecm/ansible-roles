@@ -29,16 +29,13 @@ upstream {{ upstream }} {
 ## redirect http to https
 # site.tls_redir | default(False) and not site.proxified_by
 server {
-{% if ansible_os_family in [ "FreeBSD", "OpenBSD" ] %}
-{%   if ansible_all_ipv4_addresses | count > 0 %}
+{% if ansible_all_ipv4_addresses | count > 0 %}
 	listen *:80;
-{%   endif %}
-{%   if ansible_all_ipv6_addresses | count > 0 %}
-	listen [::]:80;
-{%   endif %}
-{% else %}
-	listen 80;
 {% endif %}
+{% if ansible_all_ipv6_addresses | count > 0 %}
+	listen [::]:80;
+{% endif %}
+
 	server_name	{{ site.name }}{% if site.aliases | count > 0 %} {{ site.aliases | join(" ") }}{% endif %};
 	rewrite ^(.*) https://{{ site.name }}$1 permanent;
 }

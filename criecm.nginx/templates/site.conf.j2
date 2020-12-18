@@ -50,12 +50,8 @@ server {
 {% else %}
 {%   if site.proxified_by %}
 # site.proxified_by={{ site.proxified_by }}
-{% if ansible_os_family in [ "FreeBSD", "OpenBSD" ] %}
 	listen *:80;
 	listen [::]:80;
-{% else %}
-	listen 80;
-{% endif %}
 {%   else %}
 # site.listen_ips={{ site.listen_ips }}
 {%     for ip in site.listen_ips %}

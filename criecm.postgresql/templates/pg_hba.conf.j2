@@ -11,6 +11,15 @@ host	all	{{ pg_admin_user }}	{{ pg_admin_host | default("all") }}	md5
 {% endif %}
 
 {% for u in pg_users | default([]) | union(pg_maintenance_users) %}
-host	{{ u.db	| default("all") }}	{{ u.name }}	{% if u.host | default(False) %}{{ u.host }}/32{% else %}all{% endif %}	{% if u.password %}md5{% else %}trust{% endif %}
+{% if u.host is match("/[0-9]*$") %}
+{% set fromaddr = u.host %}
+{% elif u.host is match("\.") %}
+{% set fromaddr = u.host + "/32" %}
+{% elif u.host is match(":") %}
+{% set fromaddr = u.host + "/128" %}
+{% else %}
+{% set fromaddr = "all" %}
+{% endif %}
+host	{{ u.db	| default("all") }}	{{ u.name }}	{{ fromaddr }}	{% if u.password %}md5{% else %}trust{% endif %}
 {% endfor %}
 

@@ -93,13 +93,13 @@
     file:
       dest: '{{ tls_dir }}/private'
       state: directory
-      mode: 0750
+      mode: '0700'
       owner: root
   - name: TLS key
     copy:
       src: 'tls/{{ site.tls_key }}'
       dest: '{{ tls_dir }}/private/{{ site.tls_key }}'
-      mode: '0644'
+      mode: '0400'
   when: '"tls_key" in site'
 
 - name: site apache config

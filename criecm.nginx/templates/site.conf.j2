@@ -12,7 +12,8 @@
 upstream {{ upstream }} {
 # site.backends={{ site.backends }}
 {%   for srv in site.backends %}
-	server {{ srv | regex_replace("^.*://","") }};
+	# server {{ srv | regex_replace("^.*://","") }};
+	server {{ srv }};
 {%   endfor %}
 {%   if site.backends | count > 1 %}
 	sticky cookie {{ site.id }}LBID expires=1h path=/;

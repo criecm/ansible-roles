@@ -1,0 +1,13 @@
+---
+# defaults file for criecm.wordpress
+wp_version: latest
+
+wp_plugins:
+  - wp-super-cache
+  - nginx-helper
+
+wp_config:
+  DISABLE_WP_CRON: 'true'
+  FORCE_SSL_ADMIN: 1
+  FORCE_SSL_LOGIN: 1
+

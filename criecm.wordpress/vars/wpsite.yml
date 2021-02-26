@@ -1,0 +1,4 @@
+default_wp_site:
+  id: wordpress
+  name: ''
+

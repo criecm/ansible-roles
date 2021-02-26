@@ -1,0 +1,180 @@
+---
+- name: Download Wordpress
+  shell: 'wp core download --locale=fr_FR --version={{ wp_version }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+    creates: "{{ wpsite.rootdir }}/index.php"
+
+- name: configure wordpress
+  command: 'wp core config --dbhost={{ wpsite.db.host }} --dbuser={{ wpsite.db.user }} --dbpass={{ wpsite.db.pass }} --dbname={{ wpsite.db.name }} --path={{ wpsite.rootdir }} --url=https://{{ wpsite.name }}'
+  become: '{{ wpsite.maintainer }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+    creates: '{{ wpsite.rootdir }}/wp-config.php'
+
+- name: chown/mod
+  file:
+    path: '{{ wpsite.rootdir }}/wp-content/{{ item }}'
+    mode: 'u=rwX,g=rwX,o=rX'
+    recurse: yes
+    owner: '{{ wpsite.maintainer }}'
+    group: '_{{ wpsite.id }}'
+    state: directory
+  loop:
+    - uploads
+    - cache
+- name: chmod wp-content
+  file:
+    path: '{{ wpsite.rootdir }}/wp-content'
+    mode: '2771'
+    owner: '{{ wpsite.maintainer }}'
+    group: '_{{ wpsite.id }}'
+    state: directory
+
+- name: chown/mod files
+  file:
+    path: '{{ wpsite.rootdir }}/wp-content/{{ item }}'
+    mode: '0660'
+    owner: '{{ wpsite.maintainer }}'
+    group: '_{{ wpsite.id }}'
+    state: touch
+  loop:
+    - wp-cache-config.php
+- name: configure site
+  command: 'wp core install --url=https://{{ wpsite.name | quote }} --title={{ wpsite.title | default("Titre à changer") | quote }} --admin_user={{ wpsite.admin | default("chef") | quote }} --admin_email={{ wpsite.adminmail | quote }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+  become: '{{ wpsite.maintainer }}'
+
+- name: get wp config
+  command: 'wp config list --format=csv'
+  register: wpconfig
+  changed_when: False
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+  become: '{{ wpsite.maintainer }}'
+
+- name: set wp config
+  command: 'wp config set {{ item }} {{ wp_config[item] }} --type=constant --path={{ wpsite.rootdir }}'
+  loop: '{{ wp_config.keys() | list }}'
+  when: wpconfig.stdout is not match(item+",")
+  become: '{{ wpsite.maintainer }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+
+- name: install lang fr_FR
+  command: 'wp language core install fr_FR'
+  become: '{{ wpsite.maintainer }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+- name: activate fr_FR
+  command: 'wp language core activate fr_FR'
+  become: '{{ wpsite.maintainer }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+
+- name: Install default plugin
+  shell: 'wp plugin is-installed {{ item }} || wp plugin install {{ item }}'
+  become: '{{ wpsite.maintainer }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+  loop: "{{ wp_plugins }}"
+
+- name: install theme(s)
+  shell: 'wp theme is-installed {{ item }} || wp theme install {{ item }}'
+  changed_when: false
+  become: '{{ wpsite.maintainer }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+  loop: "{{ wp_themes }}"
+
+- name: activate theme
+  command: 'wp theme activate {{ wp_themes[0] }}'
+  become: '{{ wpsite.maintainer }}'
+  args:
+    chdir: '{{ wpsite.rootdir }}'
+  loop: "{{ wp_themes }}"
+
+- name: cron mailto
+  cron:
+    env: yes
+    name: MAILTO
+    value: '{{ wpsite.maintainer_email }}'
+  when: wpsite.maintainer_email | default(False)
+
+- name: install cron
+  cron:
+    name: 'cron WordPress'
+    job: '/usr/local/bin/php {{ wpsite.rootdir }}/wp-cron.php'
+    user: '_{{ wpsite.id }}'
+
+- name: auto-update by cron
+  block:
+    - name: update script
+      copy:
+        dest: '{{ wpsite.home }}/update_wp.sh'
+        content: |
+          #!/bin/sh
+          # script MAJ wordpress {{ wpsite.id }}
+          PATH="/bin:/usr/bin:/usr/local/bin"
+          cd {{ wpsite.rootdir }}
+          date
+          wp --user=1 core upgrade --minor --quiet
+          wp plugin list --format=csv | awk 'BEGIN{FS=","}{if(($1!="name")&&($3!="none")){printf("%s %s: update %s\n",$1,$4,$3);}}'
+          wp --user=1 plugin update --all --format=csv | awk 'BEGIN{FS=","}{if($0~/pdated/){printf("%s %s -> %s\n",$1,$2,$3);}}'
+          wp theme list --format=csv | awk 'BEGIN{FS=","}{if(($1!="name")&&($3!="none")){printf("%s %s: update %s\n",$1,$4,$3);}}'
+          wp --user=1 theme update --all --format=csv | awk 'BEGIN{FS=","}{if($0~/pdated/){printf("%s %s -> %s\n",$1,$2,$3);}}'
+          wp --user=1 language core update
+          wp --user=1 language plugin update --all
+          wp --user=1 language theme update --all
+    
+        mode: '0500'
+        owner: '{{ wpsite.maintainer }}'
+    
+    - name: cron MAJ wp
+      cron:
+        name: 'MAJ wordpress'
+        job: '{{ wpsite.home }}/update_wp.sh | tee -a ~/update.log 2>&1'
+        user: '{{ site.maintainer }}'
+        dow: '3'
+        minute: '33'
+  when: wp_update_cron | default(True)
+
+- name: update now
+  block:
+    - name: Check if Wordpress is up to date
+      shell: 'wp core check-update | grep -q Success'
+      register: check_version
+      check_mode: no
+      failed_when: false
+      changed_when: check_version.rc
+
+    - name: Update Wordpress
+      shell: 'wp core update --version={{ wp_version }}'
+      become: '{{ wpsite.maintainer }}'
+      args:
+        chdir: '{{ wpsite.rootdir }}'
+      when: check_version.rc
+
+    - name: update theme(s)
+      command: 'wp theme update --all --format=json'
+      become: '{{ wpsite.maintainer }}'
+      args:
+        chdir: '{{ wpsite.rootdir }}'
+
+    - name: Update default plugins
+      shell: 'wp plugin is-installed {{ item }} && wp plugin update {{ item }}'
+      changed_when: false
+      become: '{{ wpsite.maintainer }}'
+      args:
+        chdir: '{{ wpsite.rootdir }}'
+      with_items: "{{ wp_plugins }}"
+
+    - name: Activate default plugins
+      shell: 'wp plugin is-installed {{ item }} && wp plugin activate {{ item }}'
+      changed_when: false
+      become: '{{ wpsite.maintainer }}'
+      args:
+        chdir: '{{ wpsite.rootdir }}'
+      with_items: "{{ wp_plugins }}"
+  when: wp_do_update | default(False)

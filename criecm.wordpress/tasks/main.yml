@@ -1,0 +1,16 @@
+---
+- name: install wpcli
+  get_url:
+    url: 'https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar'
+    dest: '/usr/local/bin/wp'
+    mode: '0755'
+
+- name: wp sites
+  include_tasks: 'wpsite.yml'
+  loop_control:
+    loop_var: wpsite
+  loop: '{{ sites }}'
+
+- name: set wpcli fact
+  set_fact:
+    wpcli: /usr/local/bin/wp

@@ -1,9 +1,9 @@
 ---
 # defaults file for criecm.postgresql
-pg_version: 11
+pg_version: 12
 pg_upgrade: False
 
-criecm_role_version: 1
+criecm_role_version: 2
 
 etcprefix: '{% if ansible_os_family == "FreeBSD" %}/usr/local{% endif %}'
 prefix: '{% if ansible_os_family == "FreeBSD" %}/usr/local{% else %}/usr{% endif %}'

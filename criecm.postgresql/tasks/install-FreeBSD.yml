@@ -1,6 +1,6 @@
 ---
 - name: get postgres installed pkgs
-  shell: 'pkg info -ix postgresql'
+  shell: 'pkg info -ix postgresql | grep "^postgresql[0-9]"'
   register: pkgs_installed
   changed_when: False
   failed_when: False

@@ -60,12 +60,27 @@
 
 {%     endfor %}
     Require all granted
-    ProxySet stickysession={{ site.id }}B timeout=3
+    ProxySet stickysession={{ site.id }}B connectiontimeout=3
   </Proxy>
-{%     if site.prefixes | count() == 1 and site.prefixes[0].path is regex('^/$') %}
   ProxyPass / balancer://{{ site.id }}/
   ProxyPassReverse / balancer://{{ site.id }}/
-{%     endif %}
+
+{% for prefix in site.prefixes %}
+{% if backends in prefix %}
+{%   if prefix.backends | count() > 1 %}
+  # prefix {{ prefix.path }} load balancer
+  <Proxy balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}>
+{%     for backend in prefix.backends %}
+    BalancerMember {{ backend | regex_replace("^(.*//[^/]*).*","\\1") }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
+
+{%     endfor %}
+    Require all granted
+    ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }} timeout=3
+  </Proxy>
+
+{%   endif %}
+{% endif %}
+{%- endfor %}
 
 {%     if admin_from %}
   # balancer-manager from admin ip's
@@ -78,16 +93,15 @@
   ProxyPass /balancer-manager !
 {%     endif %}
 
-{%   elif backends | count() == 1 and site.prefixes | count() == 1 and site.prefixes[0].path is regex('^/$') %}
+{%   elif backends | count() == 1 %}
   # simple reverse-proxy (backends = {{ backends[0] }})
   <Proxy {{ backends[0] | regex_replace(" .*$","")}}>
     Require all granted
   </Proxy>
-#  ProxyPass / {{ backends[0] | regex_replace(" .*$","") }}/{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
-#
-#  ProxyPassReverse / {{ backends[0] | regex_replace(" .*$","") }}/
-
+  ProxyPass / {{ backends[0] | regex_replace(" .*$","") }}/{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+  ProxyPassReverse / {{ backends[0] | regex_replace(" .*$","") }}/
 {%   endif %}
+
 {%   if monitoring_from | count > 0 and site.fcgi_status_path %}
   # monitoring
   <Location {{ site.fcgi_status_path }}>
@@ -119,6 +133,12 @@
 
 {%     endfor %}
 {%   endif %}
+{%   if "apache_directives" in prefix and prefix.apache_directives | count > 0 %}
+{%     for directive in prefix.apache_directives %}
+    {{ directive }}
+
+{%     endfor %}
+{%   endif %}
 
 {%   if prefix.allow_from_nets | default([]) | count > 0 %}
     # prefix."{{ prefix.path }}".allow_from_nets
@@ -134,16 +154,15 @@
 {%   if "options" in prefix %}
     Options {{ prefix.options | join(" ") }}
 {%   endif %}
-{%   if "backends" in site and backends | count() > 1 %}
-{%     if site.prefixes | count() == 1 or site.prefixes[0].path is not regex('^/$') %}
-    ProxyPass balancer://{{ site.id }}{{ prefix.path }}
+{%   if "backends" in prefix and prefix.backends | count() > 1 %}
+    ProxyPass balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}{{ prefix.backends[0] | regex_replace("^.*//[^/]*(/[^ ]*)","\\1") }}
 
-    ProxyPassReverse balancer://{{ site.id }}{{ prefix.path }}
-{%     endif %}
-{%   elif backends | count() == 1 %}
-    ProxyPass {{ backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+    ProxyPassReverse balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}
 
-    ProxyPassReverse {{ backends[0] | regex_replace(" .*$","") }}{{ prefix.path }}
+{%   elif prefix.backends | default([]) | count() == 1 %}
+    ProxyPass {{ prefix.backends[0] | regex_replace(" .*$","") }}{% if prefix.backends[0] is search("=") %} {{ prefix.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+
+    ProxyPassReverse {{ prefix.backends[0] | regex_replace(" .*$","") }}
 {%   endif %}
   </Location>
 {% endfor %}
@@ -155,6 +174,11 @@
 
 {%   endfor %}
 {% endif %}
+
+{% for directive in site.apache_directives %}
+  {{ directive }}
+
+{% endfor %}
 
 {% if "cache" in site %}
 # site.cache: {{ site.cache | count() }} items

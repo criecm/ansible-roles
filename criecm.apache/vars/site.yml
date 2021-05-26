@@ -23,6 +23,8 @@ default_site:
   name: ''
   aliases: []
   apache_includes: []
+  apache_directives: []
+  backends: []
   rootdir: '{% if "rootsrc" in onesite or "gitroot" in onesite %}{{ apache_rootbase }}/{{ onesite.id }}{% endif %}'
   rootsrc: ''
   gitroot: ''

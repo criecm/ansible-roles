@@ -49,11 +49,6 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
   unique short identifier (base for dirnames, usernames, etc.)
 * `name (MANDATORY)`:
   DNS name
-* `backends ([])`:
-  eg: ``` - 'ajp://jentest1.nettest.egim:8009 route=jentest1 timeout=20 loadfactor=100'```
-  - if only one is defined, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html 
-  - if more than one, see https://httpd.apache.org/docs/2.4/mod/mod_proxy_balancer.html
-  - if you define `prefixes`, backends will only be used for them.
 
 ### optional (sane defaults)
 * `rootdir (system-dependant/{{name}})`:
@@ -65,10 +60,19 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
 * `status_path (/apache-status)`:
   will present apache status page to `monitoring_from` and `admin_from` nets, if they are populated
   and `status_path` is not empty
+* `backends ([])`:
+  eg: ``` - 'ajp://jentest1.nettest.egim:8009 route=jentest1 timeout=20 loadfactor=100'```
+  - if only one is defined, see https://httpd.apache.org/docs/2.4/mod/mod_proxy.html 
+  - if more than one, see https://httpd.apache.org/docs/2.4/mod/mod_proxy_balancer.html
+  - if you define `prefixes`, backends will only be used for them.
+* `apache_directives ([])`:
+  list of apache config lines. MUST be valid config lines in virtualhost section
 * `prefixes ([{path: /}])`:
   list of pathes allowed on this virtualhost, with
     `allow_from_nets ([])` listing IP(v4|v6) prefixes allowed
     `apache_includes ([])` as in sites
+    `backends ([])` as in sites (do not forget to add the url path as ajp://jentest1.nettest.egim:8009*/there*)
+    `apache_directives ([])`: as in sites, but must be valid in `<Location>`
 
 ### options (none by default)
 * `aliases ([])`:

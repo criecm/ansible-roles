@@ -14,3 +14,12 @@
 - name: set wpcli fact
   set_fact:
     wpcli: /usr/local/bin/wp
+
+- name: cron update wp cli
+  cron:
+    name: update wp cli
+    job: 'echo y | wp cli update >> /var/log/wp_cli_update.log'
+    minute: '38'
+    hour: '22'
+    dow: '7'
+

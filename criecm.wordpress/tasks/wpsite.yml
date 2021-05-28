@@ -119,14 +119,14 @@
           PATH="/bin:/usr/bin:/usr/local/bin"
           cd {{ wpsite.rootdir }}
           date
-          wp --user=1 core upgrade --minor --quiet
+          wp core upgrade --minor --quiet
           wp plugin list --format=csv | awk 'BEGIN{FS=","}{if(($1!="name")&&($3!="none")){printf("%s %s: update %s\n",$1,$4,$3);}}'
-          wp --user=1 plugin update --all --format=csv | awk 'BEGIN{FS=","}{if($0~/pdated/){printf("%s %s -> %s\n",$1,$2,$3);}}'
+          wp plugin update --all --format=csv | awk 'BEGIN{FS=","}{if($0~/pdated/){printf("%s %s -> %s\n",$1,$2,$3);}}'
           wp theme list --format=csv | awk 'BEGIN{FS=","}{if(($1!="name")&&($3!="none")){printf("%s %s: update %s\n",$1,$4,$3);}}'
-          wp --user=1 theme update --all --format=csv | awk 'BEGIN{FS=","}{if($0~/pdated/){printf("%s %s -> %s\n",$1,$2,$3);}}'
-          wp --user=1 language core update
-          wp --user=1 language plugin update --all
-          wp --user=1 language theme update --all
+          wp theme update --all --format=csv | awk 'BEGIN{FS=","}{if($0~/pdated/){printf("%s %s -> %s\n",$1,$2,$3);}}'
+          wp language core update
+          wp language plugin update --all
+          wp language theme update --all
     
         mode: '0500'
         owner: '{{ wpsite.maintainer }}'

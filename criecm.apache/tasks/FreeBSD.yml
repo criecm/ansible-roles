@@ -38,6 +38,11 @@
 
 - name: logrotate
   copy:
-    dest: /usr/local/etc/newsyslog.conf.d/apache
+    dest: /usr/local/etc/newsyslog.conf.d/apache.conf
     src: newsyslog.conf
     mode: '0640'
+
+- name: delete old logrotate
+  file:
+    path: /usr/local/etc/newsyslog.conf.d/apache
+    state: absent

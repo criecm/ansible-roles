@@ -66,7 +66,7 @@
   ProxyPassReverse / balancer://{{ site.id }}/
 
 {% for prefix in site.prefixes %}
-{% if backends in prefix %}
+{% if "backends" in prefix %}
 {%   if prefix.backends | count() > 1 %}
   # prefix {{ prefix.path }} load balancer
   <Proxy balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}>
@@ -159,7 +159,7 @@
 
     ProxyPassReverse balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}
 
-{%   elif prefix.backends | default([]) | count() == 1 %}
+{%   elif "backends" in prefix and prefix.backends | count() == 1 %}
     ProxyPass {{ prefix.backends[0] | regex_replace(" .*$","") }}{% if prefix.backends[0] is search("=") %} {{ prefix.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
 
     ProxyPassReverse {{ prefix.backends[0] | regex_replace(" .*$","") }}

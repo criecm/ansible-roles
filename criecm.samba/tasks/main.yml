@@ -29,6 +29,12 @@
   when: upgrade or ( which_smbd.rc > 0 )
   tags: samba,install,config
 
+- name: mkdir smb.conf.d
+  file:
+    dest: '{{ smbconf_path }}.d'
+    state: directory
+  tags: samba,shares,config
+
 - name: mkdir & co
   include_tasks: share.yml
   with_items:
@@ -38,12 +44,6 @@
     loop_var: share
   when: '"cifs" in share and share.cifs'
   tags: samba,shares
-
-- name: mkdir smb.conf.d
-  file:
-    dest: '{{ smbconf_path }}.d'
-    state: directory
-  tags: samba,shares,config
 
 - name: remove ansible_shares.conf
   file:

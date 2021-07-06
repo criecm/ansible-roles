@@ -8,7 +8,7 @@
 
 - name: install samba
   pkgng:
-    name: samba48
+    name: "samba{{ smb_version|replace('.', '') }}"
     state: present
   tags: samba, pkg
 

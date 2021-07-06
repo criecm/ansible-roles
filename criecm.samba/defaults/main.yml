@@ -5,6 +5,9 @@ smb_domain: ''
 smb_ips: []
 smb_allow:
 
+# SAMBA version specification (only for FreeBSD installation)
+smb_version: '4.12'
+
 # 'cups'
 smb_printing:
 

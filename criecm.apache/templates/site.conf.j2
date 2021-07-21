@@ -98,8 +98,11 @@
   <Proxy {{ backends[0] | regex_replace(" .*$","")}}>
     Require all granted
   </Proxy>
-  ProxyPass / {{ backends[0] | regex_replace(" .*$","") }}/{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+  ProxyPass / {{ backends[0] | regex_replace(" .*$","") }}/{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}
+
+{% endif %}
   ProxyPassReverse / {{ backends[0] | regex_replace(" .*$","") }}/
+
 {%   endif %}
 
 {%   if monitoring_from | count > 0 and site.fcgi_status_path %}
@@ -161,8 +164,8 @@
 
 {%   elif "backends" in prefix and prefix.backends | count() == 1 %}
     ProxyPass {{ prefix.backends[0] | regex_replace(" .*$","") }}{% if prefix.backends[0] is search("=") %} {{ prefix.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
-
     ProxyPassReverse {{ prefix.backends[0] | regex_replace(" .*$","") }}
+
 {%   endif %}
   </Location>
 {% endfor %}

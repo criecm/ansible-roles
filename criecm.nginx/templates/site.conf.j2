@@ -119,6 +119,8 @@ server {
 {% if "fcgi_status_path" in site and "fcgisocket" in site %}
 	# fastcgi status
 	location = {{ site.fcgi_status_path }} {
+		allow 127.0.0.1;
+		allow ::1;
 # monitoring_from = {{ monitoring_from | join(',') }}
 # admin_from = {{ admin_from | join(',') }}
 {% for netw in monitoring_from + admin_from | list | unique %}
@@ -133,6 +135,8 @@ server {
 
 {% if site.status_path %}
 	location = {{ site.status_path }} {
+		allow 127.0.0.1;
+		allow ::1;
 {% for net in monitoring_from + admin_from | list | unique %}
 		allow {{ net }};
 {% endfor %}

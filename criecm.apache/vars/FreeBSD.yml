@@ -8,3 +8,4 @@ apache_rootbase: /usr/local/www
 www_user: www
 www_group: www
 tls_dir: /usr/local/etc/ssl
+etcprefix: /usr/local

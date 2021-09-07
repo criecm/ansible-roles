@@ -120,3 +120,5 @@ monitoring_from:
 admin_from: []
 
 apache_role_version: 1
+
+etcprefix: ''

@@ -56,11 +56,11 @@
   Header add Set-Cookie "{{ site.id }}B=.%{BALANCER_WORKER_ROUTE}e; path=/;HttpOnly;Secure;SameSite=strict" env=BALANCER_ROUTE_CHANGED
   <Proxy balancer://{{ site.id }}>
 {%     for backend in backends %}
-    BalancerMember {{ backend }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
+    BalancerMember {{ backend }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %} connectiontimeout=3
 
 {%     endfor %}
     Require all granted
-    ProxySet stickysession={{ site.id }}B connectiontimeout=3
+    ProxySet stickysession={{ site.id }}B
   </Proxy>
   ProxyPass / balancer://{{ site.id }}/
 

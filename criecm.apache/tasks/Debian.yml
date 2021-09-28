@@ -12,7 +12,7 @@
   - name: enable modules
     command: 'a2enmod {{ item }}'
     when: item+".load" not in lsmods.stdout_lines
-    with_items: '{{ default_enabled_modules 
+    with_items: '{{ default_enabled_modules
     | union(apache_enabled_modules) 
     | difference(default_disabled_modules 
     | difference(apache_enabled_modules) 

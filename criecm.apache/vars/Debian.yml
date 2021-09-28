@@ -9,5 +9,8 @@ apache_rootbase: /var/www
 
 apache_service: apache2
 
+apache_modsdir: /usr/lib/apache2
+
 www_user: www-data
 www_group: www-data
+

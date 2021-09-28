@@ -5,6 +5,7 @@ apache_sitesdir: sites
 apache_service: apache24
 apache_modsconfdir: modules.d
 apache_rootbase: /usr/local/www
+apache_modsdir: /usr/local/libexec/apache24
 www_user: www
 www_group: www
 tls_dir: /usr/local/etc/ssl

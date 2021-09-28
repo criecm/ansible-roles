@@ -166,15 +166,17 @@ include_locations:
           - 'http://my.backend.internal:8090/'
       - id: ajpproxy
         name: apps.univ.fr
-        backends:
-          - 'ajp://backend1.internal:8009/'
-          - 'ajp://backend2.internal:8009/'
         prefixes:
           - path: /firstapp
             allow_from_nets:
               - 192.0.2.128/25
               - 2001:db8:cafe:f001::/64
+            backends:
+              - 'ajp://backend1.internal:8009/'
+              - 'ajp://backend2.internal:8009/'
           - path: /publicapp
+	    backends:
+	      - 'ajp://backend1.internal:8009/'
 	cache:
           - 'disk "/publicapp"'
 ```

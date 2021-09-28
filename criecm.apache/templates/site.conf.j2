@@ -46,14 +46,14 @@
 {%   endif %}
 {%- endif %}
 
-{% if backends | count() > 0 %}
+{% if site.backends | count() > 0 %}
   # backends: {{ backends | join(",") }}
   # keep host name in request
   ProxyPreserveHost On
 {%   if backends | count() > 1 %}
   # load balancer
   # set cookie for sticky-sessions
-  Header add Set-Cookie "{{ site.id }}B=.%{BALANCER_WORKER_ROUTE}e; path=/" env=BALANCER_ROUTE_CHANGED
+  Header add Set-Cookie "{{ site.id }}B=.%{BALANCER_WORKER_ROUTE}e; path=/;HttpOnly;Secure;SameSite=strict" env=BALANCER_ROUTE_CHANGED
   <Proxy balancer://{{ site.id }}>
 {%     for backend in backends %}
     BalancerMember {{ backend }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
@@ -63,24 +63,8 @@
     ProxySet stickysession={{ site.id }}B connectiontimeout=3
   </Proxy>
   ProxyPass / balancer://{{ site.id }}/
+
   ProxyPassReverse / balancer://{{ site.id }}/
-
-{% for prefix in site.prefixes %}
-{% if "backends" in prefix %}
-{%   if prefix.backends | count() > 1 %}
-  # prefix {{ prefix.path }} load balancer
-  <Proxy balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}>
-{%     for backend in prefix.backends %}
-    BalancerMember {{ backend | regex_replace("^(.*//[^/]*).*","\\1") }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
-
-{%     endfor %}
-    Require all granted
-    ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }} timeout=3
-  </Proxy>
-
-{%   endif %}
-{% endif %}
-{%- endfor %}
 
 {%     if admin_from %}
   # balancer-manager from admin ip's
@@ -101,6 +85,7 @@
   ProxyPass / {{ backends[0] | regex_replace(" .*$","") }}/{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}
 
 {% endif %}
+
   ProxyPassReverse / {{ backends[0] | regex_replace(" .*$","") }}/
 
 {%   endif %}
@@ -125,6 +110,25 @@
 {% endif %}
   </FilesMatch>
 {% endif %}
+
+{% for prefix in site.prefixes %}
+{% if "backends" in prefix %}
+  ProxyPreserveHost On
+{%   if prefix.backends | count() > 1 %}
+  # prefix {{ prefix.path }} load balancer
+  <Proxy balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}>
+{%     for backend in prefix.backends %}
+    BalancerMember {{ backend | regex_replace("^(.*//[^/]*).*","\\1") }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
+
+{%     endfor %}
+    Require all granted
+    ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }} timeout=3
+  </Proxy>
+
+{%   endif %}
+{% endif %}
+{%- endfor %}
+
 
 {% for prefix in site.prefixes %}
   # prefix {{ prefix.path }}
@@ -158,12 +162,18 @@
     Options {{ prefix.options | join(" ") }}
 {%   endif %}
 {%   if "backends" in prefix and prefix.backends | count() > 1 %}
-    ProxyPass balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}{{ prefix.backends[0] | regex_replace("^.*//[^/]*(/[^ ]*)","\\1") }}
-
-    ProxyPassReverse balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}
+{%     if prefix.backends[0] | regex_replace("^.*//[^/]+(/[^ ]*)","\\1") == prefix.backends[0] %}
+{%       set prefixpath="/" %}
+{%     else %}
+{%       set prefixpath= prefix.backends[0] | regex_replace("^.*//[^/]+(/[^ ]*)","\\1") %}
+{%     endif %}
+    ProxyPass balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}{{ prefixpath }}
+    # {{ prefix.backends[0] }} -> {{ prefix.backends[0] | regex_replace("^.*//[^/]+(/[^ ]*)","\\1") }}
+    ProxyPassReverse balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}{{ prefixpath }}
 
 {%   elif "backends" in prefix and prefix.backends | count() == 1 %}
     ProxyPass {{ prefix.backends[0] | regex_replace(" .*$","") }}{% if prefix.backends[0] is search("=") %} {{ prefix.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+
     ProxyPassReverse {{ prefix.backends[0] | regex_replace(" .*$","") }}
 
 {%   endif %}

@@ -31,8 +31,6 @@ default_enabled_modules:
   - alias
   - rewrite
   - info
-  - unixd
-  - version
 
 apache_disabled_modules: []
 

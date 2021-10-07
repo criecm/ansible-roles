@@ -112,4 +112,3 @@
     loop_var: pg_db
   loop: '{{ pg_dbs }}'
   when: 'pg_dbs | count > 0'
-

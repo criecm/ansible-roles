@@ -8,8 +8,9 @@
 - name: install
   pkgng:
     name:
-      - mongodb40
-      - py37-pymongo
+      - mongodb44
+      - mongodb-tools
+      - 'py{{ ansible_python_version | regex_replace("([2-3])\.([0-9]*)\..*$","\1\2") }}-pymongo'
     state: present
   register: mongopkg
 
@@ -45,6 +46,12 @@
   register: mongoroot
   ignore_errors: True
 
+- name: /etc/rc.conf
+  lineinfile:
+    line: 'mongod_flags=""'
+    regexp: '^mongod_flags='
+    dest: /etc/rc.conf
+
 - name: check fqdn in /etc/hosts
   command: 'grep "^127\.0\..* {{ ansible_fqdn }}" /etc/hosts'
   register: etchosts
@@ -74,23 +81,27 @@
           storage:
               dbPath: '{{ mongo_dbpath }}'
               directoryPerDB: true
+              journal:
+                  enabled: true
           systemLog:
               destination: syslog
-              verbosity: 0
+              verbosity: 1
               syslogFacility: daemon
           storage:
           {% if mongo_engine == "wiredTiger" %}
               wiredTiger:
                   engineConfig:
-                      cacheSizeGB: '{{ mongo_memlimit | default(ansible_memtotal_mb * 512) / 1024 | int }}'
+                      cacheSizeGB: '{{ [ mongo_memlimit | default(ansible_memtotal_mb * 512) / 1024 | int, 10000 ] | min }}'
           {% endif %}
               engine: {{ mongo_engine }}
           processManagement:
               timeZoneInfo: /usr/share/zoneinfo
           {% if mongo_replication_set %}
           replication:
-            replSetName: {{ mongo_replication_set }}
+              replSetName: {{ mongo_replication_set }}
           {% endif %}
+          net:
+              ipv6: true
         backup: yes
     - name: start mongodb
       service:
@@ -101,15 +112,17 @@
 #      shell: "echo '{rs.initiate()}' | mongo"
 #      when: mongo_replication_set | default(False)
     - name: initiate replication set
-      mongodb_replicaset:
-        replica_set: '{{ mongo_replication_set }}'
-        members:
-          - '{{ ansible_fqdn }}:27017'
-        validate: no
+      block:
+        - name: initiate replication set
+          mongodb_replicaset:
+            replica_set: '{{ mongo_replication_set }}'
+            members:
+              - '{{ ansible_fqdn }}:27017'
+            validate: no
+        - name: wait for rs 
+          wait_for:
+            timeout: 15
       when: mongo_replication_set | default(False)
-    - name: wait for rs 
-      wait_for:
-        timeout: 15
     - name: root user
       mongodb_user:
         name: '{{ mongo_root_user }}'
@@ -132,8 +145,6 @@
   blockinfile:
     dest: '{{ etcprefix }}/etc/mongodb.conf'
     block: |
-      net:
-          ipv6: true
       {% if mongo_bindips is defined %}
           bindIp: '{{ mongo_bindips }}'
       {% endif %}
@@ -143,8 +154,14 @@
     marker: '# {mark} ANSIBLE BLOCK mongoconf'
   notify: restart mongodb
 
+- name: get infos
+  community.mongodb.mongodb_info:
+    login_user: '{{ mongo_root_user }}'
+    login_password: '{{ mongo_root_pass }}'
+  register: mongoinfos
+
 - debug:
-    var: mongos
+    var: mongoinfos
 
 - name: mongos
   include_tasks: 'mongo.yml'

@@ -17,7 +17,7 @@ Manage mongodb instance
       database: dbname
       password: userpass
       roles: ['list','of','roles'] or 'role' (ReadWrite)
-* `mongo_engine ("mmapv1")`
+* `mongo_engine ("wiredTiger")`
   Storage engine to use (mmapv1 or wiredTiger)
 * `mongo_bindips ()`
   Ip(s) to bind. as comma-separated string
@@ -27,7 +27,7 @@ Manage mongodb instance
   If defined, use this zfs for dbdir
 * `mongo_global_users ([])`
   Define users globally (eg: monitoring) - same format as `mongos`
-* `mongo_memlimit (RAM/2)`
+* `mongo_memlimit (RAM/2 | max 1000)`
   Change what mongo thinks total RAM is. (wiredTiger)
 * `mongo_auth ("enabled")`
   Can be used to disable authorization

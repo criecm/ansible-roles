@@ -1,6 +1,6 @@
 ---
 - name: 'mongo {{ mongo.name }}'
-  mongodb_user:
+  community.mongodb.mongodb_user:
     name: '{{ mongo.name }}'
     database: '{{ mongo.database }}'
     password: '{{ mongo.password }}'

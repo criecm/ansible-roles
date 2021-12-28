@@ -24,19 +24,19 @@
       {% endfor %}
   notify: reload mountd
 
-- name: cleanup zfs sharenfs props
-  block:
-    - name: look /etc/zfs/exports
-      command: 'grep ^{{ share.path }} /etc/zfs/exports'
-      failed_when: False
-      changed_when: False
-      check_mode: False
-      register: zexport
-    - name: clean sharenfs
-      zfs:
-        name: '{{ share.zfsrc }}'
-        state: present
-        extra_zfs_properties:
-          sharenfs: 'off'
-      when: zexport.rc == 0
-  when: '"zfsrc" in share'
+#- name: cleanup zfs sharenfs props
+#  block:
+#    - name: look /etc/zfs/exports
+#      command: 'grep ^{{ share.path }} /etc/zfs/exports'
+#      failed_when: False
+#      changed_when: False
+#      check_mode: False
+#      register: zexport
+#    - name: clean sharenfs
+#      zfs:
+#        name: '{{ share.zfsrc }}'
+#        state: present
+#        extra_zfs_properties:
+#          sharenfs: 'off'
+#      when: zexport.rc == 0
+#  when: '"zfsrc" in share'

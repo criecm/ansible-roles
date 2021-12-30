@@ -39,6 +39,7 @@ default_site:
   status_path: '{{ nginx_status_path }}'
   nginx_done: True
   proxified_by: '{{ proxified_by | default([]) }}'
+  upstream: '{{ onesite.id }}'
 
 #site: '{{ default_site | combine(onesite) }}'
 

@@ -1,14 +1,8 @@
 ## upstream
-{% if "upstream" in site %}
-{%   set upstream = site.upstream %}
+{% set upstream = site.upstream %}
 # upstream=site.upstream={{ site.upstream }}
-{% else %}
-# upstream=site.id={{ site.id }}
-{%   set upstream = site.id %}
-{% endif %}
 
 {% if site.backends | count > 0 %}
-# upstream={{ upstream }}
 upstream {{ upstream }} {
 # site.backends={{ site.backends }}
 {%   for srv in site.backends %}

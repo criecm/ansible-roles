@@ -20,5 +20,6 @@ host	all	{{ pg_admin_user }}	{{ pg_admin_host | default("all") }}	md5
 {% elif u.host is match(":") %}
 {% set fromaddr = u.host + "/128" %}
 {% endif %}
-host	{{ u.db	| default("all") }}	{{ u.name }}	{{ fromaddr }}	{% if u.password %}md5{% else %}trust{% endif %}
+host	{{ u.db	| default("all") }}	{{ u.name }}	{{ fromaddr | default("all") }}	{% if u.password %}md5{% else %}trust{% endif %}
+
 {% endfor %}

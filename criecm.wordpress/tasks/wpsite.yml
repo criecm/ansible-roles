@@ -138,6 +138,7 @@
         user: '{{ site.maintainer }}'
         dow: '3'
         minute: '33'
+        hour: '0'
   when: wp_update_cron | default(True)
 
 - name: update now

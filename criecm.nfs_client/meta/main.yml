@@ -18,7 +18,8 @@ galaxy_info:
         - 10.3
     - name: Debian
       versions:
-        - stretch
+        - buster
+        - bullseye
 
   galaxy_tags:
     - ldap

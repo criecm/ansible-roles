@@ -1,11 +1,17 @@
 ---
 
 - name: system-dependant vars if any
-  include_vars: '{{ item }}'
-  with_first_found:
-    - skip: True
-    - '{{ ansible_os_family }}.yml'
-    - '{{ ansible_os_family }}-{{ ansible_ansible_distribution_major_version }}.yml'
+  include_vars: '{{ lookup("first_found", params) }}'
+  vars:
+    params:
+      files:
+        - '{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_os_family }}.yml'
+        - '{{ ansible_distribution }}.yml'
+        - main.yml
+      paths:
+        - vars
+      skip: True
   tags: munin,vars
 
 - name: munin node

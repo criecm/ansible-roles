@@ -43,7 +43,7 @@
     - name: listen 127.0.0.1 only
       replace:
         regexp: '^listen_addresses *= *(.*)$'
-        content: '#TMPANSIBLEUPGRADE# \1\nlisten_addresses = 127.0.0.1'
+        content: '#TMPANSIBLEUPGRADE# \1\nlisten_addresses = ''localhost'''
         path: '{{ olddbdir }}/postgresql.conf'
         backup: yes
       register: tmpconf

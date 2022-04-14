@@ -10,4 +10,3 @@
   become: True
   become_user: '{{ pg_owner }}'
   become_method: su
-

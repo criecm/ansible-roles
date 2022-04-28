@@ -120,3 +120,6 @@ admin_from: []
 apache_role_version: 1
 
 etcprefix: ''
+
+server_listen_ips:
+  - '*'

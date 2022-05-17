@@ -3,3 +3,4 @@ nfsv4_sec: "sys"
 
 nfsd_flags: '-t -u -n 10'
 mountd_add_flags: '-l'
+mountd_port: '4046'

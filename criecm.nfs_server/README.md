@@ -21,6 +21,8 @@ Role Variables
   list of /etc/exports lines (without path)
 * `mountd_add_flags ("-l")`
   flags to pass to mountd (man mountd)
+* `mountd_port (4046)`
+  specify port for mountd
 
 Dependencies
 ------------

@@ -1,0 +1,33 @@
+# install haproxy
+- name: install haproxy
+  package:
+    name: haproxy
+    state: present
+
+- name: haproxy config
+  template:
+    src: haproxy.conf.j2
+    dest: /usr/local/etc/haproxy.conf
+  notify: restart haproxy
+
+- name: syslog config
+  copy:
+    dest: /usr/local/etc/syslog.d/haproxy.conf
+    content: |
+      local5.*  /var/log/haproxy.log
+    mode: '0644'
+  notify: restart syslogd
+
+- name: newsyslog config
+  copy:
+    dest: /usr/local/etc/newsyslog.conf.d/haproxy.conf
+    content: |
+      /var/log/haproxy.log 640 7 10000 * CJ
+  notify: newsyslog
+
+- name: haproxy service
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
+  register: haproxy_started

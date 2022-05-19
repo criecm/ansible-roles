@@ -1,0 +1,55 @@
+# ANSIBLE MANAGED
+global
+    log /dev/log    local5 notice
+    user nobody
+    daemon
+
+defaults
+    log global
+    timeout connect 5000ms
+    timeout client  50000ms
+    timeout server  50000ms
+
+listen stats
+    mode http
+    bind :::8888 v4v6
+    mode http
+    log global
+    maxconn 10
+    stats enable
+    acl is_admin src 127.0.0.1
+    acl is_admin src ::1
+{% if admin_from | count > 0 %}
+    # ips from ansible's admin_from variable
+{%   for admin in admin_from %}
+    acl is_admin src {{ admin }}
+{%   endfor %}
+{% endif %}
+    stats admin if is_admin
+    stats uri /haproxy
+
+{% for proxy in haproxy_proxies %}
+# START ansible proxy {{ proxy.name }}
+listen {{ proxy.name }}
+{%   for bind in proxy.binds %}
+  bind {{ bind }}
+{%   endfor %}
+  balance {{ proxy.balance | default("leastconn") }}
+  mode {{ proxy.mode | default("tcp") }}
+{%   if proxy.clienttimeout | default(False) %}timeout client {{ proxy.clienttimeout }}{% endif %}
+{%   if proxy.servertimeout | default(False) %}timeout server {{ proxy.servertimeout }}{% endif %}
+{%   for opt in proxy.options | default([]) %}
+  option {{ opt }}
+{%   endfor %}
+{%   if proxy.backend %}
+#  auto-list from group {{ proxy.backend.group }}
+{%     for b in groups[proxy.backend.group] %}
+     server {{ b }} {{ hostvars[b].ansible_fqdn | default(b) }}:{{ proxy.backend.port }} {{ proxy.backend.opts | default("") }}
+{%     endfor %}
+{%   else %}
+{%     for backend in proxy.backends %}
+  server {{ backend.name }} {{ backend.address }}:{{ backend.port }} {{ backend.opts | default("") }}
+{%     endfor %}
+{%   endif %}
+# END ansible proxy {{ proxy.name }}
+{% endfor %}

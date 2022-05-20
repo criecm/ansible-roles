@@ -2,19 +2,28 @@
 global
     log /dev/log    local5 notice
     user nobody
+{% if haproxy_maxconn | default(False) %}
+    maxconn {{ haproxy_maxconn }}
+{% endif %}
+{% for glob in haproxy_global_config | default([]) %}
+    {{ glob }}
+{% endfor %}
     daemon
 
 defaults
     log global
-    timeout connect 5000ms
-    timeout client  50000ms
-    timeout server  50000ms
+{% for glob in haproxy_defaults_config | default([]) %}
+    {{ glob }}
+{% endfor %}
+    timeout connect {{ haproxy_connect_timeout | default("5000ms") }}
+    timeout client  {{ haproxy_client_timeout | default("50000ms") }}
+    timeout server  {{ haproxy_server_timeout | default("50000ms") }}
 
+{% if haproxy_stats_port | bool %}
 listen stats
     mode http
-    bind :::8888 v4v6
+    bind {{ haproxy_stats_address }}:{{ haproxy_stats_port }}{% if haproxy_stats_address is not match("^[0-9\.]*$") %} v4v6{% endif %}
     mode http
-    log global
     maxconn 10
     stats enable
     acl is_admin src 127.0.0.1
@@ -26,7 +35,8 @@ listen stats
 {%   endfor %}
 {% endif %}
     stats admin if is_admin
-    stats uri /haproxy
+    stats uri {{ haproxy_stats_path }}
+{% endif %}
 
 {% for proxy in haproxy_proxies %}
 # START ansible proxy {{ proxy.name }}
@@ -36,19 +46,23 @@ listen {{ proxy.name }}
 {%   endfor %}
   balance {{ proxy.balance | default("leastconn") }}
   mode {{ proxy.mode | default("tcp") }}
-{%   if proxy.clienttimeout | default(False) %}timeout client {{ proxy.clienttimeout }}{% endif %}
-{%   if proxy.servertimeout | default(False) %}timeout server {{ proxy.servertimeout }}{% endif %}
+{%   if proxy.clienttimeout | default(False) %}
+  timeout client {{ proxy.clienttimeout }}
+{% endif %}
+{%   if proxy.servertimeout | default(False) %}
+  timeout server {{ proxy.servertimeout }}
+{% endif %}
 {%   for opt in proxy.options | default([]) %}
   option {{ opt }}
 {%   endfor %}
-{%   if proxy.backend %}
+{%   if proxy.backend | default(False) %}
 #  auto-list from group {{ proxy.backend.group }}
 {%     for b in groups[proxy.backend.group] %}
-     server {{ b }} {{ hostvars[b].ansible_fqdn | default(b) }}:{{ proxy.backend.port }} {{ proxy.backend.opts | default("") }}
+     server {{ b }} {{ hostvars[b].ansible_fqdn | default(b) }}:{{ proxy.backend.port | default(proxy.backends_port) }} {{ proxy.backend.opts | default("") }}
 {%     endfor %}
 {%   else %}
 {%     for backend in proxy.backends %}
-  server {{ backend.name }} {{ backend.address }}:{{ backend.port }} {{ backend.opts | default("") }}
+  server {{ backend.name }} {{ backend.address }}:{{ backend.port | default(proxy.backends_port) }} {{ backend.opts | default(proxy.backends_opts) }}{{ backend.is_backup | default(False) | ternary(" backup", "") }}
 {%     endfor %}
 {%   endif %}
 # END ansible proxy {{ proxy.name }}

@@ -1,4 +1,5 @@
 galaxy_info:
+  role_name: postfix
   author: Geoffroy Desvernay
   description: sysadmin
   company: Ecole Centrale Marseille

@@ -1,0 +1,91 @@
+---
+- name: install postfix
+  package:
+    name: postfix
+    state: present
+
+- name: chroot files
+  block:
+    - name: chroot dir
+      file:
+        path: /var/spool/postfix/etc
+        state: directory
+        mode: '0755'
+    - name: chroot files
+      copy:
+        dest: '/var/spool/postfix{{ item }}'
+        src: '{{ item }}'
+        remote_src: yes
+      loop:
+        - /etc/services
+        - /etc/hosts
+        - /etc/resolv.conf
+
+- name: postfix get main.cf config
+  shell: |
+    postconf -n | egrep -v '(_directory|_path|debugger_command|mail_owner|setgid_group|smtp_tls_CApath) =' | sed 's/^\([^ ]*\) = \{0,1\}\(.*\)$/\1: "\2"/g'
+  register: postconfcmd
+  changed_when: False
+  check_mode: False
+
+- name: get postfix services
+  shell: |
+    postconf -F | awk 'BEGIN{oserv="";}{serv=$1;gsub("/[^/]+$","",serv);if(serv!=oserv){printf("\n%s:",serv);oserv=serv;}{field=$1;gsub("^.*/","",field);printf("\n  %s: ",field);printf("\"%s\"",$3);}}END{if(serv!~/^$/){printf("\n");}}'
+  register: postconfmasterservices
+  changed_when: False
+  check_mode: False
+
+- name: postfix get master.cf services parameters
+  shell: |
+    postconf -P | awk 'BEGIN{oserv="";}{serv=$1;gsub("/[^/]+$","",serv);if(serv!=oserv){printf("\n%s:",serv);oserv=serv;}{param=$1;gsub("^.*/","",param);printf("\n  %s: ",param);printf("\"%s\"",$3);}}END{if(serv!~/^$/){printf("\n");}}'
+  register: postconfmasterparams
+  changed_when: False
+  check_mode: False
+
+- name: set postconf facts
+  set_fact:
+    postconf: '{{ postconfcmd.stdout | from_yaml }}'
+    postconfservices: '{{ postconfmasterservices.stdout | from_yaml }}'
+    postconfparams: '{{ postconfmasterparams.stdout | from_yaml }}'
+    postfix_new_config: '{{ postfix_default_config | combine(postfix_config) }}'
+
+- name: postfix main.cf set config
+  command: 'postconf {{ item.key }}="{{ item.value }}"'
+  with_dict: '{{ postfix_new_config }}'
+  notify: restart postfix
+  when: not item.key in postconf.keys() or item.value != postconf[item.key]
+
+- name: remove postfix old config
+  command: 'postconf -X {{ item.key }}'
+  with_dict: '{{ postconf }}'
+  when: item.key not in postfix_new_config
+
+- name: postfix master.cf services
+  include_tasks:
+    file: service.yml
+  with_dict: '{{ postfix_services }}'
+  loop_control:
+    loop_var: service
+
+- name: postfix dh
+  command: 'openssl dhparam -out {{ postfix_new_config["smtpd_tls_dh1024_param_file"] | regex_replace("${config_directory}",postfix_config_directory) }}'
+  args:
+    creates: '{{ postfix_new_config["smtpd_tls_dh1024_param_file"] | regex_replace("${config_directory}",postfix_config_directory) }}'
+
+- name: list postfix maps
+  shell: |
+    postconf -nx | sed 's/[, ]/\n/g' | awk '/^hash:\//{gsub("hash:","");print;}' | while read m; do
+      if [ ${m}.db -ot ${m} ]; then
+        echo $m
+      fi
+    done
+  register: postmaps
+  changed_when: postmaps.stdout_lines | count > 0
+  check_mode: False
+  notify: rehash postfix maps
+
+- name: enable/start
+  service:
+    name: postfix
+    state: started
+    enabled: yes

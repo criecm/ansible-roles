@@ -1,0 +1,10 @@
+---
+# handlers file for criecm.postfix
+- name: rehash postfix maps
+  command: 'postmap {{ item }}'
+  loop: postmaps.stdout_lines | default([])
+
+- name: restart postfix
+  service:
+    name: postfix
+    state: restarted

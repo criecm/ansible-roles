@@ -9,11 +9,11 @@
 - name: set {{ service }} flag {{ item.key }}={{ item.value }}
   command: 'postconf -F {{ service.key }}/{{ item.key }}="{{ item.value }}"'
   when: 'not service.key in postconfservices.keys() or postconfservices[service.key] != item.value)'
-  with_dict: '{{ service.flags | default({}) }}'
+  with_dict: '{{ service.value.flags | default({}) }}'
   notify: restart postfix
 
 - name: 'set {{ service }} param {{ item.key }}="{{ item.value }}"'
   command: 'postconf -P {{  service.key }}/{{ item.key }}="{{ item.value }}"'
   when: 'not service.key in postconfservices.keys() or postconfparams[service.key] != item.value)'
-  with_dict: '{{ service.parameters | default({}) }}'
+  with_dict: '{{ service.value.parameters | default({}) }}'
   notify: restart postfix

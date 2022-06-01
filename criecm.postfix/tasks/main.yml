@@ -23,7 +23,7 @@
 
 - name: postfix get main.cf config
   shell: |
-    postconf -n | egrep -v '(_directory|_path|debugger_command|mail_owner|setgid_group|smtp_tls_CApath) =' | sed 's/^\([^ ]*\) = \{0,1\}\(.*\)$/\1: "\2"/g'
+    postconf -n | egrep -v '(debugger_command|smtp_tls_CApath) =' | sed 's/^\([^ ]*\) = \{0,1\}\(.*\)$/\1: "\2"/g'
   register: postconfcmd
   changed_when: False
   check_mode: False

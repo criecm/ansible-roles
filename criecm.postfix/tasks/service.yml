@@ -1,19 +1,20 @@
-- debug:
-    var: service
-
 - name: postfix master.cf service {{ service.key }}
   command: 'postconf -M {{ service.key }}="{{ service.key | regex_replace("/.*$","") }} {{ service.key | regex_replace("^.*/","") }} {{ service.value.flags.private | default("-") }} {{ service.value.flags.unprivileged | default("-") }} {{ service.value.flags.chroot | default("-") }} {{ service.value.flags.wakeup | default("-") }} {{ service.value.flags.process_limit | default("1") }} {{ service.value.flags.command }}"'
   when: service.key not in postconfservices.keys()
   notify: restart postfix
 
-- name: set {{ service }} flag {{ item.key }}={{ item.value }}
+- name: set {{ service.key }} flag {{ item.key }} = {{ item.value }}
   command: 'postconf -F {{ service.key }}/{{ item.key }}="{{ item.value }}"'
-  when: 'not service.key in postconfservices.keys() or postconfservices[service.key] != item.value)'
+  when: service.key not in postconfservices.keys() or
+    item.key not in postconfservices[service.key] or
+    postconfservices[service.key][item.key] != item.value
   with_dict: '{{ service.value.flags | default({}) }}'
   notify: restart postfix
 
-- name: 'set {{ service }} param {{ item.key }}="{{ item.value }}"'
-  command: 'postconf -P {{  service.key }}/{{ item.key }}="{{ item.value }}"'
-  when: 'not service.key in postconfservices.keys() or postconfparams[service.key] != item.value)'
+- name: set {{ service.key }} param {{ item.key }}="{{ item.value }}"
+  command: 'postconf -P {{ service.key }}/{{ item.key }}="{{ item.value }}"'
+  when: service.key not in postconfparams.keys() or
+    item.key not in postconfparams[service.key] or
+    postconfparams[service.key][item.key] != item.value
   with_dict: '{{ service.value.parameters | default({}) }}'
   notify: restart postfix

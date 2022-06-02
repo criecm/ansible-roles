@@ -43,7 +43,7 @@
     - name: listen 127.0.0.1 only
       replace:
         regexp: '^listen_addresses *= *(.*)$'
-        content: '#TMPANSIBLEUPGRADE# \1\nlisten_addresses = ''localhost'''
+        replace: '#TMPANSIBLEUPGRADE# \1\nlisten_addresses = ''localhost'''
         path: '{{ olddbdir }}/postgresql.conf'
         backup: yes
       register: tmpconf
@@ -88,6 +88,15 @@
       loop: '{{ pkgs_installed.stdout_lines 
       | map("regex_search","^postgresql"+pg_old_vers+"-.*") | list 
       | map("regex_replace","^postgresql"+pg_old_vers+"-([^-]+)-[0-9].*$","\1") | list }}'
+
+    - name: zfs
+      zfs:
+        name: '{{ pg_zfs_base }}/{{ pg_datasubdir }}'
+        state: present
+        extra_zfs_properties:
+          mountpoint: '{{ pg_basedir }}/{{ pg_datasubdir }}'
+          recordsize: 8K
+      when: pg_zfs_base | length > 0
 
     - name: install new postgresql packages
       command: 'pkg install -yfR {{ pkgs_installed.stdout_lines | map("regex_replace",pg_old_vers+"(-[^-]+)-[0-9].*$",pg_vers+"\1") | list | join(" ") }}'

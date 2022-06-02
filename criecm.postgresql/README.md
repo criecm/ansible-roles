@@ -11,7 +11,7 @@ FreeBSD machine (or jail or ?)
 * `pg_admin_user (admin)`:
 * `pg_admin_password ('')`:
   You *need* to set this one
-* `pg_admin_host` ('all')
+* `pg_admin_host` ('localhost')
   IP or network to allow admin user from in pg_hba.conf
 * `pg_allowed_hosts` ([])
   list of adresses allowed to connect to any DB with any user

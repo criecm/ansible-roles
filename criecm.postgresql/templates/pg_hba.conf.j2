@@ -7,7 +7,7 @@ host	all	all	{{ h }}	md5
 {% endfor %}
 
 {% if pg_admin_password != '' %}
-host	all	{{ pg_admin_user }}	{{ pg_admin_host | default("all") }}	md5
+host	all	{{ pg_admin_user }}	{{ pg_admin_host | default("localhost") }}	md5
 {% endif %}
 
 {% for u in pg_users | default([]) | union(pg_maintenance_users) %}

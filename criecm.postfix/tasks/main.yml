@@ -74,8 +74,8 @@
 
 - name: list postfix maps
   shell: |
-    postconf -nx | sed 's/[, ]/\n/g' | awk '/^hash:\//{gsub("hash:","");print;}' | while read m; do
-      if [ ${m}.db -ot ${m} ]; then
+    postconf -x | grep -v alias_ | sed 's/[, ]/\n/g' | awk '/^hash:\//{gsub("hash:","");print;}' | while read m; do
+      if [ ! -e ${m}.db -o ${m}.db -ot ${m} ]; then
         echo $m
       fi
     done
@@ -83,6 +83,9 @@
   changed_when: postmaps.stdout_lines | count > 0
   check_mode: False
   notify: rehash postfix maps
+
+- name: newaliases
+  shell: newaliases
 
 - name: enable/start
   service:

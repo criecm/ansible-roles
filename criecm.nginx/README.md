@@ -149,7 +149,9 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
 #### optional (default values may suffice)
 
 * `rootdir` (/home/{{id}}/{{id}})
-  web root
+  site root (code)
+* `webroot` (rootdir)
+  alternative web root if needed
 * `listen` ([80|443])
   list of port or ip:port's to listen to
 * `default_index ('index.html index.htm')`

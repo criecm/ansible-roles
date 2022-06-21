@@ -95,7 +95,7 @@ server {
 
 {% if not site.nginx_includes | list() %}
 	location / {
-		root	{{ site.rootdir }};
+		root	{{ site.webroot | default(site.rootdir) }};
 		index	{{ site.default_index | default("index.html index.htm") }};
 {%   if "backends" in site and not ( "backend" in site and "php" in site.backend ) %}
 		proxy_pass {{ site.backends[0] | regex_replace("://.*","") }}://{{ upstream }};
@@ -104,7 +104,7 @@ server {
 {%   if "backend" in site and "php" in site.backend %}
 # site.backend={{ site.backend }}
 	location ~ "^.*\.php(?:/.*)?" {
-		root	{{ site.rootdir }};
+		root	{{ site.webroot | default(site.rootdir) }};
 		fastcgi_split_path_info ^(.+?\.php)(/.*)$;
 		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 		fastcgi_param PATH_TRANSLATED $document_root$fastcgi_path_info;

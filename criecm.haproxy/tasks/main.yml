@@ -31,3 +31,6 @@
     state: started
     enabled: yes
   register: haproxy_started
+
+#- name: to_check
+  

@@ -19,10 +19,10 @@ defaults
     timeout client  {{ haproxy_client_timeout | default("50000ms") }}
     timeout server  {{ haproxy_server_timeout | default("50000ms") }}
 
-{% if haproxy_stats_port | bool %}
+{% if haproxy_stats_port %}
 listen stats
     mode http
-    bind {{ haproxy_stats_address }}:{{ haproxy_stats_port }}{% if haproxy_stats_address is not match("^[0-9\.]*$") %} v4v6{% endif %}
+    bind {{ haproxy_stats_address }}:{{ haproxy_stats_port }}{% if haproxy_stats_address is not match("^[0-9\.]*$") %} v4v6{% endif +%}
     mode http
     maxconn 10
     stats enable

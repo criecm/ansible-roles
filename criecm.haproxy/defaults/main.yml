@@ -2,3 +2,4 @@
 # defaults file for criecm.haproxy
 haproxy_stats_port: 8888
 haproxy_stats_address: '::'
+haproxy_stats_path: '/haproxy'

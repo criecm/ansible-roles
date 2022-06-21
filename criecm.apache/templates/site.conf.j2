@@ -21,7 +21,7 @@
 {% if site.webroot | default(site.rootdir) %}
   DocumentRoot {{ site.webroot | default(site.rootdir) }}
 
-  <Directory {{ site.webroot | default(site.rootdirr }}>
+  <Directory {{ site.webroot | default(site.rootdir) }}>
     Require all granted
   </Directory>
 {% endif %}

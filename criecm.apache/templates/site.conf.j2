@@ -18,10 +18,10 @@
   DirectoryIndex {{ site.default_index }}
 {%- endif %}
 
-{% if site.rootdir %}
-  DocumentRoot {{ site.rootdir }}
+{% if site.webroot | default(site.rootdir) %}
+  DocumentRoot {{ site.webroot | default(site.rootdir) }}
 
-  <Directory {{ site.rootdir }}>
+  <Directory {{ site.webroot | default(site.rootdirr }}>
     Require all granted
   </Directory>
 {% endif %}

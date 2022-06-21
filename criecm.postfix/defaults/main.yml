@@ -4,3 +4,5 @@ postfix_default_config:
   smtpd_tls_dh1024_param_file: '${config_directory}/dh1024.pem'
 
 postfix_config_directory: /usr/local/etc/postfix
+
+postfix_services: []

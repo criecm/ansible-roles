@@ -68,9 +68,9 @@
     loop_var: service
 
 - name: postfix dh
-  command: 'openssl dhparam -out {{ postfix_new_config["smtpd_tls_dh1024_param_file"] | regex_replace("${config_directory}",postfix_config_directory) }}'
+  command: 'openssl dhparam -out {{ postfix_new_config["smtpd_tls_dh1024_param_file"] | regex_replace("\$\{config_directory\}",postfix_config_directory) }} 1024'
   args:
-    creates: '{{ postfix_new_config["smtpd_tls_dh1024_param_file"] | regex_replace("${config_directory}",postfix_config_directory) }}'
+    creates: '{{ postfix_new_config["smtpd_tls_dh1024_param_file"] | regex_replace("\$\{config_directory\}",postfix_config_directory) }}'
 
 - name: list postfix maps
   shell: |

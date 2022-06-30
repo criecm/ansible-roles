@@ -88,9 +88,18 @@
       tags: samba, smbldap
   when: smb_is_pdc | bool
 
+- name: domain info
+  command: 'net rpc info -U {{ samba_join_user }}%{{ samba_join_passwd }}'
+  when: samba_join_user | length > 0 and newconf.changed
+  register: rpcinfo
+  failed_when: False
+  changed_when: False
+  check_mode: False
+  tags: samba, config
+
 - name: join domain
   command: 'net rpc join -U {{ samba_join_user }}%{{ samba_join_passwd }}'
-  when: samba_join_user | length > 0 and newconf.changed
+  when: samba_join_user | length > 0 and newconf.changed and rpcinfo.rc != 0
   tags: samba, config
 
 - name: enable services

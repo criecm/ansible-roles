@@ -5,7 +5,7 @@
   vars:
     params:
       files:
-        - '{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml'
+        - '{{ ansible_os_family }}-{{ ansible_distribution_major_version | default(ansible_distribution_version) }}.yml'
         - '{{ ansible_os_family }}.yml'
         - '{{ ansible_distribution }}.yml'
         - main.yml

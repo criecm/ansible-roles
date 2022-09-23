@@ -44,7 +44,7 @@
 - name: log dir
   file:
     dest: '{{ nginx_log_dir }}'
-    mode: '0750'
+    mode: '0755'
     state: directory
   when: 'nginx_log_dir != ""'
   tags: nginx, config

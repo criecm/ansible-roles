@@ -1,5 +1,5 @@
 - name: postfix master.cf service {{ service.key }}
-  command: 'postconf -M {{ service.key }}="{{ service.key | regex_replace("/.*$","") }} {{ service.key | regex_replace("^.*/","") }} {{ service.value.flags.private | default("-") }} {{ service.value.flags.unprivileged | default("-") }} {{ service.value.flags.chroot | default("-") }} {{ service.value.flags.wakeup | default("-") }} {{ service.value.flags.process_limit | default("1") }} {{ service.value.flags.command }}"'
+  command: 'postconf -M {{ service.key }}="{{ service.key | regex_replace("/.*$","") }} {{ service.key | regex_replace("^.*/","") }} {{ service.value.flags.private | default("-") }} {{ service.value.flags.unprivileged | default("-") }} {{ service.value.flags.chroot | default("-") }} {{ service.value.flags.wakeup | default("-") }} {{ service.value.flags.process_limit | default("-") }} {{ service.value.flags.command }}"'
   when: service.key not in postconfservices.keys()
   notify: restart postfix
 

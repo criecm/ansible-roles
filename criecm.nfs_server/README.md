@@ -23,6 +23,8 @@ Role Variables
   flags to pass to mountd (man mountd)
 * `mountd_port (4046)`
   specify port for mountd
+* `nfsv4_only (False)`
+  NFSv4 only server (FreeBSD 13+)
 
 Dependencies
 ------------

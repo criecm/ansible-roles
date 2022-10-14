@@ -12,6 +12,7 @@
     rpc_mountd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p {{ mountd_port }} {{ mountd_add_flags }}"
     mountd_enable: 'YES'
     nfsv4_server_enable: '{% if nfsv4_enable %}YES{% else %}NO{% endif %}'
+    nfsv4_server_only: '{% if nfsv4_only %}YES{% else %}NO{% endif %}'
   notify: restart freebsd nfs server
   when: ansible_os_family == "FreeBSD" and item.value != ''
 

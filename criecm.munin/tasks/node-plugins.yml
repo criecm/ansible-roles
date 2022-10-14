@@ -4,7 +4,7 @@
   munin-node-configure --shell | fgrep -v plugins/if_ | fgrep -v plugins/sendmail_ | sh'
   args:
     creates: '{{ munin_etcdir }}/plugins/load'
-  when: not ansible_virtualization_type == "jails"
+  when: not ansible_virtualization_tech_guest[0] | default("") == "jails"
   notify:
     - restart munin node
     - restart munin asyncd
@@ -14,7 +14,7 @@
     src: '{{ munin_dist_plugins }}/snmp__if_multi'
     dest: '{{ munin_etcdir }}/plugins/snmp_localhost_if_multi'
     state: link
-  when: not ansible_virtualization_type == "jails"
+  when: not ansible_virtualization_tech_guest[0] | default("") == "jails"
   notify:
     - restart munin node
     - restart munin asyncd

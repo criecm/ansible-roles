@@ -27,7 +27,7 @@ FreeBSD machine (or jail or ?)
 * `pg_users ([])`:
   Users to be created, dict with keys 'db', 'name','password', 'priv'
   ( like in http://docs.ansible.com/ansible/latest/postgresql_user_module.html )
-  + 'host' (to be added to pg_hba.conf)
+  + 'hosts ([all])' (to be added to pg_hba.conf)
 * `pg_maintenance_users ([])`:
   like above, but to be defined globally
 * `pg_dbs ([])`:
@@ -59,21 +59,16 @@ FreeBSD machine (or jail or ?)
   * `pg_lc_time`
 * `pg_text_search_config ('pg_catalog.english')`:
 
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+Simple postgresql on ZFS setup
 
     - hosts: servers
       roles:
          - { role: criecm.postgresql, pg_admin_password: '42', pg_zfs_base: 'zdata/pgsql' }
 
-More complete
+Create user (and db)
 
     - hosts: dbhosts
       roles:
@@ -81,13 +76,34 @@ More complete
       vars:
         pg_admin_password: '42'
 	pg_zfs_base: 'zdata/pgsql'
-	pg_dbs:
-	  - name: db1
-	    owner: app1
 	pg_users:
 	  - name: app1
 	    password: secret
 	    db: db1
+	    hosts: [ 10.2.5.0/24 ]
+
+Create db and some users
+    - hosts: dbhosts
+      roles:
+        - criecm.postgresql
+      vars:
+        pg_admin_password: '42'
+        pg_zfs_base: 'zdata/pgsql'
+        pg_dbs:
+          - name: db1
+            owner: app1
+	  - name: otherdb
+	    owner: app1
+        pg_users:
+          - name: app1
+            password: secret
+            db: db1
+            hosts: [ 10.2.5.0/24 ]
+          - name: app2
+            password: secret
+            db: db1
+            hosts: [ 10.2.5.0/24 ]
+	    priv: 'SELECT/table1:INSERT'
 
 License
 -------

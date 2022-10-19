@@ -9,13 +9,13 @@
     zpat: '{% if zpat1 | count > 0 %}{{ zpat1[0] | regex_replace("^.* ([^ ]*)$","\1") }}{% endif %}'
 
 - name: 'delete zone {{ zone.name }}'
-  command: 'nsd-control delzone {{ zone.name }}'
+  command: '{{ nsd_bin }}-control delzone {{ zone.name }}'
   when: 'zpat | length > 0 and zone.pattern | length > 0 and zpat != zone.pattern'
   register: zdel
   notify: reconfig nsd
 
 - name: 'add zone {{ zone.name }}'
-  command: 'nsd-control addzone {{ zone.name }} {{ zone.pattern }}'
+  command: '{{ nsd_bin }}-control addzone {{ zone.name }} {{ zone.pattern }}'
   when: 'zone.pattern | length > 0 and ( zdel.changed or zpat | length == 0 )
     and zone.pattern in nsd_patterns_list'
   register: zadd

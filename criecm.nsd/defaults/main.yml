@@ -1,4 +1,5 @@
 ---
+nsd_bin: /usr/sbin/nsd
 nsd_configdir: /etc/nsd
 nsd_zonesdir: '{{ nsd_configdir }}/zones'
 nsd_port: 53

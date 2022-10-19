@@ -8,4 +8,4 @@
     - restarted
 
 - name: reconfig nsd
-  command: nsd-control reconfig
+  command: '{{ nsd_bin }}-control reconfig'

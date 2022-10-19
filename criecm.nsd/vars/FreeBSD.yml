@@ -1,4 +1,5 @@
 ---
+nsd_bin: /usr/local/sbin/nsd
 nsd_configdir: /usr/local/etc/nsd
 nsd_dbdir: /var/db/nsd
 nsd_user: nsd

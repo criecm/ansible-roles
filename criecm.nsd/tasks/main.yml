@@ -32,7 +32,7 @@
   tags: config, nsd
 
 - name: init nsd-control
-  shell: 'nsd-control-setup'
+  shell: '{{ nsd_bin }}-control-setup'
   when: not nsdcontrolkey.stat.exists
   tags: config, nsd, skip_ansible_lint
 
@@ -82,12 +82,12 @@
     state: started
 
 - name: reload nsd now
-  command: nsd-control reconfig
+  command: '{{ nsd_bin }}-control reconfig'
   when: nsdcfg.changed
   tags: config, nsd, skip_ansible_lint
 
 - name: get zones patterns
-  shell: "nsd-control zonestatus | awk '/^zone:/{zone=$2}/pattern:/{printf(\"%s %s\\n\",zone,$2);}'"
+  shell: "{{ nsd_bin }}-control zonestatus | awk '/^zone:/{zone=$2}/pattern:/{printf(\"%s %s\\n\",zone,$2);}'"
   register: zpatterns
   check_mode: False
   changed_when: False

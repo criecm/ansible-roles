@@ -118,4 +118,3 @@
   loop_control:
     loop_var: pg_user
   loop: '{{ pg_users | union(pg_maintenance_users) }}'
-  when: pg_init.changed | default(False)

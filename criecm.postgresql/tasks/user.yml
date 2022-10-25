@@ -1,4 +1,14 @@
 ---
+- name: 'create db {{ pg_user.name }}'
+  postgresql_db:
+    name: '{{ pg_user.db }}'
+    owner: '{{ pg_user.name }}'
+    state: present
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su
+  when: '"db" in pg_user.keys() and not pg_user.db in pg_actual.databases.keys()'
+
 - name: 'pg user {{ pg_user.name }}'
   postgresql_user:
     name: '{{ pg_user.name }}'
@@ -11,16 +21,6 @@
   become_user: '{{ pg_owner }}'
   become_method: su
 
-- name: create db
-  postgresql_db:
-    name: '{{ pg_user.db }}'
-    owner: '{{ pg_user.name }}'
-    state: present
-  become: True
-  become_user: '{{ pg_owner }}'
-  become_method: su
-  when: '"db" in pg_user.keys() and not pg_user.db in pg_actual.databases.keys()'
-
 - name: access in pg_hba.conf for {{ pg_user.name }}
   blockinfile:
     path: '{{ pg_basedir }}/{{ pg_datasubdir }}/pg_hba.conf'
@@ -30,4 +30,6 @@
     block: |
       {% for host in pg_user.hosts | default(['all']) %}
       host	{{ pg_user.db | default(pg_user.name) }}	{{ pg_user.name }}	{{ host }}	{% if pg_user.password | default(False) %}md5{% else %}trust{% endif %}
+      
       {% endfor %}
+  notify: reload postgresql

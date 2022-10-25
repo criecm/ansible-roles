@@ -8,5 +8,5 @@
 - name: restart munin asyncd
   service:
     name: '{{ munin_asyncd_service }}'
-    state: restarted
+    state: started
   ignore_errors: yes

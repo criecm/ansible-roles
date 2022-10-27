@@ -97,7 +97,7 @@ server {
 	location / {
 		root	{{ site.webroot | default(site.rootdir) }};
 		index	{{ site.default_index | default("index.html index.htm") }};
-{%   if "backends" in site and not ( "backend" in site and "php" in site.backend ) %}
+{%   if site.backends | count() > 0 and not ( "backend" in site and "php" in site.backend ) %}
 		proxy_pass {{ site.backends[0] | regex_replace("://.*","") }}://{{ upstream }};
 {%   endif %}
 	}

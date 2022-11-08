@@ -6,5 +6,5 @@ ssl_session_tickets	off;
 ssl_session_timeout	1d;
 ssl_dhparam	/etc/ssl/dhparam4096.pem;
 resolver_timeout	3s;
-resolver {% for ns in resolvers %}{% if ansible_all_ipv4_addresses | ipaddr(ns.network) %}{{ns.ip}} {% elif ansible_all_ipv6_addresses | ipaddr(ns.network) %}[{{ ns.ip }}] {% endif %}{% endfor %};
+resolver {% for ns in resolvers %}{% if ansible_all_ipv4_addresses | ansible.utils.ipaddr(ns.network) %}{{ns.ip}} {% elif ansible_all_ipv6_addresses | ansible.utils.ipaddr(ns.network) %}[{{ ns.ip }}] {% endif %}{% endfor %};
 

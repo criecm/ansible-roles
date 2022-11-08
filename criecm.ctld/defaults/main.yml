@@ -3,7 +3,7 @@
 iscsi_target: '{{ inventory_hostname }}'
 iscsi_auth_group: 'defauthgroup'
 iscsi_portal_group: 'defportal'
-iscsi_listen_ip: '{{ (ansible_all_ipv4_addresses | ipaddr(iscsi_network_cidr))[0] }}'
+iscsi_listen_ip: '{{ (ansible_all_ipv4_addresses | ansible.utils.ipaddr(iscsi_network_cidr))[0] }}'
 iscsi_auth_type: 'none'
 iscsi_iqn_base: 'iqn.2017-12'
 iscsi_domain: '{{ ansible_fqdn }}'

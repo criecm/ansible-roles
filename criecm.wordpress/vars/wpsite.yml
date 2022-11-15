@@ -1,4 +1,6 @@
 default_wp_site:
   id: wordpress
   name: ''
-
+  wp_plugins: '{{ wp_plugins }}'
+  wp_config: '{{ wp_config }}'
+  wp_themes: '{{ wp_themes }}'

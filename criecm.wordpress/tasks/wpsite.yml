@@ -1,13 +1,25 @@
 ---
+- name: site vars
+  include_vars: wpsite.yml
+
+- name: site fact
+  set_fact:
+    wpsite: '{{ default_wp_site | combine(onewpsite) }}'
+
 - name: Download Wordpress
   shell: 'wp core download --locale=fr_FR --version={{ wp_version }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
     creates: "{{ wpsite.rootdir }}/index.php"
 
 - name: configure wordpress
   command: 'wp core config --dbhost={{ wpsite.db.host }} --dbuser={{ wpsite.db.user }} --dbpass={{ wpsite.db.pass }} --dbname={{ wpsite.db.name }} --path={{ wpsite.rootdir }} --url=https://{{ wpsite.name }}'
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
     creates: '{{ wpsite.rootdir }}/wp-config.php'
@@ -23,6 +35,7 @@
   loop:
     - uploads
     - cache
+
 - name: chmod wp-content
   file:
     path: '{{ wpsite.rootdir }}/wp-content'
@@ -44,7 +57,9 @@
   command: 'wp core install --url=https://{{ wpsite.name | quote }} --title={{ wpsite.title | default("Titre à changer") | quote }} --admin_user={{ wpsite.admin | default("chef") | quote }} --admin_email={{ wpsite.adminmail | quote }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
 
 - name: get wp config
   command: 'wp config list --format=csv'
@@ -52,48 +67,62 @@
   changed_when: False
   args:
     chdir: '{{ wpsite.rootdir }}'
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
 
 - name: set wp config
-  command: 'wp config set {{ item }} {{ wp_config[item] }} --type=constant --path={{ wpsite.rootdir }}'
-  loop: '{{ wp_config.keys() | list }}'
+  command: 'wp config set {{ item }} {{ wpsite.wp_config[item] }} --type=constant --path={{ wpsite.rootdir }}'
+  loop: '{{ wpsite.wp_config.keys() | list }}'
   when: wpconfig.stdout is not match(item+",")
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
 
 - name: install lang fr_FR
   command: 'wp language core install fr_FR'
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
 - name: activate fr_FR
   command: 'wp language core activate fr_FR'
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
 
-- name: Install default plugin
+- name: Install default plugins
   shell: 'wp plugin is-installed {{ item }} || wp plugin install {{ item }}'
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
-  loop: "{{ wp_plugins }}"
+  loop: "{{ wpsite.wp_plugins }}"
 
 - name: install theme(s)
   shell: 'wp theme is-installed {{ item }} || wp theme install {{ item }}'
   changed_when: false
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
-  loop: "{{ wp_themes }}"
+  loop: "{{ wpsite.wp_themes }}"
 
 - name: activate theme
   command: 'wp theme activate {{ wp_themes[0] }}'
-  become: '{{ wpsite.maintainer }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
   args:
     chdir: '{{ wpsite.rootdir }}'
-  loop: "{{ wp_themes }}"
+  loop: "{{ wpsite.wp_themes }}"
 
 - name: cron mailto
   cron:
@@ -152,21 +181,27 @@
 
     - name: Update Wordpress
       shell: 'wp core update --version={{ wp_version }}'
-      become: '{{ wpsite.maintainer }}'
+      become: yes
+      become_method: su
+      become_user: '{{ wpsite.maintainer }}'
       args:
         chdir: '{{ wpsite.rootdir }}'
       when: check_version.rc
 
     - name: update theme(s)
       command: 'wp theme update --all --format=json'
-      become: '{{ wpsite.maintainer }}'
+      become: yes
+      become_method: su
+      become_user: '{{ wpsite.maintainer }}'
       args:
         chdir: '{{ wpsite.rootdir }}'
 
     - name: Update default plugins
       shell: 'wp plugin is-installed {{ item }} && wp plugin update {{ item }}'
       changed_when: false
-      become: '{{ wpsite.maintainer }}'
+      become: yes
+      become_method: su
+      become_user: '{{ wpsite.maintainer }}'
       args:
         chdir: '{{ wpsite.rootdir }}'
       with_items: "{{ wp_plugins }}"
@@ -174,7 +209,9 @@
     - name: Activate default plugins
       shell: 'wp plugin is-installed {{ item }} && wp plugin activate {{ item }}'
       changed_when: false
-      become: '{{ wpsite.maintainer }}'
+      become: yes
+      become_method: su
+      become_user: '{{ wpsite.maintainer }}'
       args:
         chdir: '{{ wpsite.rootdir }}'
       with_items: "{{ wp_plugins }}"

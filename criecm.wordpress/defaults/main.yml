@@ -11,3 +11,4 @@ wp_config:
   FORCE_SSL_ADMIN: 1
   FORCE_SSL_LOGIN: 1
 
+wp_themes: []

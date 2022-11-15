@@ -8,8 +8,10 @@
 - name: wp sites
   include_tasks: 'wpsite.yml'
   loop_control:
-    loop_var: wpsite
+    loop_var: onewpsite
   loop: '{{ sites }}'
+  #loop: '{% if mysite %}{{ sites | selectattr("id","equalto",mysite) }}{% else %}{{ sites }}{% endif %}'
+  when: 'mysite == "" or mysite == onewpsite.id'
 
 - name: set wpcli fact
   set_fact:

@@ -118,6 +118,7 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   activate http2 when using tls
 * `mysite ('')`:
   if defined, will only process this `site.id`
+  (use `ansible-playbook ... -e mysite=thisone` where `thisone` is your site's `id`)
 * `nginx_default_site ('default')`
   set it to '' to prevent default site to be installed
 * `nginx_aio (off)`

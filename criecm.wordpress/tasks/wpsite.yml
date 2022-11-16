@@ -6,22 +6,53 @@
   set_fact:
     wpsite: '{{ default_wp_site | combine(onewpsite) }}'
 
+- name: configure wp cli
+  block:
+    - name: dir
+      file:
+        path: '~{{ wpsite.maintainer }}/.wp-cli'
+        state: directory
+      become: yes
+      become_method: su
+      become_user: '{{ wpsite.maintainer }}'
+    - name: config
+      copy:
+        dest: '~{{ wpsite.maintainer }}/.wp-cli/config.yml'
+        mode: '0640'
+        content: |
+          # ansible generated criecm.wordpress - one time only
+          color: False
+          url: https://{{ wpsite.name }}
+          user: {{ wpsite.admin }}
+          path: {{ wpsite.rootdir }}
+        force: no
+      become: yes
+      become_method: su
+      become_user: '{{ wpsite.maintainer }}'
+    - name: user .profile
+      lineinfile:
+        dest: '~{{ wpsite.maintainer }}/.profile'
+        line: 'export {{ item.key }}="{{ item.value }}"'
+        regexp: '^export {{ item.key }}='
+      with_dict:
+        SERVER_NAME: '{{ wpsite.name }}'
+        SERVER_PORT: '443'
+        HTTPS: 'On'
+
 - name: Download Wordpress
-  shell: 'wp core download --locale=fr_FR --version={{ wp_version }}'
+  shell: 'wp core download --locale={{ wp_lang }} --version={{ wp_version }}'
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
   args:
-    chdir: '{{ wpsite.rootdir }}'
     creates: "{{ wpsite.rootdir }}/index.php"
 
 - name: configure wordpress
-  command: 'wp core config --dbhost={{ wpsite.db.host }} --dbuser={{ wpsite.db.user }} --dbpass={{ wpsite.db.pass }} --dbname={{ wpsite.db.name }} --path={{ wpsite.rootdir }} --url=https://{{ wpsite.name }}'
+  command: 'wp core config --dbhost={{ wpsite.db.host }} --dbuser={{ wpsite.db.user }} --dbpass={{ wpsite.db.pass }} --dbname={{ wpsite.db.name }}'
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
   args:
-    chdir: '{{ wpsite.rootdir }}'
     creates: '{{ wpsite.rootdir }}/wp-config.php'
 
 - name: chown/mod
@@ -44,92 +75,125 @@
     group: '_{{ wpsite.id }}'
     state: directory
 
-- name: chown/mod files
-  file:
-    path: '{{ wpsite.rootdir }}/wp-content/{{ item }}'
+- name: create wp-cache-config.php
+  copy:
+    dest: '{{ wpsite.rootdir }}/wp-content/wp-cache-config.php'
     mode: '0660'
     owner: '{{ wpsite.maintainer }}'
     group: '_{{ wpsite.id }}'
-    state: touch
-  loop:
-    - wp-cache-config.php
-- name: configure site
-  command: 'wp core install --url=https://{{ wpsite.name | quote }} --title={{ wpsite.title | default("Titre à changer") | quote }} --admin_user={{ wpsite.admin | default("chef") | quote }} --admin_email={{ wpsite.adminmail | quote }}'
-  args:
-    chdir: '{{ wpsite.rootdir }}'
+    force: no
+    content: ''
+    state: present
+
+- name: get install status
+  command: 'wp core is-installed'
+  ignore_errors: True
+  changed_when: False
+  register: isinstalled
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
+  
+- name: configure site
+  command: 'wp core install --title={{ wpsite.title | default("Titre à changer") | quote }} --admin_user={{ wpsite.admin | quote }} --admin_email={{ wpsite.adminmail | quote }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
+  when: isinstalled.rc > 0
 
 - name: get wp config
   command: 'wp config list --format=csv'
   register: wpconfig
   changed_when: False
-  args:
-    chdir: '{{ wpsite.rootdir }}'
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
 
 - name: set wp config
-  command: 'wp config set {{ item }} {{ wpsite.wp_config[item] }} --type=constant --path={{ wpsite.rootdir }}'
+  command: 'wp config set {{ item }} {{ wpsite.wp_config[item] }} --type=constant'
   loop: '{{ wpsite.wp_config.keys() | list }}'
-  when: wpconfig.stdout is not match(item+",")
+  when: wpconfig.stdout is not match(item+","+wpsite.wp_config[item] | string)
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  args:
-    chdir: '{{ wpsite.rootdir }}'
 
-- name: install lang fr_FR
-  command: 'wp language core install fr_FR'
+- name: list installed languages
+  command: 'wp language core list --format=json'
+  changed_when: False
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  args:
-    chdir: '{{ wpsite.rootdir }}'
-- name: activate fr_FR
-  command: 'wp language core activate fr_FR'
+  register: installedlangs
+  
+- name: install lang {{ wp_lang }}
+  command: 'wp language core install {{ wp_lang }}'
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  args:
-    chdir: '{{ wpsite.rootdir }}'
+  when: wp_lang in installedlangs.stdout | from_json | selectattr("status","equalto","uninstalled") | map(attribute="language") | list
+
+- name: activate {{ wp_lang }}
+  command: 'wp language core activate {{ wp_lang }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
+  when: wp_lang not in installedlangs.stdout | from_json | selectattr("status","equalto","active") | map(attribute="language") | list
+
+- name: list installed plugins
+  command: 'wp plugin list --format=json'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
+  register: pluginlist
+  changed_when: False
 
 - name: Install default plugins
-  shell: 'wp plugin is-installed {{ item }} || wp plugin install {{ item }}'
+  command: 'wp plugin install {{ item }}'
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  args:
-    chdir: '{{ wpsite.rootdir }}'
   loop: "{{ wpsite.wp_plugins }}"
+  when: item not in pluginlist.stdout | from_json | map(attribute="name") | list
+
+- name: activate plugins
+  command: 'wp plugin activate {{ item }}'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
+  loop: "{{ wpsite.wp_plugins }}"
+  when: item not in pluginlist.stdout | from_json | selectattr("status","equalto","active") | map(attribute="name") | list
+
+- name: list installed themes
+  command: 'wp theme list --format=json'
+  become: yes
+  become_method: su
+  become_user: '{{ wpsite.maintainer }}'
+  register: themelist
+  changed_when: False
 
 - name: install theme(s)
-  shell: 'wp theme is-installed {{ item }} || wp theme install {{ item }}'
+  shell: 'wp theme install {{ item }}'
   changed_when: false
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  args:
-    chdir: '{{ wpsite.rootdir }}'
   loop: "{{ wpsite.wp_themes }}"
+  when: item not in themelist | map(attribute="name") | list
 
 - name: activate theme
   command: 'wp theme activate {{ wp_themes[0] }}'
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  args:
-    chdir: '{{ wpsite.rootdir }}'
   loop: "{{ wpsite.wp_themes }}"
+  when: wp_themes | count() > 0 and themelist.stdout | from_json | selectattr("status","equalto","active") | map(attribute="name") | list | first != wp_themes[0]
 
 - name: cron mailto
   cron:
     env: yes
     name: MAILTO
-    value: '{{ wpsite.maintainer_email }}'
-  when: wpsite.maintainer_email | default(False)
+    value: '{{ wpsite.adminmail }}'
+  when: wpsite.adminmail != ""
 
 - name: install cron
   cron:
@@ -184,8 +248,6 @@
       become: yes
       become_method: su
       become_user: '{{ wpsite.maintainer }}'
-      args:
-        chdir: '{{ wpsite.rootdir }}'
       when: check_version.rc
 
     - name: update theme(s)
@@ -193,8 +255,6 @@
       become: yes
       become_method: su
       become_user: '{{ wpsite.maintainer }}'
-      args:
-        chdir: '{{ wpsite.rootdir }}'
 
     - name: Update default plugins
       shell: 'wp plugin is-installed {{ item }} && wp plugin update {{ item }}'
@@ -202,8 +262,6 @@
       become: yes
       become_method: su
       become_user: '{{ wpsite.maintainer }}'
-      args:
-        chdir: '{{ wpsite.rootdir }}'
       with_items: "{{ wp_plugins }}"
 
     - name: Activate default plugins
@@ -212,7 +270,5 @@
       become: yes
       become_method: su
       become_user: '{{ wpsite.maintainer }}'
-      args:
-        chdir: '{{ wpsite.rootdir }}'
       with_items: "{{ wp_plugins }}"
   when: wp_do_update | default(False)

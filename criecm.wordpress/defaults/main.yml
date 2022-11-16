@@ -12,3 +12,5 @@ wp_config:
   FORCE_SSL_LOGIN: 1
 
 wp_themes: []
+
+wp_lang: 'fr_FR'

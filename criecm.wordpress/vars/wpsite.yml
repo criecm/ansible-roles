@@ -4,3 +4,5 @@ default_wp_site:
   wp_plugins: '{{ wp_plugins }}'
   wp_config: '{{ wp_config }}'
   wp_themes: '{{ wp_themes }}'
+  adminmail: ''
+  admin: 'chef'

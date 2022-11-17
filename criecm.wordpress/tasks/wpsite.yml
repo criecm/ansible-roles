@@ -25,7 +25,11 @@
           url: https://{{ wpsite.name }}
           user: {{ wpsite.admin }}
           path: {{ wpsite.rootdir }}
-        force: no
+          {% if "wp-cassify" in wpsite.wp_plugins %}
+          skip-plugins:
+            - wp-cassify
+          {% endif %}
+        force: yes
       become: yes
       become_method: su
       become_user: '{{ wpsite.maintainer }}'
@@ -112,7 +116,7 @@
 - name: set wp config
   command: 'wp config set {{ item }} {{ wpsite.wp_config[item] }} --type=constant'
   loop: '{{ wpsite.wp_config.keys() | list }}'
-  when: wpconfig.stdout is not match(item+","+wpsite.wp_config[item] | string)
+  when: wpconfig.stdout_lines | select("match",item+","+wpsite.wp_config[item] | string) | count == 0
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
@@ -130,14 +134,14 @@
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  when: wp_lang in installedlangs.stdout | from_json | selectattr("status","equalto","uninstalled") | map(attribute="language") | list
+  when: wp_lang in installedlangs.stdout | from_json | selectattr("status","equalto","uninstalled") | map(attribute="language")
 
 - name: activate {{ wp_lang }}
   command: 'wp language core activate {{ wp_lang }}'
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  when: wp_lang not in installedlangs.stdout | from_json | selectattr("status","equalto","active") | map(attribute="language") | list
+  when: wp_lang not in installedlangs.stdout | from_json | selectattr("status","equalto","active") | map(attribute="language")
 
 - name: list installed plugins
   command: 'wp plugin list --format=json'
@@ -160,7 +164,7 @@
   become: yes
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
-  loop: "{{ wpsite.wp_plugins }}"
+  loop: "{{ wpsite.wp_activate_plugins }}"
   when: item not in pluginlist.stdout | from_json | selectattr("status","equalto","active") | map(attribute="name") | list
 
 - name: list installed themes
@@ -178,7 +182,7 @@
   become_method: su
   become_user: '{{ wpsite.maintainer }}'
   loop: "{{ wpsite.wp_themes }}"
-  when: item not in themelist | map(attribute="name") | list
+  when: item not in themelist.stdout | from_json | map(attribute="name") | list
 
 - name: activate theme
   command: 'wp theme activate {{ wp_themes[0] }}'
@@ -193,12 +197,13 @@
     env: yes
     name: MAILTO
     value: '{{ wpsite.adminmail }}'
+    user: '_{{ wpsite.id }}'
   when: wpsite.adminmail != ""
 
 - name: install cron
   cron:
     name: 'cron WordPress'
-    job: '/usr/local/bin/php {{ wpsite.rootdir }}/wp-cron.php'
+    job: '/usr/local/bin/wp --path={{ wpsite.rootdir }} cron event run --due-now --quiet --skip-plugins=wp-cassify'
     user: '_{{ wpsite.id }}'
 
 - name: auto-update by cron
@@ -224,11 +229,19 @@
         mode: '0500'
         owner: '{{ wpsite.maintainer }}'
     
+    - name: cron mailto
+      cron:
+        env: yes
+        name: MAILTO
+        value: '{{ wpsite.adminmail }}'
+        user: '{{ wpsite.maintainer }}'
+      when: wpsite.adminmail != ""
+
     - name: cron MAJ wp
       cron:
         name: 'MAJ wordpress'
         job: '{{ wpsite.home }}/update_wp.sh | tee -a ~/update.log 2>&1'
-        user: '{{ site.maintainer }}'
+        user: '{{ wpsite.maintainer }}'
         dow: '3'
         minute: '33'
         hour: '0'

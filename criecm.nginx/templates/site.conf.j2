@@ -40,7 +40,7 @@ server {
 {% if "listen" in site %}
 # site.listen={{ site.listen }}
 {%   for l in site.listen %}
-        listen {{ l }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
+        listen {{ l }}{% if site.tls_cert and not site.listen | join(" ") is search("ssl") %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%   endfor %}
 {% else %}
 {%   if site.proxified_by %}

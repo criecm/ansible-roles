@@ -33,6 +33,7 @@ default_site:
   tls_redirect: False
   tls_cert: ''
   tls_key: ''
+  cert_name: '{% if onesite.name | default("") != "" %}{{ onesite.name | regex_replace("\*","wildcard") }}{% else %}{{ onesite.id }}{% endif %}'
   x509_stapling_chain: '{{ x509_stapling_chain | default("") }}'
   backends: []
   default_index: 'index.html index.htm index.txt'

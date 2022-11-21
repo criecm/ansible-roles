@@ -64,13 +64,13 @@
     - name: x509 cert
       copy:
         src: '{{ site.tls_cert }}'
-        dest: '{{ tls_certs_dir }}/{{ site.name | regex_replace("\*","wildcard") }}.crt'
+        dest: '{{ tls_certs_dir }}/{{ site.cert_name }}.crt'
         mode: '0400'
       notify: reload nginx
     - name: x509 key
       copy:
         src: '{{ site.tls_key }}'
-        dest: '{{ tls_certs_dir }}/private/{{ site.name | regex_replace("\*","wildcard") }}.key'
+        dest: '{{ tls_certs_dir }}/private/{{ site.cert_name }}.key'
         mode: '0400'
       notify: reload nginx
     - name: x509 chain

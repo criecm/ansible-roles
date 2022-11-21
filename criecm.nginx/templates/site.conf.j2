@@ -91,7 +91,7 @@ server {
 	real_ip_header X-Forwarded-For;
 {% endif %}
 
-	server_name	{{ site.name }}{% if site.aliases %} {{ site.aliases | join(" ") }}{% endif %};
+{% if site.name != '' %}	server_name	{{ site.name }}{% if site.aliases %} {{ site.aliases | join(" ") }}{% endif %};{% endif %}
 
 {% if not site.nginx_includes | list() %}
 	location / {

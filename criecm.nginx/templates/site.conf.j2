@@ -57,8 +57,8 @@ server {
 	listen	{{ ip }}:{{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%     endfor %}
 {%     if site.tls_cert %}
-	ssl_certificate {{ tls_certs_dir }}/{{ site.name }}.crt;
-	ssl_certificate_key {{ tls_certs_dir }}/private/{{ site.name }}.key;
+	ssl_certificate {{ tls_certs_dir }}/{{ site.name | regex_replace("\*","wildcard") }}.crt;
+	ssl_certificate_key {{ tls_certs_dir }}/private/{{ site.name | regex_replace("\*","wildcard") }}.key;
 {%       if site.x509_stapling_chain %}
 	ssl_trusted_certificate {{ tls_certs_dir }}/{{ site.x509_stapling_chain | basename}};
 	ssl_stapling    on;

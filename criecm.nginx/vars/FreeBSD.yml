@@ -6,3 +6,4 @@ nginx_etcdir: '/usr/local/etc/nginx'
 nginx_mods_path: '/usr/local/libexec/nginx'
 nginx_modsprefix: '/usr/local/libexec/nginx/'
 etcprefix: /usr/local
+tls_certs_dir: /usr/local/etc/ssl

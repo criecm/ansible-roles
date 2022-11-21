@@ -178,7 +178,7 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
 * `tls_key` (NODEFAULT)
   private key for tls/http2
 * `x509_stapling_chain` ('')
-  complete ca chain for stapling
+  complete ca chain for stapling (use global `x509_stapling_chain` var if exists)
   (from root CA to last intermediate)
 * `http2 (do_http2)`
   activate http2 when using tls

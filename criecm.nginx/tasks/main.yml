@@ -97,7 +97,7 @@
   notify: restart nginx
   tags: nginx, config
 
-- name: nginx includes
+- name: nginx_includes
   template:
     src: '{{ item }}'
     dest: '{{ nginx_etcdir }}/conf.d/{{ item | basename | regex_replace("\.j2$","") }}'
@@ -106,6 +106,17 @@
   with_items: '{{ nginx_includes }}'
   notify: restart nginx
   tags: nginx, config
+
+- name: nginx_files
+  template:
+    src: '{{ item }}'
+    dest: '{{ nginx_etcdir }}/{{ item | basename | regex_replace("\.j2$","") }}'
+    mode: '0640'
+    group: '{{ www_group }}'
+  with_items: '{{ nginx_files }}'
+  notify: restart nginx
+  tags: nginx, config
+
 
 - name: x509 - global part
   block:

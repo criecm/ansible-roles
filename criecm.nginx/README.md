@@ -96,6 +96,8 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   ip addresses/networks allowed to access monitoring pages
 * `nginx_includes ([])`
   list of templates (or files) to be 'include'd in http block (conf.d/)
+* `nginx_files ([])`
+  list of templates (or files) to be copied in nginx's config dir (for inclusion elsewhere)
 * `nginx_modules ([])`
   nginx modules to load explicitly (eg: `["ngx_http_auth_pam_module","ngx_http_geoip_module"]`)
 * `nginx_mods_includes ([])`
@@ -161,6 +163,8 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
 
 * `aliases ([])`
   server aliases
+* `nginx_lines ([])`
+  config stanzas to be added to site's config
 * `nginx_includes`
   files or templates included inside `server {}` block
   see *Files / Templates locations* for path

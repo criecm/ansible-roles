@@ -9,6 +9,7 @@ do_tls: False
 do_http2: False
 nginx_status_path: /nginx_status
 nginx_includes: []
+nginx_files: []
 nginx_mods_includes: []
 
 # eg:

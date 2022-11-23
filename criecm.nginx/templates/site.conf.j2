@@ -1,35 +1,37 @@
 ## upstream
 {% set upstream = site.upstream %}
+{% if upstream == site.id %}
 # upstream=site.upstream={{ site.upstream }}
 
-{% if site.backends | count > 0 %}
+{%   if site.backends | count > 0 %}
 upstream {{ upstream }} {
 # site.backends={{ site.backends }}
-{%   for srv in site.backends %}
+{%     for srv in site.backends %}
 	# server {{ srv | regex_replace("^.*://","") }};
 	server {{ srv }};
-{%   endfor %}
-{%   if site.backends | count > 1 %}
+{%     endfor %}
+{%     if site.backends | count > 1 %}
 	sticky cookie {{ site.id }}LBID expires=1h path=/;
-{%   endif %}
+{%     endif %}
 }
-{% elif "fcgisocket" in site %}
+{%   elif "fcgisocket" in site %}
 # no site.backends but "fcgisocket" in site
-{%   set upstream = upstream | default(site.id) %}
+{%     set upstream = upstream | default(site.id) %}
 upstream {{ upstream }} {
 	  server {% if site.fcgisocket | regex_search("^\/") %}unix:{% endif %}{{ site.fcgisocket }};
 }
+{%   endif %}
 {% endif %}
 {% if site.tls_redir | default(False) and not site.proxified_by %}
 ## redirect http to https
 # site.tls_redir | default(False) and not site.proxified_by
 server {
-{% if ansible_all_ipv4_addresses | count > 0 %}
+{%   if ansible_all_ipv4_addresses | count > 0 %}
 	listen *:80;
-{% endif %}
-{% if ansible_all_ipv6_addresses | count > 0 %}
+{%   endif %}
+{%   if ansible_all_ipv6_addresses | count > 0 %}
 	listen [::]:80;
-{% endif %}
+{%   endif %}
 
 	server_name	{{ site.name }}{% if site.aliases | count > 0 %} {{ site.aliases | join(" ") }}{% endif %};
 	rewrite ^(.*) https://{{ site.name }}$1 permanent;
@@ -93,6 +95,8 @@ server {
 
 {% if site.name != '' %}	server_name	{{ site.name }}{% if site.aliases %} {{ site.aliases | join(" ") }}{% endif %};{% endif %}
 
+	root	{{ site.webroot | default(site.rootdir) }};
+
 {% if not site.nginx_includes | list() %}
 	location / {
 		root	{{ site.webroot | default(site.rootdir) }};
@@ -121,9 +125,9 @@ server {
 		allow ::1;
 # monitoring_from = {{ monitoring_from | join(',') }}
 # admin_from = {{ admin_from | join(',') }}
-{% for netw in monitoring_from + admin_from | list | unique %}
+{%   for netw in monitoring_from + admin_from | list | unique %}
 		allow {{ netw }};
-{% endfor %}
+{%   endfor %}
 		deny all;
 		include fastcgi_params;
 		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
@@ -143,8 +147,13 @@ server {
 	}
 {% endif %}
 
-{% for inc in site.nginx_includes %}
+# site.nginx_lines
+{% for line in site.nginx_lines | default([]) %}
+{{ line | regex_replace(";$","") }};
+{% endfor %}
+
 # site.nginx_includes
+{% for inc in site.nginx_includes %}
 	include {{ inc | basename | regex_replace("\.j2$","") }};
 {% endfor %}
 

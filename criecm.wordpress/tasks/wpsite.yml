@@ -205,6 +205,7 @@
     name: 'cron WordPress'
     job: '/usr/local/bin/wp --path={{ wpsite.rootdir }} cron event run --due-now --quiet --skip-plugins=wp-cassify'
     user: '_{{ wpsite.id }}'
+    minute: '*/30'
 
 - name: auto-update by cron
   block:

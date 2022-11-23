@@ -62,13 +62,11 @@
     Require all granted
     ProxySet stickysession={{ site.id }}B
   </Proxy>
-  ProxyPass / balancer://{{ site.id }}/
-
-  ProxyPassReverse / balancer://{{ site.id }}/
+{% set sitebackend = "balancer://"+site.id %}
 
 {%     if admin_from %}
   # balancer-manager from admin ip's
-  <Location /balancer-manager>
+  <Location "/balancer-manager">
     SetHandler balancer-manager
 {%       for net in admin_from %}
     Require ip {{ net }}
@@ -82,17 +80,13 @@
   <Proxy {{ backends[0] | regex_replace(" .*$","")}}>
     Require all granted
   </Proxy>
-  ProxyPass / {{ backends[0] | regex_replace(" .*$","") }}/{% if backends[0] is search("=") %} {{ backends[0] | regex_replace("^[^ ]* ","") }}
-
-{% endif %}
-
-  ProxyPassReverse / {{ backends[0] | regex_replace(" .*$","") }}/
+{% set sitebackend = backends[0] | regex_replace("/? .*$","") %}
 
 {%   endif %}
 
 {%   if monitoring_from | count > 0 and site.fcgi_status_path %}
   # monitoring
-  <Location {{ site.fcgi_status_path }}>
+  <Location "{{ site.fcgi_status_path }}">
 {%     for net in monitoring_from %}
     Require ip {{ net }}
 {%     endfor %}
@@ -132,7 +126,7 @@
 
 {% for prefix in site.prefixes %}
   # prefix {{ prefix.path }}
-  <Location {{ prefix.path }}>
+  <Location "{{ prefix.path }}">
 {%   if "apache_includes" in prefix and prefix.apache_includes | count > 0 %}
     # prefix."{{ prefix.path }}".apache_includes
 {%     for include in prefix.apache_includes %}
@@ -193,6 +187,15 @@
 
 {% endfor %}
 
+{% if sitebackend | default(False) %}
+  ProxyPass / {{ sitebackend | regex_replace(" .*$","") }}/{% if site.backends | count() == 1 and site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}
+
+  ProxyPassReverse / {{ sitebackend | regex_replace(" .*$","") }}/
+
+
+
+{% endif %}
+
 {% if "cache" in site %}
 # site.cache: {{ site.cache | count() }} items
 {% for c in site.cache %}
@@ -211,7 +214,7 @@
 
 {% if monitoring_from | count > 0 and site.status_path %}
   # status URL from monitoring
-  <Location {{ site.status_path }}>
+  <Location "{{ site.status_path }}">
     SetHandler server-status
 {%   for net in monitoring_from %}
     Require ip {{ net }}

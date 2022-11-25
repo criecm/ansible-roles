@@ -87,7 +87,6 @@
     group: '_{{ wpsite.id }}'
     force: no
     content: ''
-    state: present
 
 - name: get install status
   command: 'wp core is-installed'

@@ -26,6 +26,10 @@
   </Directory>
 {% endif %}
 
+{% if "protocols" in site %}
+Protocols {{ site.protocols }}
+{% endif %}
+
 {%- if "tls_cert" in site and "tls_key" in onesite %}
   # TLS config
   SSLEngine on
@@ -87,7 +91,7 @@
 {%   if monitoring_from | count > 0 and site.fcgi_status_path %}
   # monitoring
   <Location "{{ site.fcgi_status_path }}">
-{%     for net in monitoring_from %}
+{%     for net in monitoring_from + admin_from | default([]) %}
     Require ip {{ net }}
 {%     endfor %}
   </Location>

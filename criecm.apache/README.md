@@ -40,6 +40,8 @@ apache with sites configs
   ip addresses/networks allowed to access status/balancer-manager pages
 * `mysite ('')`:
   if defined, only process this site.id instead of each `sites`
+* `apache_protocols ("")`:
+  you may define as per https://httpd.apache.org/docs/2.4/mod/core.html#protocols
 
 ## per site variables (default value)
 Most of these are used in bundled site.conf.j2 template only, except `id`, `apache_includes`, `rootdir`, `user/group`, `grwfiles/dirs` and `tls_key/cert`
@@ -75,6 +77,8 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
     `apache_includes ([])` as in sites
     `backends ([])` as in sites (do not forget to add the url path as ajp://jentest1.nettest.egim:8009*/there*)
     `apache_directives ([])`: as in sites, but must be valid in `<Location>`
+* `protocols (apache_protocols)`:
+  you may override `Protocol` per vhost - see https://httpd.apache.org/docs/2.4/mod/core.html#protocols
 
 ### options (none by default)
 * `aliases ([])`:

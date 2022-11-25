@@ -34,6 +34,8 @@ default_enabled_modules:
 
 apache_disabled_modules: []
 
+apache_protocols: ''
+
 default_disabled_modules:
   - access_compat
   - authn_dbm

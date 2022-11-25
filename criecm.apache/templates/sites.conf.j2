@@ -1,4 +1,8 @@
 # {{ ansible_managed }}
 # Listen placeholder
 
+{% if apache_protocols != "" %}
+Protocols {{ apache_protocols }}
+{% endif %}
+
 Include {{ apache_etcdir }}/{{ apache_sitesdir }}/*.conf

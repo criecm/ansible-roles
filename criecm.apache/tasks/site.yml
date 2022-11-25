@@ -17,8 +17,6 @@
   set_fact:
     site: '{{ default_site | combine(onesite) }}'
 
-- debug: var=site
-
 - name: site includes
   template:
     dest: '{{ apache_etcdir }}/{{ item | basename | regex_replace(".j2$","") }}'
@@ -107,7 +105,7 @@
     dest: '{{ apache_etcdir }}/{{ apache_sitesdir }}/{% if site.id == "default" %}0{% endif %}{{ site.id }}.conf'
     src: '{{ lookup("first_found", siteconf_locations) }}'
     force: '{{ apache_rewrite_config | default(False) | bool }}'
-  notify: restart apache
+  notify: reload apache
 
 - name: Listen in Zsites.conf
   lineinfile:

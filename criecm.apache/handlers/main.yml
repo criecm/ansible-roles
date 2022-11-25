@@ -8,3 +8,11 @@
     - started
   loop_control:
     loop_var: apachestate
+  register: apacherestarted
+  when: not apachestarted.changed | default(False)
+
+- name: reload apache
+  service:
+    name: '{{ apache_service }}'
+    state: reloaded
+  when: not apachestarted.changed | default(False) and not apacherestarted.changed | default(False)

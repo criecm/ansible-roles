@@ -54,6 +54,7 @@
           | map("fileglob") | reject("equalto",[]) | map("flatten") | list }}'
       loop_control:
         label: '{{ item }}'
+      notify: restart apache
     - name: conf .inc's
       copy:
         src: '{{ item }}'
@@ -66,6 +67,7 @@
         - '{{ ["apache/*.inc"] | map("fileglob") | list }}'
       loop_control:
         label: '{{ item }}'
+      notify: restart apache
     - name: conf include sites
       template:
         dest: '{{ apache_etcdir }}/{{ apache_includesdir }}/Zsites.conf'
@@ -82,6 +84,7 @@
         - 'apache/default_root'
       loop_control:
         label: '{{ item }}'
+      notify: reload apache
   tags: apache, config
   when: do_sys
 
@@ -108,3 +111,4 @@
     name: '{{ apache_service }}'
     state: started
   tags: apache, sites
+  register: apachestarted

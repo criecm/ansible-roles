@@ -44,7 +44,9 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
     sites:
       - id: myfirstbackend
         name: mfb.example.org
-        nginx_includes: [myconf.conf.j2]
+        nginx_includes: 
+          - files/mysite/myconf.conf.j2
+          - "files/generic/genconf.conf.j2 localname.inc"
 
 # reverse-proxy
 - hosts: relays
@@ -167,6 +169,7 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   config stanzas to be added to site's config
 * `nginx_includes`
   files or templates included inside `server {}` block
+  if there is a space, first part is the template src and second one is the dest name
   see *Files / Templates locations* for path
 * `upstream`
   allows to fix upstream name (for reuse in template/prefixes)

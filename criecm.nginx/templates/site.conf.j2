@@ -154,7 +154,7 @@ server {
 
 # site.nginx_includes
 {% for inc in site.nginx_includes %}
-	include {{ inc | basename | regex_replace("\.j2$","") }};
+	include {{ inc | regex_replace("^.* ","") | basename | regex_replace("\.j2$","") }};
 {% endfor %}
 
 	error_page	500 502 503 504	/50x.html;

@@ -125,3 +125,5 @@ etcprefix: ''
 
 server_listen_ips:
   - '*'
+
+apache_rewrite_config: True

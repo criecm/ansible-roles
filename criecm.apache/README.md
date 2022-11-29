@@ -44,7 +44,7 @@ apache with sites configs
   you may define as per https://httpd.apache.org/docs/2.4/mod/core.html#protocols
 
 ## per site variables (default value)
-Most of these are used in bundled site.conf.j2 template only, except `id`, `apache_includes`, `rootdir`, `user/group`, `grwfiles/dirs` and `tls_key/cert`
+Most of these are used in bundled site.conf.j2 template only, except `id`, `apache_includes`, `apache_configs`, `rootdir`, `user/group`, `grwfiles/dirs` and `tls_key/cert`
 
 ### mandatory
 * `id (MANDATORY)`:
@@ -75,6 +75,7 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
   list of pathes allowed on this virtualhost, with
     `allow_from_nets ([])` listing IP(v4|v6) prefixes allowed
     `apache_includes ([])` as in sites
+    `apache_configs ([])` as in sites
     `backends ([])` as in sites (do not forget to add the url path as ajp://jentest1.nettest.egim:8009*/there*)
     `apache_directives ([])`: as in sites, but must be valid in `<Location>`
 * `protocols (apache_protocols)`:
@@ -85,6 +86,9 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
   DNS aliases (ServerAlias'es)
 * `apache_includes ([])`
   Files to be included in virtualhost config.
+  see *Files / Templates locations* for searched path
+* `apache_configs ([])`
+  Files to be copied in apache config directory (for inclusion in your templates)
   see *Files / Templates locations* for searched path
 * `grwfiles ([])`
   files writeable by group

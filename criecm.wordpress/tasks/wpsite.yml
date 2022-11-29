@@ -202,7 +202,7 @@
 - name: install cron
   cron:
     name: 'cron WordPress'
-    job: '/usr/local/bin/wp --path={{ wpsite.rootdir }} cron event run --due-now --quiet --skip-plugins=wp-cassify'
+    job: '/usr/local/bin/wp --path={{ wpsite.rootdir }} cron event run --due-now --quiet --skip-plugins=wp-cassify 2>&1 | grep -v Deprecated'
     user: '_{{ wpsite.id }}'
     minute: '*/30'
 

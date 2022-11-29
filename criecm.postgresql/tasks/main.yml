@@ -104,6 +104,13 @@
   become_method: su
   register: pg_actual
 
+# admin users
+- name: pg users
+  include_tasks: user.yml
+  loop_control:
+    loop_var: pg_user
+  loop: '{{ pg_users | union(pg_maintenance_users) }}'
+
 # DBs
 - name: new dbs
   include_tasks: db.yml
@@ -111,10 +118,3 @@
     loop_var: pg_db
   loop: '{{ pg_dbs }}'
   when: 'pg_dbs | count > 0'
-
-# admin users
-- name: pg users
-  include_tasks: user.yml
-  loop_control:
-    loop_var: pg_user
-  loop: '{{ pg_users | union(pg_maintenance_users) }}'

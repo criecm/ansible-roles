@@ -74,6 +74,9 @@ Create user (and db)
       roles:
         - criecm.postgresql
       vars:
+        admin_from:
+          - 2001:DB8:l0l:ad31::/64
+          - 192.0.2.42/32
         pg_admin_password: '42'
 	pg_zfs_base: 'zdata/pgsql'
 	pg_users:
@@ -81,6 +84,11 @@ Create user (and db)
 	    password: secret
 	    db: db1
 	    hosts: [ 10.2.5.0/24 ]
+	pg_maintenance_users:
+          - name: mypgadmin
+            password: "verysecret"
+            db: all
+            hosts: '{{ admin_from }}'
 
 Create db and some users
     - hosts: dbhosts

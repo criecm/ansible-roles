@@ -22,6 +22,9 @@
     version: '{{ node_app.gitversion | default(omit) }}'
   when: '"gitsrc" in node_app'
   register: gitted
+  become: true
+  become_method: su
+  become_user: '{{ node_app.user }}'
 
 - name: 'chown -R {{ node_app.user }} {{ node_app.path }}'
   file:

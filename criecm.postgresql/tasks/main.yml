@@ -39,6 +39,7 @@
   register: pg_init
   args:
     warn: False
+  when: ansible_os_family != "Debian"
 
 # postgresql.conf
 - name: postgresql.conf.j2

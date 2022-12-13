@@ -55,6 +55,9 @@ listen {{ proxy.name }}
 {%   for opt in proxy.options | default([]) %}
   option {{ opt }}
 {%   endfor %}
+{%   for line in proxy.lines | default([]) %}
+  {{ line }}
+{% endfor %}
 {%   if proxy.backend | default(False) %}
 #  auto-list from group {{ proxy.backend.group }}
 {%     for b in groups[proxy.backend.group] %}

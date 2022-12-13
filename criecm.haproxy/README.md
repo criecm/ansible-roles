@@ -38,6 +38,7 @@ A proxy definition contains:
     - 192.0.2.5:9876
     - ':::9876 v4v6'
 * `options ([])` list of forntend options
+* `lines ([])` lines to add as-is
 * `balance ("leastconn")` type of balance
 * `mode ("tcp")` proxy mode
 * `clienttimeout` if different from `haproxy_client_timeout`

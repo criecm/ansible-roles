@@ -21,7 +21,7 @@ Install/run node apps on FreeBSD (could be easily adapted)
   update git sources overriding local changes
 * `node_force_conf` (False)
   overwrite existing config files
-* `node_start_app (True)
+* `node_start_app` (True)
   Set to false to start/enable app by other way
 
 ### app variables
@@ -35,9 +35,9 @@ Install/run node apps on FreeBSD (could be easily adapted)
   Git repository source
 * `gitversion ('master')`
   Git repo tag/branch
-* `update` (`node_update_git`)
+* `gitupdate` (`node_update_git`)
   Will update source code
-* `force` (`node_force_git`)
+* `gitforce` (`node_force_git`)
   Will force source update
 * `confs` ([])
   List of config files, as dicts of {src=template,dest=dest}

@@ -31,6 +31,8 @@ Install/run node apps on FreeBSD (could be easily adapted)
 * `user` (`name`)
 * `path` (/home/`name`)
 * `script` (app.js)
+* `scriptargs ({})`
+  dict of runtime flags passed to script
 * `gitsrc` ('')
   Git repository source
 * `gitversion ('master')`

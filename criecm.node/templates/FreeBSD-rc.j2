@@ -22,7 +22,7 @@ load_rc_config ${{ '{' }}name{{ '}' }}
 
 pidfile="/var/run/{{ node_app.name }}.pid"
 command=/usr/sbin/daemon
-command_args="-rP $pidfile -u {{ node_app.user }} {% if node_app.use_syslog %}-T '{{ node_app.syslog_tag | default(node_app.name) }}' {% endif %}-t '{{ node_app.name }}' /usr/local/bin/node ${{ '{' }}{{ node_app.name }}_script{{ '}' }}"
+command_args="-rP $pidfile -u {{ node_app.user }} {% if node_app.use_syslog %}-T '{{ node_app.syslog_tag | default(node_app.name) }}' {% endif %}-t '{{ node_app.name }}' /usr/local/bin/node ${{ '{' }}{{ node_app.name }}_script{{ '}' }}{% if node_app.scriptargs is defined %}{% for arg, value in node_app.scriptargs.items() %} --{{ arg }} {{ value }}{% endfor %}{% endif %}"
 
 start_precmd()
 {

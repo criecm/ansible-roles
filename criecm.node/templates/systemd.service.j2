@@ -6,7 +6,7 @@ After=syslog.target network.target
 [Service]
 Environment="NODE_ENV={{ node_app.env | default('production') }}{% for envvar in node_app.envvars.keys() %} {{ envvar }}='{{ node_app.envvars[envvar] }}'{% endfor %}"
 WorkingDirectory={{ node_app.path }}
-ExecStart=/usr/bin/node {{ node_app.script }}
+ExecStart=/usr/bin/node {{ node_app.script }}{% if node_app.scriptargs is defined %}{% for arg, value in node_app.scriptargs.items() %} --{{ arg }} {{ value }}{% endfor %}{% endif %}
 Type=simple
 User={{ node_app.user }}
 Restart=always

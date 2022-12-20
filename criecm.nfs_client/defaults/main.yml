@@ -33,3 +33,7 @@ nfsccb_port: 4048
 idmap_domain:
 
 nfs_bind_ips: []
+
+nfsv4_enable: True
+
+nfsv4_only: False

@@ -18,6 +18,12 @@ Fix lockd/statd/nfscbcd ports:
 * `idmap_domain` ()
     if you need user names mapping
 
+* `nfsv4_enable (True)`
+  Enable NFSv4
+
+* `nfsv4_only (False)`
+  for NFSv4-only config
+
 For LDAP/autofs
 * `ldap_autofs` (False) If true, deploy LDAP autofs maps
 * `ldap_autofs_master_map`

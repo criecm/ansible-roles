@@ -1,6 +1,6 @@
 ---
 # NFS services
-- name: rc conf
+- name: rc conf NFSv3
   lineinfile:
     line: '{{ item.key }}="{{ item.value }}"'
     regexp: "^{{ item.key }}="
@@ -11,19 +11,52 @@
     rpcbind_enable: "YES"
     rpc_lockd_enable: "YES"
     rpc_statd_enable: "YES"
-    nfscbd_enable: "YES"
     rpcbind_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}"
     rpc_lockd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p {{ lockd_port }}"
     rpc_statd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p {{ statd_port }}"
+  notify: freebsd restart nfs all
+  when: not nfsv4_only
+
+- name: disable NFSv3
+  block:
+    - name: rc
+      lineinfile:
+        regexp: "^{{ item }}="
+        dest: /etc/rc.conf
+        state: absent
+      loop:
+        - rpcbind_enable
+        - rpc_statd_enable
+        - rpc_lockd_enable
+    - name: services
+      service:
+        name: '{{ item }}'
+        state: stopped
+      loop:
+        - lockd
+        - statd
+        - rpcbind
+  when: nfsv4_only
+
+- name: rc.conf NFSv4
+  lineinfile:
+    line: '{{ item.key }}="{{ item.value }}"'
+    regexp: "^{{ item.key }}="
+    dest: /etc/rc.conf
+  when: item.value != ''
+  with_dict:
+    nfs_client_enable: "YES"
     nfscbd_flags: "-p {{ nfsccb_port }}"
+    nfscbd_enable: "YES"
     nfsuserd_enable: "{% if idmap_domain | default(False) %}YES{% else %}NO{% endif %}"
     nfsuserd_flags: "{% if idmap_domain | default(False) %}-domain {{idmap_domain}} {% endif %}-usermax 10000"
-  notify: freebsd restart nfs all
+  when: nfsv4_enable
 
 - name: rpcbind started
   service:
     name: rpcbind
     state: started
+  when: not nfsv4_only
 
 # automount /users
 - block:

@@ -8,8 +8,7 @@
   with_dict:
     nfs_server_enable: 'YES'
     nfs_server_flags: '{{ mynfsd_flags }}'
-    mountd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p {{ mountd_port }} {{ mountd_add_flags }}"
-    rpc_mountd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p {{ mountd_port }} {{ mountd_add_flags }}"
+    mountd_flags: "{% if not nfsv4_only %}{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p {{ mountd_port }} {{ mountd_add_flags }}{% else %}-l -S{% endif %}"
     mountd_enable: 'YES'
     nfsv4_server_enable: '{% if nfsv4_enable %}YES{% else %}NO{% endif %}'
     nfsv4_server_only: '{% if nfsv4_only %}YES{% else %}NO{% endif %}'

@@ -74,7 +74,7 @@
 - name: chmod wp-content
   file:
     path: '{{ wpsite.rootdir }}/wp-content'
-    mode: '2771'
+    mode: '2751'
     owner: '{{ wpsite.maintainer }}'
     group: '_{{ wpsite.id }}'
     state: directory
@@ -86,7 +86,7 @@
     owner: '{{ wpsite.maintainer }}'
     group: '_{{ wpsite.id }}'
     force: no
-    content: ''
+    content: '<?php'
 
 - name: get install status
   command: 'wp core is-installed'

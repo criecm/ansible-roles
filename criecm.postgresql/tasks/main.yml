@@ -35,11 +35,10 @@
 - name: init postgresql server
 #  command: 'service postgresql {% if ansible_os_family == "FreeBSD" %}one{% endif %}initdb'
   command: 'service postgresql initdb'
-  when: not pg_db_exists.stat.exists
   register: pg_init
   args:
     warn: False
-  when: ansible_os_family != "Debian"
+  when: not pg_db_exists.stat.exists and ansible_os_family != "Debian"
 
 # postgresql.conf
 - name: postgresql.conf.j2

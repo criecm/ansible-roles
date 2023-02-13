@@ -60,8 +60,8 @@ listen {{ proxy.name }}
 {% endfor %}
 {%   if proxy.backend | default(False) %}
 #  auto-list from group {{ proxy.backend.group }}
-{%     for b in groups[proxy.backend.group] %}
-     server {{ b }} {{ hostvars[b].ansible_fqdn | default(b) }}:{{ proxy.backend.port | default(proxy.backends_port) }} {{ proxy.backend.opts | default("") }}
+{%     for backend_hostname in groups[proxy.backend.group] %}
+     server {{ backend_hostname }} {{ hostvars[backend_hostname]["ansible_fqdn"] | default(backend_hostname) }}:{{ proxy.backend.port | default(proxy.backends_port) }} {{ proxy.backend.opts | default("") }}
 {%     endfor %}
 {%   else %}
 {%     for backend in proxy.backends %}

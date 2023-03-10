@@ -47,7 +47,7 @@
   max log size = 50
 
   idmap config *: backend = tdb
-  idmap config *: range = 100000-200000
+  idmap config *: range = 1000000-1999999
 
 {% if is_dc %}
 {%   if smb_ldap_uri %}
@@ -66,7 +66,7 @@
   idmap config {{ smb_domain }}: ldap_user_dn = {{ smb_ldap_readdn | default(smb_ldap_admindn) }}
   idmap config {{ smb_domain }}: ldap_base_dn = {{ smb_ldap_suffix }}
   idmap config {{ smb_domain }}: ldap_url = {{ smb_ldapr_uri | default(smb_ldap_uri) }}
-  idmap config {{ smb_domain }}: range = 10000-99999
+  idmap config {{ smb_domain }}: range = 10000-999999
 {%     endif %}
 
   passdb expand explicit = no

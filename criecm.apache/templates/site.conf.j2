@@ -50,6 +50,11 @@ Protocols {{ site.protocols }}
 {%   endif %}
 {%- endif %}
 
+{% for directive in site.apache_directives %}
+  {{ directive }}
+
+{% endfor %}
+
 {% if site.backends | count() > 0 %}
   # backends: {{ backends | join(",") }}
   # keep host name in request
@@ -185,11 +190,6 @@ Protocols {{ site.protocols }}
 
 {%   endfor %}
 {% endif %}
-
-{% for directive in site.apache_directives %}
-  {{ directive }}
-
-{% endfor %}
 
 {% if sitebackend | default(False) %}
   ProxyPass / {{ sitebackend | regex_replace(" .*$","") }}/{% if site.backends | count() == 1 and site.backends[0] is search("=") %} {{ site.backends[0] | regex_replace("^[^ ]* ","") }}{% endif %}

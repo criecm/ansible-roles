@@ -55,7 +55,7 @@ Protocols {{ site.protocols }}
 
 {% endfor %}
 
-{% if site.backends | count() > 0 %}
+{% if backends | count() > 0 %}
   # backends: {{ backends | join(",") }}
   # keep host name in request
   ProxyPreserveHost On
@@ -103,17 +103,6 @@ Protocols {{ site.protocols }}
 {%   endif %}
 {% endif %}
 
-{% if "backend" in site and site.backend == "php-fpm" %}
-  # backend = php-fpm, fcgisocket = {{ site.fcgisocket }}
-  <FilesMatch ".*\.php$">
-{% if site.fcgisocket is match ("^/") %}
-    SetHandler "proxy:unix:{{ site.fcgisocket }}|fcgi://localhost/"
-{% else %}
-    SetHandler "proxy:fcgi://fcgisocket"
-{% endif %}
-  </FilesMatch>
-{% endif %}
-
 {% for prefix in site.prefixes %}
 {% if "backends" in prefix %}
   ProxyPreserveHost On
@@ -132,6 +121,16 @@ Protocols {{ site.protocols }}
 {% endif %}
 {%- endfor %}
 
+{% if "backend" in site and site.backend == "php-fpm" %}
+  # backend = php-fpm, fcgisocket = {{ site.fcgisocket }}
+  <FilesMatch ".*\.php$">
+{% if site.fcgisocket is match ("^/") %}
+    SetHandler "proxy:unix:{{ site.fcgisocket }}|fcgi://localhost/"
+{% else %}
+    SetHandler "proxy:fcgi://fcgisocket"
+{% endif %}
+  </FilesMatch>
+{% endif %}
 
 {% for prefix in site.prefixes %}
   # prefix {{ prefix.path }}
@@ -216,7 +215,7 @@ Protocols {{ site.protocols }}
 {% endfor %}
 {% endif %}
 
-{% if monitoring_from | count > 0 and site.status_path %}
+{% if monitoring_from | default([]) | count > 0 and site.status_path %}
   # status URL from monitoring
   <Location "{{ site.status_path }}">
     SetHandler server-status

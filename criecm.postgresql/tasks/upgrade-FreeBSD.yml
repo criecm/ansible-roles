@@ -98,6 +98,14 @@
           recordsize: 8K
       when: pg_zfs_base | length > 0
 
+    - name: dbdir chmod
+      file:
+        path: '{{ pg_basedir }}/{{ pg_datasubdir }}'
+        owner: '{{ pg_owner }}'
+        group: '{{ pg_group }}'
+        mode: '0700'
+        state: directory
+
     - name: install new postgresql packages
       command: 'pkg install -yfR {{ pkgs_installed.stdout_lines | map("regex_replace",pg_old_vers+"(-[^-]+)-[0-9].*$",pg_vers+"\1") | list | join(" ") }}'
       register: installpkgs

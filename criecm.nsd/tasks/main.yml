@@ -98,6 +98,11 @@
     loop_var: nsd_zone
   tags: nsd, zones
 
+- name: set_fact nsd_bin for munin
+  set_fact:
+    nsd_bin: '{{ nsd_bin }}'
+    cacheable: yes
+
 - name: push to to_monitor fact
   block:
   - name: tmpmon

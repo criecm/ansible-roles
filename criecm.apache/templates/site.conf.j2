@@ -110,7 +110,12 @@ Protocols {{ site.protocols }}
   # prefix {{ prefix.path }} load balancer
   <Proxy balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}>
 {%     for backend in prefix.backends %}
-    BalancerMember {{ backend | regex_replace("^(.*//[^/]*).*","\\1") }}{% if backend is not search("route=") %} route={{ backend | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
+{%       if backend is search("http") %}
+{%         set myback=backend | regex_replace("^(.*//[^/]*)/[^ ]*( .*)?$","\\1\\2") %}
+{%       else %}
+{%         set myback=backend %}
+{%       endif %}
+    BalancerMember {{ myback }}{% if myback is not search("route=") %} route={{ myback | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
 
 {%     endfor %}
     Require all granted
@@ -164,8 +169,8 @@ Protocols {{ site.protocols }}
     Options {{ prefix.options | join(" ") }}
 {%   endif %}
 {%   if "backends" in prefix and prefix.backends | count() > 1 %}
-{%     if prefix.backends[0] | regex_replace("^.*//[^/]+(/[^ ]*)","\\1") == prefix.backends[0] %}
-{%       set prefixpath="/" %}
+{%     if ( prefix.backends[0] | regex_replace("^.*//[^/]+(/[^ ]*)","\\1") == prefix.backends[0] ) or not prefix.backends[0] is match("http.*") %}
+{%       set prefixpath="" %}
 {%     else %}
 {%       set prefixpath= prefix.backends[0] | regex_replace("^.*//[^/]+(/[^ ]*)","\\1") %}
 {%     endif %}

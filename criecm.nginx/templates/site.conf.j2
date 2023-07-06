@@ -157,5 +157,9 @@ server {
 	include {{ inc | regex_replace("^.* ","") | basename | regex_replace("\.j2$","") }};
 {% endfor %}
 
+	location ~ /\. {
+		deny all;
+	}
+
 	error_page	500 502 503 504	/50x.html;
 }

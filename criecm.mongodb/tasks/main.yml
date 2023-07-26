@@ -48,7 +48,7 @@
 
 - name: /etc/rc.conf
   lineinfile:
-    line: 'mongod_flags=""'
+    line: 'mongod_flags="--setParameter=disabledSecureAllocatorDomains=\*"'
     regexp: '^mongod_flags='
     dest: /etc/rc.conf
 

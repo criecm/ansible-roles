@@ -1,5 +1,5 @@
 - name: get dbdir
-  shell: 'sysrc postgresql_data || sysrc postgresql_dbdir'
+  shell: 'sysrc postgresql_data || sysrc postgresql_dbdir || echo "{{ pg_basedir }}/data{{ pg_old_vers }}"'
   changed_when: False
   register: dbdir
   check_mode: False

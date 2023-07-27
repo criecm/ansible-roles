@@ -142,6 +142,6 @@
 
 - name: install psycopg2 python module
   pip:
-    executable: 'pip-{{ ansible_python.version.major }}.{{ ansible_python.version.minor }}'
+    executable: 'pip'
     name: psycopg2
     state: present

@@ -17,6 +17,10 @@
   set_fact:
     site: '{{ default_site | combine(onesite) }}'
 
+- name: working on {{ site.id }}
+  debug:
+    var: site
+
 - name: site includes
   template:
     dest: '{{ apache_etcdir }}/{{ item | basename | regex_replace(".j2$","") }}'

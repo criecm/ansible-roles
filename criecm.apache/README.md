@@ -80,6 +80,7 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
     `apache_directives ([])`: as in sites, but must be valid in `<Location>`
 * `protocols (apache_protocols)`:
   you may override `Protocol` per vhost - see https://httpd.apache.org/docs/2.4/mod/core.html#protocols
+* `stickysession` name of session cookie for use with load-balancing
 
 ### options (none by default)
 * `aliases ([])`:
@@ -90,6 +91,8 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
 * `apache_configs ([])`
   Files to be copied in apache config directory (for inclusion in your templates)
   see *Files / Templates locations* for searched path
+* `apache_directives ([])`
+  List of raw apache config lines (can be located in site, prefix)
 * `grwfiles ([])`
   files writeable by group
 * `grwdirs ([])`
@@ -162,6 +165,7 @@ include_locations:
           - site_example.inc # see Files / Templates locations
           - favicon.inc
         rootdir: /usr/local/www/default
+      # reverse-proxy
       - id: rproxy
         name: www.my.univ.fr
 	listen: 443
@@ -189,4 +193,21 @@ include_locations:
 	      - 'ajp://backend1.internal:8009/'
 	cache:
           - 'disk "/publicapp"'
+      # reverse-proxy with differents backends
+      - id: apps
+        name: apps.univ.sample
+        prefixes:
+          - path: /
+            backends:
+              - http://mainback.local/
+          - path: /app1
+            backends:
+              - ajp://backapp1.local
+            allow_from_nets:
+              - 192.0.2.128/25
+              - 2001:db8:cafe:f001::/64
+          - path: /app2
+            backends:
+              - http://app2-1.local/app2/
+              - http://app2-2.local/app2/
 ```

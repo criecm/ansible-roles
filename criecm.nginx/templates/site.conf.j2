@@ -80,7 +80,7 @@ server {
 {%   endfor %}
 {% endif %}
 
-{% if site.upload_max_meg | int | default(0) > 0 %}
+{% if site.upload_max_meg | default(0) | int > 0 %}
 # site.upload_max_meg={{ site.upload_max_meg }}
 	client_max_body_size {{ ( site.upload_max_meg | int * 1.6 ) | round(0,'ceil') | int }}m;
 {% endif %}

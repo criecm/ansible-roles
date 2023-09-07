@@ -71,6 +71,7 @@
   command: 'openssl dhparam -out {{ postfix_new_config["smtpd_tls_dh1024_param_file"] | regex_replace("\$\{config_directory\}",postfix_config_directory) }} 1024'
   args:
     creates: '{{ postfix_new_config["smtpd_tls_dh1024_param_file"] | regex_replace("\$\{config_directory\}",postfix_config_directory) }}'
+  when: postfix_new_config["smtpd_tls_dh1024_param_file"] | bool
 
 - name: list postfix maps
   shell: |

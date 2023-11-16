@@ -122,11 +122,11 @@ Protocols {{ site.protocols }}
 {%         else %}
 {%           set myback=backend %}
 {%         endif %}
-    BalancerMember {{ myback }}{% if myback is not search("route=") %} route={{ myback | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}
+    BalancerMember {{ myback }}{% if myback is not search("route=") %} route={{ myback | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}{% if myback is not search("connectiontimeout=") %} connectiontimeout=3{% endif %}
 
 {%       endfor %}
     Require all granted
-    ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }} connectiontimeout=3
+    ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }}
   </Proxy>
 
 {%       set prefixbackend="balancer://"+site.id+prefix.path | regex_replace('/','_') %}

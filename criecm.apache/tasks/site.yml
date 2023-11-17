@@ -102,6 +102,7 @@
     src: 'tls/{{ site.tls_cert }}'
     dest: '{{ tls_dir }}/{{ site.tls_cert }}'
     mode: '0644'
+    force: no
   when: '"tls_cert" in site'
 
 - block:
@@ -115,6 +116,7 @@
     copy:
       src: 'tls/{{ site.tls_key }}'
       dest: '{{ tls_dir }}/private/{{ site.tls_key }}'
+      force: no
       mode: '0400'
   when: '"tls_key" in site'
 

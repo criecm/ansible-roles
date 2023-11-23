@@ -81,6 +81,10 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
 * `protocols (apache_protocols)`:
   you may override `Protocol` per vhost - see https://httpd.apache.org/docs/2.4/mod/core.html#protocols
 * `stickysession` name of session cookie for use with load-balancing
+* `apache_rewrite_config (True)`:
+  Set to false it will never modify existing config files
+* `override_site_config (apache_rewrite_config)`:
+  You may want to rewrite sites configs but not global ones, or inverse with this one
 
 ### options (none by default)
 * `aliases ([])`:

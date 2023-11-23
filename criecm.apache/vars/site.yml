@@ -14,6 +14,8 @@ include_locations:
 
 site_port: '{% if "tls_cert" in onesite and onesite.tls_cert != "" %}443{% else %}80{% endif %}'
 
+apache_rewrite_site_config: '{{ override_site_config | default(apache_rewrite_config) }}'
+
 # site par defaut
 default_site:
   id: default

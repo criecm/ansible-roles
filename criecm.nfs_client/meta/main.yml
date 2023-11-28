@@ -6,20 +6,17 @@ galaxy_info:
 
   license: BSD
 
-  min_ansible_version: 2.4
+  min_ansible_version: 2.11
 
   platforms:
     - name: FreeBSD
       versions:
-        - 12.0
-        - 11.2
-        - 11.1
-        - 10.4
-        - 10.3
+        - all
     - name: Debian
       versions:
         - buster
         - bullseye
+        - bookworm
 
   galaxy_tags:
     - ldap

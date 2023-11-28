@@ -74,4 +74,11 @@
         auth_conf_file: '/etc/autofs_ldap_auth.conf'
       when: ansible_distribution_major_version | int > 11
       notify: debian autofs restart
+    - name: enable automount in nsswitch.conf
+      lineinfile:
+        line: 'automount: files ldap'
+        regexp: '^automount:'
+        dest: /etc/nsswitch.conf
+      when: ansible_distribution_major_version | int > 11
+      notify: debian autofs restart
     when: ldap_autofs and ldap_autofs_ou != ""

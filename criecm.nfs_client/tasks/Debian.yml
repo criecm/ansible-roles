@@ -52,4 +52,20 @@
         - { k: AUTH_CONF_FILE, v: /etc/autofs_ldap_auth.conf }
         - { k: LDAP_URI, v: '{{ ldap_uri }}' }
         - { k: SEARCH_BASE, v: '{{ ldap_autofs_ou }}{{ ldap_base }}' }
+      when: ansible_distribution_major_version < 12
+    - name: use it (debian > 11)
+      lineinfile:
+        dest: /etc/autofs.conf
+        line: '{{ item.key }} = {{ item.value }}'
+        insert_after: '#{{ item.key }} =.*'
+        regexp: '^{{ item.key }} ='
+        state: '{% if item.value != "" %}present{% else %}absent{% endif %}'
+      with_dict:
+        mount_nfs_default_protocol: '{% if nfsv4_only %}4{% else %}3{% endif %}'
+        ldap_uri: '"{{ ldap_uri }}"'
+        browse_mode: 'no'
+        ldap_timeout: '3'
+        search_base: '{{ ldap_autofs_ou }}{{ ldap_base }}'
+        auth_conf_file: '/etc/autofs_ldap_auth.conf'
+      when: ansible_distribution_major_version > 11
     when: ldap_autofs and ldap_autofs_ou != ""

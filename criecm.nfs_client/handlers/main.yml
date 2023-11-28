@@ -34,3 +34,8 @@
     - nfs-statd
     - nfs-statd-notify
   failed_when: False
+
+- name: debian autofs restart
+  service:
+    name: autofs
+    state: restarted

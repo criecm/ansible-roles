@@ -37,6 +37,10 @@
 
   # automount LDAP
   - block:
+    - name: autofs-ldap
+      package:
+        name: autofs-ldap
+        state: present
     - name: install NFS/LDAP map
       template:
         src: autofs_ldap_auth.conf.j2
@@ -52,12 +56,13 @@
         - { k: AUTH_CONF_FILE, v: /etc/autofs_ldap_auth.conf }
         - { k: LDAP_URI, v: '{{ ldap_uri }}' }
         - { k: SEARCH_BASE, v: '{{ ldap_autofs_ou }}{{ ldap_base }}' }
-      when: ansible_distribution_major_version < 12
+      when: ansible_distribution_major_version | int < 12
+      notify: debian autofs restart
     - name: use it (debian > 11)
       lineinfile:
         dest: /etc/autofs.conf
         line: '{{ item.key }} = {{ item.value }}'
-        insert_after: '#{{ item.key }} =.*'
+        insertafter: '#{{ item.key }} =.*'
         regexp: '^{{ item.key }} ='
         state: '{% if item.value != "" %}present{% else %}absent{% endif %}'
       with_dict:
@@ -67,5 +72,6 @@
         ldap_timeout: '3'
         search_base: '{{ ldap_autofs_ou }}{{ ldap_base }}'
         auth_conf_file: '/etc/autofs_ldap_auth.conf'
-      when: ansible_distribution_major_version > 11
+      when: ansible_distribution_major_version | int > 11
+      notify: debian autofs restart
     when: ldap_autofs and ldap_autofs_ou != ""

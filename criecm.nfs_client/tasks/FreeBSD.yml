@@ -88,4 +88,4 @@
       regexp: '^\+'
     notify: freebsd autofs reload
 
-  when: ldap_autofs_master_map | bool
+  when: ldap_autofs_master_map != ''

@@ -1,6 +1,6 @@
 ---
 - include_role:
     name: criecm.ldap_client
-  when: ldap_autofs and ldap_autofs_master_map != ""
+  when: ldap_autofs
 
 - include_tasks: 'tasks/{{ansible_os_family}}.yml'

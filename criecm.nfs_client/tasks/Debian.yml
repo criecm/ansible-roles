@@ -18,8 +18,8 @@
       line: "{{ item }}"
     with_items:
       - 'STATDOPTS="-p {{ statd_port }}"'
-      - 'NEED_STATD=yes'
-      - 'NEED_IDMAPD=yes'
+      - 'NEED_STATD={% if nfsv4_only %}no{% else %}yes{% endif %}'
+      - 'NEED_IDMAPD={% if nfsv4_enable %}yes{% else %}no{% endif %}'
     notify: debian restart nfs all
   - name: fix start-statd
     copy:
@@ -27,6 +27,7 @@
       dest: /usr/sbin/start-statd
       mode: '0755'
       owner: root
+    when: not nfsv4_only
   - name: idmapd
     template:
       src: idmapd.conf.j2
@@ -34,6 +35,7 @@
       mode: '0644'
       owner: root
     notify: debian restart nfs all
+    when: nfsv4_enable
 
   # automount LDAP
   - block:
@@ -81,4 +83,4 @@
         dest: /etc/nsswitch.conf
       when: ansible_distribution_major_version | int > 11
       notify: debian autofs restart
-    when: ldap_autofs and ldap_autofs_ou != ""
+    when: ldap_autofs

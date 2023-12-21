@@ -79,6 +79,16 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
           - http://backend01.example.org
           - http://backend02.example.org
           - http://backend03.example.org
+      # this one is local, http AND https
+      - id: http_and_https
+        name: mfc.example.org
+        tls_cert: files/tls/mycert.crt
+        tls_key: files/tls/private/mycert.key
+        x509_stapling_chain: files/tls/stapling.pem
+        # listen 80(http) and 443(https)
+        tls_only: no
+        rootdir: /home/mfc/site
+        index: index.html index.txt
 ```
 
 ## Role Variables
@@ -180,6 +190,8 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   if > 0, add Strict-Transport-Security header
 * `tls_redir` (False)
   if True, redirect all http requests to https
+* `tls_only` (True if tls_key defined)
+  if set to False, listen http AND https
 * `tls_cert` (NODEFAULT)
   x509 certificate (with intermediate certs)
 * `tls_key` (NODEFAULT)

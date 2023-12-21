@@ -57,6 +57,9 @@ server {
 # site.listen_ips={{ site.listen_ips }}
 {%     for ip in site.listen_ips %}
 	listen	{{ ip }}:{{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
+	{% if not site.tls_only | default(True) %}
+	listen  {{ ip }}:80;
+	{% endif %}
 {%     endfor %}
 {%     if site.tls_cert %}
 	ssl_certificate {{ tls_certs_dir }}/{{ site.cert_name }}.crt;

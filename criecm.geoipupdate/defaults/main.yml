@@ -1,0 +1,5 @@
+---
+maxminddb_id: ''
+maxminddb_key: ''
+geoipeditions: ["GeoLite2-Country","GeoLite2-City","GeoLite2-ASN"]
+

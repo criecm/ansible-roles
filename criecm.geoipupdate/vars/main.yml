@@ -1,0 +1,3 @@
+---
+geoipconfigfile: '{% if ansible_os_family=="FreeBSD" %}/usr/local{% endif %}/etc/GeoIP.conf'
+geoip_datadir: '{% if ansible_os_family=="FreeBSD" %}/usr/local{% else %}/usr{% endif %}/share/GeoIP'

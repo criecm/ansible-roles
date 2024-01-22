@@ -1,0 +1,34 @@
+---
+- name: install geoipupdate
+  package:
+    name: geoipupdate
+    state: present
+
+- name: config
+  lineinfile:
+    path: '{{ geoipconfigfile }}'
+    line: '{{ item.key }} {{ item.value }}'
+      regexp: '^{{ item.key }}'
+      insertafter: '{{ item.key }}'
+    with_dict:
+      EditionIDs: '{{ geoipeditions | join(" ") }}'
+      AccountID: '{{ maxminddb_id }}'
+      LicenseKey: '{{ maxminddb_key }}'
+
+- name: fetch files
+  command: 'geoipupdate'
+  args:
+    creates: '{{ geoip_datadir }}/{{ geoipeditions | first | string }}' 
+
+- name: cron
+  cron:
+    name: geoip update
+    job: geoipupdate
+    minute: '{{ 59 | random(seed=ansible_hostname) }}'
+    hour: '23'
+    dow: '7'
+  when: ansible_service_mgr != "systemd"
+
+- name: set_fact
+  set_fact:
+    geoip_datadir: '{{ geoip_datadir }}'

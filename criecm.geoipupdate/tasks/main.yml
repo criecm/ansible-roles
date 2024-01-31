@@ -8,12 +8,12 @@
   lineinfile:
     path: '{{ geoipconfigfile }}'
     line: '{{ item.key }} {{ item.value }}'
-      regexp: '^{{ item.key }}'
-      insertafter: '{{ item.key }}'
-    with_dict:
-      EditionIDs: '{{ geoipeditions | join(" ") }}'
-      AccountID: '{{ maxminddb_id }}'
-      LicenseKey: '{{ maxminddb_key }}'
+    regexp: '^{{ item.key }}'
+    insertafter: '{{ item.key }}'
+  with_dict:
+    EditionIDs: '{{ geoipeditions | join(" ") }}'
+    AccountID: '{{ maxminddb_id }}'
+    LicenseKey: '{{ maxminddb_key }}'
 
 - name: fetch files
   command: 'geoipupdate'

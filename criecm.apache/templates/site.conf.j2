@@ -126,7 +126,7 @@ Protocols {{ site.protocols }}
 
 {%       endfor %}
     Require all granted
-    ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }}
+    ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }}B
   </Proxy>
 
 {%     endif %}
@@ -185,6 +185,7 @@ Protocols {{ site.protocols }}
 {%       else %}
 {%         set prefixpath= prefix.backends[0] | regex_replace("^.*//[^/ ]+(/[^ ]*) ?.*$","\\1") %}
 {%       endif %}
+    Header add Set-Cookie "{{ site.id }}{{ prefix.path | regex_replace('/','_') }}B=.%{BALANCER_WORKER_ROUTE}e; path=/;HttpOnly;Secure;SameSite=strict" env=BALANCER_ROUTE_CHANGED
     ProxyPass balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}{{ prefixpath }}
     # {{ prefix.backends[0] }} -> {{ prefix.backends[0] | regex_replace("^.*//[^/]+(/[^ ]*)","\\1") }}
     ProxyPassReverse balancer://{{ site.id }}{{ prefix.path | regex_replace('/','_') }}{{ prefixpath }}

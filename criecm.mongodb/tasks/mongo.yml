@@ -6,6 +6,6 @@
     password: '{{ mongo.password }}'
     login_user: '{{ mongo_root_user }}'
     login_password: '{{ mongo_root_pass }}'
-    replica_set: '{{ mongo.replica_set | default(omit) }}'
+    replica_set: '{{ mongo_replication_set | default(omit) }}'
     update_password: '{{ mongo_update_password | default(omit) }}'
     roles: '{{ mongo.roles | default("readWrite") }}'

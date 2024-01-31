@@ -8,3 +8,5 @@ mongo_global_users: []
 mongo_engine: wiredTiger
 mongo_replication_set:
 mongo_auth: enabled
+mongo_major_version: 6
+mongo_update_password: 'on_create'

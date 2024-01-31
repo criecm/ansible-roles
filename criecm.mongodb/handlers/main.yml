@@ -4,4 +4,5 @@
   service:
     name: mongod
     state: restarted
+  throttle: 1
 

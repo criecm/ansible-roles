@@ -5,14 +5,31 @@
     path: '{{ mongo_dbpath }}/admin'
   register: mongoadmin
 
+- name: get installed version
+  command: 'pkg query -x "%v" "mongodb[0-9]"'
+  check_mode: False
+  register: pkgvers
+  changed_when: False
+  failed_when: false
+
 - name: install
   pkgng:
     name:
-      - mongodb44
+      - 'mongodb{{ mongo_major_version }}0'
       - mongodb-tools
       - 'py{{ ansible_python_version | regex_replace("([2-3])\.([0-9]*)\..*$","\1\2") }}-pymongo'
     state: present
   register: mongopkg
+  when: pkgvers.stdout is match('^$')
+
+- name: pymongo
+  block:
+    - package:
+        name: 'py{{ ansible_python_version | regex_replace("([2-3])\.([0-9]*)\..*$","\1\2") }}-pymongo'
+        state: absent
+    - pip:
+        name: pymongo
+        state: present
 
 - name: zfs
   zfs:
@@ -22,7 +39,7 @@
       compression: on
       mountpoint: '{{ mongo_dbpath }}'
   register: mongonewzfs
-  when: mongo_zfs is defined
+  when: mongo_zfs is defined and not mongoadmin.stat.exists
 
 - name: chown
   file:
@@ -30,21 +47,7 @@
     owner: mongodb
     group: mongodb
     recurse: yes
-  when: not mongoadmin.stat.exists or mongonewzfs.changed
-
-- name: check root
-  mongodb_user:
-    name: '{{ mongo_root_user }}'
-    database: 'admin'
-    login_database: admin
-    password: '{{ mongo_root_pass }}'
-    login_password: '{{ mongo_root_pass }}'
-    login_user: '{{ mongo_root_user }}'
-    roles:
-      - dbAdminAnyDatabase
-      - userAdminAnyDatabase
-  register: mongoroot
-  ignore_errors: True
+  when: not mongoadmin.stat.exists or mongonewzfs.changed | default(False)
 
 - name: /etc/rc.conf
   lineinfile:
@@ -65,103 +68,172 @@
     replace: '\1 {{ ansible_fqdn }}'
   when: etchosts.stdout_lines | count < 1
 
-- debug: var=mongoroot
+- name: stat mongo root pass
+  stat:
+    path: /root/mongoroot
+  register: rootpass
+  when: ansible_hostname == ansible_play_hosts[0]
 
-- name: (re)set root using localhost exception
-  block:
-    - name: stop mongodb
-      service:
-        name: mongod
-        state: stopped
-    - name: temp config
-      copy:
-        dest: '{{ etcprefix }}/etc/mongodb.conf'
-        content: |
-          # ansible
-          storage:
-              dbPath: '{{ mongo_dbpath }}'
-              directoryPerDB: true
-              journal:
-                  enabled: true
-          systemLog:
-              destination: syslog
-              verbosity: 1
-              syslogFacility: daemon
-          storage:
-          {% if mongo_engine == "wiredTiger" %}
-              wiredTiger:
-                  engineConfig:
-                      cacheSizeGB: '{{ [ mongo_memlimit | default(ansible_memtotal_mb * 512) / 1024 | int, 10000 ] | min }}'
-          {% endif %}
-              engine: {{ mongo_engine }}
-          processManagement:
-              timeZoneInfo: /usr/share/zoneinfo
-          {% if mongo_replication_set %}
-          replication:
-              replSetName: {{ mongo_replication_set }}
-          {% endif %}
-          net:
-              ipv6: true
-        backup: yes
-    - name: start mongodb
-      service:
-        name: mongod
-        state: started
-        enabled: yes
-#    - name: init replicaset
-#      shell: "echo '{rs.initiate()}' | mongo"
-#      when: mongo_replication_set | default(False)
-    - name: initiate replication set
-      block:
-        - name: initiate replication set
-          mongodb_replicaset:
-            replica_set: '{{ mongo_replication_set }}'
-            members:
-              - '{{ ansible_fqdn }}:27017'
-            validate: no
-        - name: wait for rs 
-          wait_for:
-            timeout: 15
-      when: mongo_replication_set | default(False)
-    - name: root user
-      mongodb_user:
-        name: '{{ mongo_root_user }}'
-        database: admin
-        password: '{{ mongo_root_pass }}'
-        roles:
-          - dbAdminAnyDatabase
-          - userAdminAnyDatabase
-        update_password: on_create
-    - name: restart mongodb
-      service:
-        name: mongod
-        state: restarted
-    - name: wait for rs 
-      wait_for:
-        timeout: 15
-  when: not mongoadmin.stat.exists or mongoroot.failed
-
-- name: end config
-  blockinfile:
-    dest: '{{ etcprefix }}/etc/mongodb.conf'
-    block: |
-      {% if mongo_bindips is defined %}
-          bindIp: '{{ mongo_bindips }}'
-      {% endif %}
-          port: {{ mongo_port | default("27017") }}
-      security:
-          authorization: {{ mongo_auth }}
-    marker: '# {mark} ANSIBLE BLOCK mongoconf'
-  notify: restart mongodb
-
-- name: get infos
-  community.mongodb.mongodb_info:
+- name: test root pass
+  mongodb_info:
     login_user: '{{ mongo_root_user }}'
     login_password: '{{ mongo_root_pass }}'
-  register: mongoinfos
+    filter: databases,users
+  ignore_errors: true
+  register: mongoroottest
+  when: not mongo_replication_set | default(False) or ansible_hostname == ansible_play_hosts[0]
 
-- debug:
-    var: mongoinfos
+- name: show mongo infos
+  debug:
+    var: mongoroottest
+  when: mongoroottest | default(False)
+
+- name: set_fact rootpass
+  set_fact:
+    rootpass: '{% if rootpass.stat %}{{ rootpass.stat.exists }}{% elif mongoroottest.failed %}False{% endif %}'  
+  when: not mongo_replication_set | default(False) or ansible_hostname == ansible_play_hosts[0]
+
+- name: root done
+  set_fact:
+    root_done: '{% if mongo_replication_set %}{{ hostvars[ansible_play_hosts[0]].rootpass }}{% else %}{{ rootpass }}{% endif %}'
+
+- name: config
+  copy:
+    dest: '{{ etcprefix }}/etc/mongodb.conf'
+    content: |
+      # ansible
+      storage:
+          dbPath: '{{ mongo_dbpath }}'
+          directoryPerDB: true
+          journal:
+              enabled: true
+      systemLog:
+          destination: syslog
+          verbosity: 0
+          syslogFacility: daemon
+      storage:
+      {% if mongo_engine == "wiredTiger" %}
+          wiredTiger:
+              engineConfig:
+                  cacheSizeGB: '{{ [ mongo_memlimit | default(ansible_memtotal_mb * 512) / 1024 | int, 10000 ] | min }}'
+      {% endif %}
+          engine: {{ mongo_engine }}
+      processManagement:
+          timeZoneInfo: /usr/share/zoneinfo
+      {% if mongo_replication_set %}
+      replication:
+          replSetName: {{ mongo_replication_set }}
+      {% endif %}
+      security:
+      {% if mongo_replication_set %}
+          keyFile: /var/db/mongodb/keyfile
+      {% endif %}
+          authorization: {% if root_done %}{{ mongo_auth }}
+      {% else %}disabled
+      {% endif %}
+      net:
+          ipv6: true
+      {% if mongo_replication_set %}
+          bindIpAll: true
+      {% endif %}
+    backup: yes
+  notify: restart mongodb
+
+- name: initiate replication keyfile
+  block:
+    - name: get keyfile
+      fetch:
+        fail_on_missing: false
+        src: '{{ mongo_dbpath }}/keyfile'
+        dest: /tmp/mongo_keyfile
+        flat: yes
+      check_mode: False
+    - name: create keyfile
+      shell: 'openssl rand -base64 756 > /tmp/mongo_keyfile'
+      args:
+        creates: /tmp/mongo_keyfile
+      delegate_to: localhost
+      check_mode: False
+    - name: copy keyfile
+      copy:
+        dest: '{{ mongo_dbpath }}/keyfile'
+        src: '/tmp/mongo_keyfile'
+        owner: mongodb
+        mode: '0500'
+        force: no
+  when: mongo_replication_set | default(False)
+
+- name: mongodb started
+  service:
+    name: mongod
+    state: started
+    enabled: yes
+
+- name: initiate replication set
+  block:
+    - name: initiate replication set
+      mongodb_replicaset:
+        replica_set: '{{ mongo_replication_set }}'
+        members: '{{ ansible_play_hosts | join(",") }}'
+        arbiter_at_index: '{{ ansible_play_hosts | count() - 1 }}'
+#        validate: no
+      run_once: yes
+      register: initrepl
+    - name: Wait for the replicaset to stabilise
+      community.mongodb.mongodb_status:
+        replica_set: '{{ mongo_replication_set }}'
+        poll: 5
+        interval: 10
+  when: mongo_replication_set | default(False) and not root_done
+
+- name: check replicaset
+  block:
+    - name: check replication set
+      mongodb_replicaset:
+        replica_set: '{{ mongo_replication_set }}'
+        members: '{{ ansible_play_hosts | join(",") }}'
+        login_user: '{{ mongo_root_user }}'
+        login_password: '{{ mongo_root_pass }}'
+        arbiter_at_index: '{{ ansible_play_hosts | count() - 1 }}'
+#        validate: no
+      run_once: yes
+  when: mongo_replication_set | default(False) and root_done
+
+- name: check root
+  mongodb_user:
+    name: '{{ mongo_root_user }}'
+    database: admin
+    password: '{{ mongo_root_pass }}'
+    create_for_localhost_exception: /root/mongoroot
+    roles:
+      - root
+#      - dbAdminAnyDatabase
+#      - userAdminAnyDatabase
+  register: mongoroot
+  when: not mongo_replication_set | default(False) or ansible_hostname == ansible_play_hosts[0]
+
+- name: lineinfile
+  lineinfile:
+    path: '{{ etcprefix }}/etc/mongodb.conf'
+    line: '    authorization: {{ mongo_auth }}'
+    regexp: '^    authorization:'
+    insertafter: '^  security:'
+  when: not root_done
+
+- name: restart mongo
+  service:
+    name: mongod
+    state: started
+  when: not root_done
+
+#- name: get infos
+#  community.mongodb.mongodb_info:
+#    login_user: '{{ mongo_root_user }}'
+#    login_password: '{{ mongo_root_pass }}'
+#  register: mongoinfos
+#
+#- debug:
+#    var: mongoinfos
 
 - name: mongos
   include_tasks: 'mongo.yml'
@@ -169,3 +241,4 @@
   loop_control:
     loop_var: mongo
     label: '{{ mongo.name }}'
+  when: not mongo_replication_set | default(False) or ansible_hostname == ansible_play_hosts[0]

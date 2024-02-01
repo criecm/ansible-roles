@@ -17,7 +17,7 @@
     name:
       - 'mongodb{{ mongo_major_version }}0'
       - mongodb-tools
-      - 'py{{ ansible_python_version | regex_replace("([2-3])\.([0-9]*)\..*$","\1\2") }}-pymongo'
+      - 'py{{ ansible_python_version | regex_replace("([2-3])\.([0-9]*)\..*$","\1\2") }}-pip'
     state: present
   register: mongopkg
   when: pkgvers.stdout is match('^$')

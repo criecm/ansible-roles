@@ -218,10 +218,12 @@
           cd {{ wpsite.rootdir }}
           date
           wp core upgrade --minor --quiet
+          wp core update-db --quiet
           wp plugin list --format=csv | awk 'BEGIN{FS=","}{if(($1!="name")&&($3!="none")){printf("%s %s: update %s\n",$1,$4,$3);}}'
           wp plugin update --all --format=csv | awk 'BEGIN{FS=","}{if($0~/pdated/){printf("%s %s -> %s\n",$1,$2,$3);}}'
           wp theme list --format=csv | awk 'BEGIN{FS=","}{if(($1!="name")&&($3!="none")){printf("%s %s: update %s\n",$1,$4,$3);}}'
           wp theme update --all --format=csv | awk 'BEGIN{FS=","}{if($0~/pdated/){printf("%s %s -> %s\n",$1,$2,$3);}}'
+          wp core update-db --quiet
           wp language core update
           wp language plugin update --all
           wp language theme update --all

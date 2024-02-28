@@ -7,7 +7,8 @@
 - name: haproxy config
   template:
     src: haproxy.conf.j2
-    dest: /usr/local/etc/haproxy.conf
+    dest: '{{ haproxy_config_file }}'
+    backup: yes
   notify: restart haproxy
 
 - name: syslog config
@@ -17,6 +18,7 @@
       local5.*  /var/log/haproxy.log
     mode: '0644'
   notify: restart syslogd
+  when: ansible_os_family == "FreeBSD"
 
 - name: newsyslog config
   copy:
@@ -24,6 +26,7 @@
     content: |
       /var/log/haproxy.log 640 7 10000 * CJ
   notify: newsyslog
+  when: ansible_os_family == "FreeBSD"
 
 - name: haproxy service
   service:

@@ -42,6 +42,9 @@ galaxy_info:
   - name: FreeBSD
     versions:
     - all
+  - name: Debian
+    versions:
+    - all
 
   galaxy_tags:
   - haproxy

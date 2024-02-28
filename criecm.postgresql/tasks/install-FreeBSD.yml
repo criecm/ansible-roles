@@ -37,9 +37,7 @@
     block: |
       {{ pg_class }}:\
         :lang={{ pg_lc }}:\
-        :setenv=LC_MESSAGES={{ pg_lc_messages | default(pg_lc) }}:\
-        :setenv=LC_ALL={{ pg_lc }}:\
-        :setenv=LC_COLLATE={{ pg_lc }}:\
+        :setenv=LC_MESSAGES={{ pg_lc_messages | default(pg_lc) }},LC_ALL={{ pg_lc }},LC_COLLATE={{ pg_lc }}:\
         :charset=UTF-8:\
         :tc=daemon:
 

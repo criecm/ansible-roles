@@ -36,7 +36,29 @@
       owner: root
     notify: debian restart nfs all
     when: nfsv4_enable
-
+  # https://www.kernel.org/doc/html/latest/filesystems/nfs/client-identifier.html
+  - name: is client unique id set ?
+    command: 'grep nfs.nfs4_unique_id /etc/default/grub'
+    register: clientidset
+    failed_when: False
+    changed_when: False
+    check_mode: False
+  - name: set client-id
+    block:
+      - name: get unique client-id
+        stat:
+          path: /etc/machine-id
+          checksum_algorithm: sha256
+        register: machineid
+      - name: set unique client-id
+        lineinfile:
+          dest: /etc/default/grub
+          line: 'GRUB_CMDLINE_LINUX="nfs.nfs4_unique_id={{ machineid.stat.checksum }} \1"'
+          regexp: '^GRUB_CMDLINE_LINUX="(.*)"'
+          backrefs: yes
+      - name: set now
+        shell: 'echo {{ machineid.stat.checksum }} > /sys/fs/nfs/net/nfs_client/identifier'
+    when: clientidset.stdout_lines | count() = 0
   # automount LDAP
   - block:
     - name: autofs-ldap

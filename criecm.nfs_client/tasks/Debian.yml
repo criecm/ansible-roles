@@ -58,7 +58,7 @@
           backrefs: yes
       - name: set now
         shell: 'echo {{ machineid.stat.checksum }} > /sys/fs/nfs/net/nfs_client/identifier'
-    when: clientidset.stdout_lines | count() = 0
+    when: clientidset.stdout_lines | count() == 0
   # automount LDAP
   - block:
     - name: autofs-ldap

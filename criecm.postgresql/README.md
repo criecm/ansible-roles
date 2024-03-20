@@ -113,6 +113,20 @@ Create db and some users
             hosts: [ 10.2.5.0/24 ]
 	    priv: 'SELECT/table1:INSERT'
 
+Only create one user and db
+    - hosts: dbhost
+      vars:
+        forgedb: '{{ hostvars[groups["forge"][0]].redmine.db }}'
+      tasks:
+        - include_role:
+            name: criecm.postgresql
+            tasks_from: user.yml
+          vars:
+            pg_user:
+              name: 'pguser42'
+              password: 'PASSWORD'
+              db: 'db42'
+
 License
 -------
 

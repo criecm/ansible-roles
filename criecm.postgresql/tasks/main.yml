@@ -95,19 +95,19 @@
   become_user: '{{ pg_owner }}'
   become_method: su
 
-- name: get postgresql infos
-  postgresql_info:
-  become: True
-  become_user: '{{ pg_owner }}'
-  become_method: su
-  register: pg_actual
-
 # admin users
 - name: pg users
   include_tasks: user.yml
   loop_control:
     loop_var: pg_user
   loop: '{{ pg_users | union(pg_maintenance_users) }}'
+
+- name: get postgresql infos
+  postgresql_info:
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su
+  register: pg_actual
 
 # DBs
 - name: new dbs

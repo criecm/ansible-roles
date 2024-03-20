@@ -1,4 +1,11 @@
 ---
+- name: get postgresql infos
+  postgresql_info:
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su
+  register: pg_actual
+
 - name: 'pg user {{ pg_user.name }}'
   postgresql_user:
     name: '{{ pg_user.name }}'

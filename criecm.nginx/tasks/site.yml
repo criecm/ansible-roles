@@ -52,7 +52,7 @@
     state: directory
     mode: '0755'
     owner: root
-  when: not statrootdir.stat.exists
+  when: not statrootdir.stat.exists and nginx_create_rootdir
 
 - name: x509 certs
   block:

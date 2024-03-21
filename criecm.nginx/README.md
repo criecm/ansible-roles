@@ -143,6 +143,8 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   use tcp_nopush (you want it with sendfile for zero-copy)
 * `nginx_tcp_nodelay (on)`
   use tcp_nodelay (do not wait for tcp packets to be filled)
+* `nginx_create_rootdir (True)`
+  Can be set to `False` if you need to create rootdir elsewhere
 
 ### if behind reverse-proxy
 

@@ -46,3 +46,5 @@ nginx_aio: 'on'
 nginx_tcp_nodelay: 'on'
 
 etcprefix: ''
+
+nginx_create_rootdir: True

@@ -45,6 +45,7 @@ A proxy definition contains:
 * `servertimeout` if different from `haproxy_server_timeout`
 * `backends_port`: port for backends (needed if not defined there)
 * `backends_opts`: options for each backend (can be overriden in `backend`)
+  note: %HOSTNAME% will be replaced by each backend `inventory_hostname`
 * one of `backend` or `backends`:
   * `backend` is a dict based on an ansible group, contains:
     * `group` (ansible group) mandatory

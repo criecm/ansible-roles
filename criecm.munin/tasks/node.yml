@@ -26,6 +26,7 @@
     insertafter: 'host'
   when: munin_async and not munin_async_and_node
   tags: munin-node
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - include_tasks: node-plugins.yml
   tags: munin-node
@@ -45,6 +46,7 @@
     user: munin-async
   when: munin_async
   tags: munin-node
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: enable munin service
   service:
@@ -52,6 +54,7 @@
     state: started
     enabled: yes
   tags: munin-node
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: enable munin asyncd
   service:
@@ -63,6 +66,7 @@
     - restart munin node
     - restart munin asyncd
   tags: munin-node
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: add config in munin server
   copy:

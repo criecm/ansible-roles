@@ -17,6 +17,7 @@
   notify:
     - restart munin node
     - restart munin asyncd
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: additional plugins
   file:
@@ -27,6 +28,7 @@
   notify:
     - restart munin node
     - restart munin asyncd
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: munin config blobs
   copy:

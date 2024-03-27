@@ -4,6 +4,7 @@
   service:
     name: '{{ munin_service }}'
     state: restarted
+  ignore_errors: "{{ ansible_check_mode }}"
 
 - name: restart munin asyncd
   service:

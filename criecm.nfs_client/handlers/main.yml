@@ -39,3 +39,6 @@
   service:
     name: autofs
     state: restarted
+
+- name: update-grub
+  command: update-grub

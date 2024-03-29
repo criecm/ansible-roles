@@ -37,28 +37,54 @@
     notify: debian restart nfs all
     when: nfsv4_enable
   # https://www.kernel.org/doc/html/latest/filesystems/nfs/client-identifier.html
-  - name: is client unique id set ?
-    command: 'grep nfs.nfs4_unique_id /etc/default/grub'
-    register: clientidset
-    failed_when: False
-    changed_when: False
-    check_mode: False
-  - name: set client-id
+  - name: set nfs4.unique_id
     block:
-      - name: get unique client-id
-        stat:
-          path: /etc/machine-id
-          checksum_algorithm: sha256
+      - name: is client unique id set ?
+        command: 'grep "^[^#]*GRUB_CMDLINE_LINUX=.*nfs.nfs4_unique_id" /etc/default/grub'
+        register: clientidset
+        failed_when: False
+        changed_when: False
+        check_mode: False
+      - name: fact grub nfs4_unique_id
+        set_fact: 
+          grub_nfs4_unique_id: '{% if clientidset.stdout_lines | count() > 0
+                                %}{{ clientidset.stdout | regex_replace("^GRUB_CMDLINE_LINUX=.*nfs.nfs4_unique_id=(?P<nfsid>[a-fA-F0-9]+).*$","\g<nfsid>") }}{%
+                                endif %}'
+      - name: get kernel nfs4_unique_id
+        command: 'cat /sys/module/nfs/parameters/nfs4_unique_id'
+        register: clientid
+        failed_when: False
+        changed_when: False
+        check_mode: False
+      - name: get machine-id
+        command: 'cat /etc/machine-id'
+        check_mode: False
+        changed_when: False
         register: machineid
-      - name: set unique client-id
+      - name: fact nfs4_unique_id_valid
+        set_fact:
+          nfs4_unique_id_valid: '{{ machineid.stdout_lines[0] | truncate(32,True,"") }}'
+      - name: get cmdline
+        command: 'grep "^GRUB_CMDLINE_LINUX=" /etc/default/grub'
+        register: grubcmdline
+        changed_when: False
+        check_mode: False
+        failed_when: False
+      - name: fact new grub cmdline
+        set_fact:
+          new_cmdline: '{{ grubcmdline.stdout | regex_replace(''GRUB_CMDLINE_LINUX=" ?'',"") | regex_replace('' ?"$'',"") |
+                        regex_replace("nfs\.nfs4_unique_id=[a-zA-Z0-9]+","nfs.nfs4_unique_id="+nfs4_unique_id_valid) }}'
+        when: grubcmdline.rc == 0 and grub_nfs4_unique_id is not match("^"+nfs4_unique_id_valid+"$")
+      - name: set GRUB_CMDLINE_LINUX
         lineinfile:
           dest: /etc/default/grub
-          line: 'GRUB_CMDLINE_LINUX="nfs.nfs4_unique_id={{ machineid.stat.checksum }} \1"'
-          regexp: '^GRUB_CMDLINE_LINUX="(.*)"'
-          backrefs: yes
+          line: 'GRUB_CMDLINE_LINUX="{{ new_cmdline }}"'
+          regexp: '^GRUB_CMDLINE_LINUX=.*$'
+        when: grubcmdline.rc == 0 and grub_nfs4_unique_id is not match("^"+nfs4_unique_id_valid+"$")
+        notify: update-grub
       - name: set now
-        shell: 'echo {{ machineid.stat.checksum }} > /sys/fs/nfs/net/nfs_client/identifier'
-    when: clientidset.stdout_lines | count() == 0
+        shell: 'echo -n {{ nfs4_unique_id_valid }} > /sys/fs/nfs/net/nfs_client/identifier'
+        when: clientid.rc == 0 and clientid.stdout is not match("^"+nfs4_unique_id_valid+"$")
   # automount LDAP
   - block:
     - name: autofs-ldap

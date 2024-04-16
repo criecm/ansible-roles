@@ -1,15 +1,36 @@
 ---
+- name: get installed samba
+  command: 'pkg query -x %n samba[0-9][0-9]'
+  register: samba_pkg_actual
+  changed_when: False
+  check_mode: False
+  failed_when: False
+
+- name: set samba package name
+  set_fact:
+    smb_new_pkg: "samba{{ smb_version|replace('.', '') }}"
+
+- name: register version
+  set_fact:
+    samba_pkg: '{% if samba_pkg_actual.rc != 0 or 
+              samba_pkg_actual.stdout_lines[0] != smb_new_pkg %}{{ smb_new_pkg }}{% else
+              %}{{ samba_pkg_actual.stdout }}{% endif %}'
+
+- name: show versions
+  debug:
+    msg: 'Actual version: {{ samba_pkg_actual.stdout }} Wanted: {{ smb_new_pkg }} Will install: {{ samba_pkg }}'
+
 - name: stop samba
   service:
     name: samba_server
     state: stopped
-  when: upgrade
+  when: samba_pkg_actual.rc == 0 and samba_pkg != samba_pkg_actual.stdout
   tags: samba, pkg, upgrade
 
 - name: install samba
   pkgng:
-    name: "samba{{ smb_version|replace('.', '') }}"
-    state: present
+    name: '{{ samba_pkg }}'
+    state: '{% if samba_upgrade | default(False) %}latest{% else %}present{% endif %}'
   tags: samba, pkg
 
 - name: installe smbldap-tools

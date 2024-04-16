@@ -26,7 +26,7 @@
       skip: True
   loop_control:
     loop_var: includefile
-  when: upgrade or ( which_smbd.rc > 0 )
+  when: samba_upgrade or ( which_smbd.rc > 0 )
   tags: samba,install,config
 
 - name: mkdir smb.conf.d

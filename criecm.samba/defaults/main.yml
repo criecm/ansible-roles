@@ -6,7 +6,7 @@ smb_ips: []
 smb_allow:
 
 # SAMBA version specification (only for FreeBSD installation)
-smb_version: '4.13'
+smb_version: '4.19'
 
 # 'cups'
 smb_printing:
@@ -74,4 +74,4 @@ shares: []
 group_shares: []
 
 # upgrade samba package
-upgrade: False
+samba_upgrade: False

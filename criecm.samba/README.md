@@ -38,7 +38,7 @@ read: `variable_name` (default value) details
 * `smb_ldap_adminpw` ()
 
 ### optional
-* `upgrade (False)` do upgrade samba packages
+* `samba_upgrade (False)` do upgrade samba packages
 * `smb_global_params` ({}) dict of samba parameters
 ```
 smb_global_params:

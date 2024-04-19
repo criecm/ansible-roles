@@ -35,6 +35,11 @@ http {
 	access_log syslog:server={{ syslog_server }},facility=local5 main;
 	{% endif %}
 
+	resolver_timeout        3s;
+{% if nginx_resolvers | default([]) | count() > 0 %}
+	resolver{% for ns in nginx_resolvers %} {{ ns | ansible.utils.ipwrap }}{% endfor %};
+{% endif %}
+
 	server_tokens	off;
 
 	# https://thoughts.t37.net/optimisations-nginx-bien-comprendre-sendfile-tcp-nodelay-et-tcp-nopush-2ab3f33432ca

@@ -48,3 +48,5 @@ nginx_tcp_nodelay: 'on'
 etcprefix: ''
 
 nginx_create_rootdir: True
+
+nginx_resolvers: '{{ ansible_dns.nameservers }}'

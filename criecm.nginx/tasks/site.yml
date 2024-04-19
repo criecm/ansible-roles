@@ -66,12 +66,14 @@
         src: '{{ site.tls_cert }}'
         dest: '{{ tls_certs_dir }}/{{ site.cert_name }}.crt'
         mode: '0400'
+        force: no
       notify: reload nginx
     - name: x509 key
       copy:
         src: '{{ site.tls_key }}'
         dest: '{{ tls_certs_dir }}/private/{{ site.cert_name }}.key'
         mode: '0400'
+        force: no
       notify: reload nginx
     - name: x509 chain
       copy:

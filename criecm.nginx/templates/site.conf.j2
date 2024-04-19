@@ -3,6 +3,10 @@
 {% if upstream == site.id %}
 # upstream=site.upstream={{ site.upstream }}
 
+{% for k in site.keys() %}
+# site.{{k}} = {{ site[k] }}
+{% endfor %}
+
 {%   if site.backends | count > 0 %}
 upstream {{ upstream }} {
 # site.backends={{ site.backends }}
@@ -42,37 +46,39 @@ server {
 {% if "listen" in site %}
 # site.listen={{ site.listen }}
 {%   for l in site.listen %}
-        listen {{ l }}{% if site.tls_cert and not site.listen | join(" ") is search("ssl") %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
+	listen {{ l }}{% if site.tls_cert and not site.listen | join(" ") is search("ssl") %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
 {%   endfor %}
 {% else %}
 {%   if site.proxified_by %}
 # site.proxified_by={{ site.proxified_by }}
-{%     if ansible_all_ipv4_addresses | count > 0 %}
-	listen *:80;
-{%     endif %}
-{%     if ansible_all_ipv6_addresses | count > 0 %}
-	listen [::]:80;
-{%     endif %}
+	listen 80;
 {%   else %}
 # site.listen_ips={{ site.listen_ips }}
-{%     for ip in site.listen_ips %}
+{%     if site.listen_ips | count > 0 %}
+{%       for ip in site.listen_ips %}
 	listen	{{ ip }}:{{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
-	{% if not site.tls_only | default(True) and port != "80" %}
+{%         if not site.tls_only | default(site.tls) and port != "80" %}
 	listen  {{ ip }}:80;
-	{% endif %}
-{%     endfor %}
-{%     if site.tls_cert %}
+{%         endif %}
+{%       endfor %}
+{%     else %}
+        listen {{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
+{%       if not site.tls_only | default(site.tls) and port != "80" %}
+        listen 80;
+{%       endif %}
+{%     endif %}
+{%   endif %}
+{% endif %}
+{% if site.tls_cert %}
 	ssl_certificate {{ tls_certs_dir }}/{{ site.cert_name }}.crt;
 	ssl_certificate_key {{ tls_certs_dir }}/private/{{ site.cert_name }}.key;
-{%       if site.x509_stapling_chain %}
+{%   if site.x509_stapling_chain %}
 	ssl_trusted_certificate {{ tls_certs_dir }}/{{ site.x509_stapling_chain | basename}};
 	ssl_stapling    on;
 	ssl_stapling_verify     on;
-{%       endif %}
-{%       if site.hsts | int | default(31536000) > 0 %}
+{%   endif %}
+{%   if site.hsts | int | default(31536000) > 0 %}
 	add_header Strict-Transport-Security "max-age={{ site.hsts | default(31536000) }}";
-{%       endif %}
-{%     endif %}
 {%   endif %}
 {% endif %}
 

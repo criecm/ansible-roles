@@ -13,7 +13,7 @@
   failed_when: false
 
 - name: install
-  pkgng:
+  package:
     name:
       - 'mongodb{{ mongo_major_version }}0'
       - mongodb-tools

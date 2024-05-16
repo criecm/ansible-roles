@@ -3,10 +3,6 @@
 {% if upstream == site.id %}
 # upstream=site.upstream={{ site.upstream }}
 
-{% for k in site.keys() %}
-# site.{{k}} = {{ site[k] }}
-{% endfor %}
-
 {%   if site.backends | count > 0 %}
 upstream {{ upstream }} {
 # site.backends={{ site.backends }}

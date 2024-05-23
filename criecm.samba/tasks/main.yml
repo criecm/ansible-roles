@@ -86,7 +86,7 @@
         dest: '{{ smbldap_conf_dir }}/smbldap_bind.conf'
         mode: '0600'
       tags: samba, smbldap
-  when: smb_is_pdc | bool
+  when: smb_is_pdc | bool and not smb_ldapsam_editposix
 
 - name: domain info
   command: 'net rpc info -U {{ samba_join_user }}%{{ samba_join_passwd }}'

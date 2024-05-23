@@ -38,7 +38,7 @@
     name: smbldap-tools
     state: present
   tags: samba, pkg
-  when: is_dc
+  when: is_dc and not smb_ldapsam_editposix
 
 - name: enable winbind
   lineinfile:

@@ -19,4 +19,4 @@
     name: smbldap-tools
     state: present
   tags: samba, pkg
-  when: smb_is_pdc
+  when: smb_is_pdc and not smb_ldapsam_editposix

@@ -58,8 +58,8 @@
   ldap passwd sync = {{ smb_ldap_passwd_sync }}
   ldap suffix = {{ smb_ldap_suffix }}
   ldap user suffix = {{ smb_ldap_user_suffix }}
-{% if not smb_ldap_uri is search("^ldaps:") %}
-  ldap ssl = No
+{% if smb_ldap_uri is search("^ldaps:") %}
+  ldap ssl = Off
 {% endif %}
 
 {%     if not smb_is_pdc %}

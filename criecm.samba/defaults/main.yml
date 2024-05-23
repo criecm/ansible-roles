@@ -52,7 +52,7 @@ smb_ldap_uri:
 smb_ldap_admindn:
 smb_ldap_adminpw:
 smb_ldap_suffix:
-smb_ldap_group_suffix: 'dc=Group'
+smb_ldap_group_suffix: 'ou=Group'
 smb_ldap_user_suffix: 'ou=People'
 smb_ldap_machine_suffix: 'ou=Machines'
 smb_ldap_idmap_suffix:

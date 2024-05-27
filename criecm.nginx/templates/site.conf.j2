@@ -47,7 +47,12 @@ server {
 {% else %}
 {%   if site.proxified_by %}
 # site.proxified_by={{ site.proxified_by }}
-	listen 80;
+{%   if ansible_all_ipv4_addresses | count > 0 %}
+	listen *:80;
+{%   endif %}
+{%   if ansible_all_ipv6_addresses | count > 0 %}
+	listen [::]:80;
+{%   endif %}
 {%   else %}
 # site.listen_ips={{ site.listen_ips }}
 {%     if site.listen_ips | count > 0 %}

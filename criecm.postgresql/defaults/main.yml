@@ -1,6 +1,6 @@
 ---
 # defaults file for criecm.postgresql
-pg_version: 13
+pg_version: 15
 pg_upgrade: False
 
 criecm_role_version: 2

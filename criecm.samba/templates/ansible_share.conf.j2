@@ -2,7 +2,9 @@
 # {{ share }}
 {% if "cifs" in share and share.cifs %}
 [{{ share.name }}]
+{%   if not "path" in share.smbparms.keys() %}
   path = {{ share.path }}
+{%   endif %}
 {%   for e,v in share.smbparms.items() %}
   {{ e }} = {{ v }}
 {%   endfor %}

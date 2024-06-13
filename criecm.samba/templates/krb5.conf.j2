@@ -1,0 +1,18 @@
+[libdefaults]
+	default_realm = {{ smb_ad_realm | upper }}
+	dns_lookup_realm = false
+	dns_lookup_kdc = true
+{% if smb_krb5_enctypes %}
+	default_tkt_enctypes = {{ smb_krb5_enctypes }}
+	default_tgs_enctypes = {{ smb_krb5_enctypes }}
+	permitted_enctypes = {{ smb_krb5_enctypes }}
+{% endif %}
+{% if is_dc %}
+[realms]
+{{ smb_ad_realm | upper }} = {
+	default_domain = {{ smb_ad_realm | lower }}
+}
+
+[domain_realm]
+	{{ ansible_hostname }} = {{ smb_ad_realm | upper }}
+{% endif %}

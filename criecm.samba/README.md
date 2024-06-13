@@ -30,7 +30,11 @@ read: `variable_name` (default value) details
   * `path` ('') MANDATORY
   share's directory
 
-## LDAP ((P)DC-only)
+## ADS domain
+### Mandatory
+* `smb_ad_realm ()` if set, will work in ADS mode
+
+## LDAP (NT4 (P)DC-only)
 ### Mandatory
 * `smb_ldap_uri` ()
 * `smb_ldap_suffix` ()
@@ -57,7 +61,7 @@ smb_global_params:
 * `x509_ldap_client_cert` ()
 * `x509_ldap_client_key` ()
 
-### optional - only for PDC (smbldap.conf.j2)
+### optional - only for NT4 PDC (smbldap.conf.j2)
 * `smb_ldap_pwdhash` (SSHA)
 * `smb_crypt_salt_format` ('')
 * `smbldap_loginshell` ('/bin/bash')

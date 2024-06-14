@@ -4,6 +4,7 @@
     name:
       - samba
     state: present
+  register: samba_pkg_upgrade
   tags: samba,pkg
 
 - name: install winbind

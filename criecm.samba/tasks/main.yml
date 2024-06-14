@@ -62,18 +62,40 @@
   register: newconf
   notify: reload samba
 
-- name: save ldap passwd (IDMAP)
+- name: schemaupgrade if upgrade
+  command: 'samba-tool domain schemaupgrade'
+  when: smb_ad_realm | length > 0 and smb_is_pdc
+
+- name: root mapping configuration
+  copy:
+    dest: '{{ smb_global_params["username map"] }}'
+    content: |
+      !root = {{ smb_domain }}\Administrator
+    force: no
+  when: smb_domain | length > 0 and smb_ad_realm | length > 0 and not is_dc and 'username map' in smb_global_params
+
+- name: get AD domain status
+  command: net ads testjoin
+  register: testjoin
+  when: smb_ad_realm | length > 0 and not is_pdc
+
+- name: join AD domain
+  command: 'net ads join -U {{ samba_join_user }}%{{ samba_join_passwd }}'
+  when: samba_join_user | length > 0 and smb_ad_realm | length > 0 and testjoin.rc != 0
+  tags: samba, config
+
+- name: save NT4 ldap passwd (IDMAP)
   command: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'
   when: newconf.changed and smb_domain | length > 0 and not smb_ad_realm | length > 0
     and ( smb_ldap_adminpw is defined or smb_ldap_readpw is defined ) and is_dc and not smb_is_pdc
   tags: samba, config
 
-- name: save ldap adminpw
+- name: save NT4 ldap adminpw
   command: 'smbpasswd -w {{ smb_ldap_adminpw }}'
   when: is_dc and newconf.changed and smb_ldap_adminpw | length > 0 and not smb_ad_realm | length > 0
   tags: samba, config
 
-- name: smbldap-tools if pdc
+- name: smbldap-tools if NT4 pdc
   block:
     - name: config smbldap-tools
       template:
@@ -88,7 +110,7 @@
       tags: samba, smbldap
   when: smb_is_pdc | bool and not smb_ldapsam_editposix and not smb_ad_realm | length > 0
 
-- name: domain info
+- name: NT4 domain info
   command: 'net rpc info -U {{ samba_join_user }}%{{ samba_join_passwd }}'
   when: samba_join_user | length > 0 and newconf.changed and not smb_ad_realm | length > 0
   register: rpcinfo
@@ -97,7 +119,7 @@
   check_mode: False
   tags: samba, config
 
-- name: join domain
+- name: join NT4 domain
   command: 'net rpc join -U {{ samba_join_user }}%{{ samba_join_passwd }}'
   when: samba_join_user | length > 0 and not smb_ad_realm | length > 0 and newconf.changed and rpcinfo.rc != 0 
   tags: samba, config

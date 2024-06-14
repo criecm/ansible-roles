@@ -31,6 +31,7 @@
   pkgng:
     name: '{{ samba_pkg }}'
     state: '{% if samba_upgrade | default(False) %}latest{% else %}present{% endif %}'
+  register: samba_pkg_upgrade
   tags: samba, pkg
 
 - name: installe smbldap-tools

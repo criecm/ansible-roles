@@ -2,7 +2,7 @@
 	default_realm = {{ smb_ad_realm | upper }}
 	dns_lookup_realm = false
 	dns_lookup_kdc = true
-{% if smb_krb5_enctypes %}
+{% if smb_krb5_enctypes is defined %}
 	default_tkt_enctypes = {{ smb_krb5_enctypes }}
 	default_tgs_enctypes = {{ smb_krb5_enctypes }}
 	permitted_enctypes = {{ smb_krb5_enctypes }}

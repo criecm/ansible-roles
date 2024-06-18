@@ -62,6 +62,16 @@
   register: newconf
   notify: reload samba
 
+- name: krb5.conf
+  template:
+    src: krb5.conf.j2
+    dest: '/etc/krb5.conf'
+    mode: '0644'
+    validate: 'verify_krb5_conf %s'
+    backup: yes
+  tags: samba, config
+  register: newconf
+
 - name: schemaupgrade if upgrade
   command: 'samba-tool domain schemaupgrade'
   when: smb_ad_realm | length > 0 and smb_is_pdc
@@ -74,15 +84,27 @@
     force: no
   when: smb_domain | length > 0 and smb_ad_realm | length > 0 and not is_dc and 'username map' in smb_global_params
 
+- name: touch local.conf
+  file:
+    path: '{{ smbconf_path }}.d/local.conf'
+    state: touch
+  tags: samba, config
+
 - name: get AD domain status
   command: net ads testjoin
   register: testjoin
-  when: smb_ad_realm | length > 0 and not is_pdc
+  ignore_errors: True
+  when: smb_ad_realm | length > 0 and not smb_is_pdc
 
 - name: join AD domain
-  command: 'net ads join -U {{ samba_join_user }}%{{ samba_join_passwd }}'
-  when: samba_join_user | length > 0 and smb_ad_realm | length > 0 and testjoin.rc != 0
+  command: 'samba-tool domain join {{ smb_ad_realm }} {% if is_dc %}DC{% else %}MEMBER{% endif %} -U{{ samba_join_user }} --password={{ samba_join_passwd }}' 
+  when: samba_join_user | length > 0 and smb_ad_realm | length > 0 and not smb_is_pdc and testjoin.rc != 0
   tags: samba, config
+
+#- name: move to OU ## On peut pas le faire sur le client mais sur le DC (c'est certainement pas ça) : delegate_to: {{% inventory_hostname[DC] where hostvars[inventory_hostname]['smb_is_pdc'] %}}
+#  command: 'samba-tool computer move {{ ansible_hostname }} OU=Servers'
+#  when: samba_join_user | length > 0 and smb_ad_realm | length > 0 and testjoin.rc != 0 and not is_dc
+#  tags: samba, config
 
 - name: save NT4 ldap passwd (IDMAP)
   command: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'

@@ -10,6 +10,7 @@
   netbios name = {{ ansible_hostname }}
 
 {% if smb_ad_realm != "" %}
+  realm = {{ smb_ad_realm | upper }}
 {%   if not is_dc %}
   security = ADS
 {%   endif %}
@@ -92,6 +93,7 @@
   domain logons = Yes
 {%  else %}
 # DC ADS
+  server role = active directory domain controller
 {%  endif %}
 {% else %}
   idmap config {{ ansible_hostname }}: backend = nss
@@ -99,7 +101,7 @@
   idmap config {{ smb_domain }}: backend = nss
   idmap config {{ smb_domain }}: range = 5000-99999
 {%   if smb_ad_realm != "" %}
-  realm = {{ smb_ad_realm | upper }}
+#  realm = {{ smb_ad_realm | upper }}
 #  winbind nss info = rfc2307
 #  winbind enum users = yes
 #  winbind enum groups = yes

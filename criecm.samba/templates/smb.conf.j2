@@ -54,6 +54,10 @@
 
   idmap config *: backend = tdb
   idmap config *: range = 1000000-1999999
+  idmap config {{ ansible_hostname }}: backend = nss
+  idmap config {{ ansible_hostname }}: range = 2000-4999
+  idmap config {{ smb_domain }}: backend = nss
+  idmap config {{ smb_domain }}: range = 5000-99999
 
 {% if is_dc %}
 {%   if smb_ad_realm == "" %}
@@ -76,6 +80,10 @@
   idmap config {{ smb_domain }}: ldap_base_dn = {{ smb_ldap_suffix }}
   idmap config {{ smb_domain }}: ldap_url = {{ smb_ldapr_uri | default(smb_ldap_uri) }}
   idmap config {{ smb_domain }}: range = 10000-999999
+
+  server role = CLASSIC BACKUP DOMAIN CONTROLLER
+{%       else %}
+  server role = CLASSIC PRIMARY DOMAIN CONTROLLER
 {%       endif %}
 
   passdb expand explicit = no
@@ -96,10 +104,6 @@
   server role = active directory domain controller
 {%  endif %}
 {% else %}
-  idmap config {{ ansible_hostname }}: backend = nss
-  idmap config {{ ansible_hostname }}: range = 2000-4999
-  idmap config {{ smb_domain }}: backend = nss
-  idmap config {{ smb_domain }}: range = 5000-99999
 {%   if smb_ad_realm != "" %}
 #  realm = {{ smb_ad_realm | upper }}
 #  winbind nss info = rfc2307

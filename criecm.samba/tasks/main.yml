@@ -71,6 +71,7 @@
     backup: yes
   tags: samba, config
   register: newconf
+  when: smb_ad_realm | length > 0
 
 - name: schemaupgrade if upgrade
   command: 'samba-tool domain schemaupgrade'

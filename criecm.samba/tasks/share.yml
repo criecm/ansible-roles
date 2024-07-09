@@ -20,6 +20,6 @@
 - name: ansible_share.conf
   template:
     src: ansible_share.conf.j2
-    dest: '{{ smbconf_path }}.d/ansible_{{ share.name }}.conf'
+    dest: '{{ smbconf_path }}.d/ansible_{{ share.name | regex_replace("[\$&^\[\]\(\)\?]", "") }}.conf'
   tags: samba, shares, config
   notify: reload samba

@@ -13,6 +13,14 @@
   realm = {{ smb_ad_realm | upper }}
 {%   if not is_dc %}
   security = ADS
+
+  idmap config *: backend = tdb
+  idmap config *: range = 1000000-1999999
+  idmap config {{ ansible_hostname }}: backend = nss
+  idmap config {{ ansible_hostname }}: range = 2000-4999
+  idmap config {{ smb_domain }}: backend = nss
+  idmap config {{ smb_domain }}: range = 5000-99999
+
 {%   endif %}
 {% elif is_dc or smb_domain == "" %}
   security = user
@@ -51,13 +59,6 @@
 
   # Put a capping on the size of the log files (in Kb).
   max log size = 50
-
-  idmap config *: backend = tdb
-  idmap config *: range = 1000000-1999999
-  idmap config {{ ansible_hostname }}: backend = nss
-  idmap config {{ ansible_hostname }}: range = 2000-4999
-  idmap config {{ smb_domain }}: backend = nss
-  idmap config {{ smb_domain }}: range = 5000-99999
 
 {% if is_dc %}
 {%   if smb_ad_realm == "" %}

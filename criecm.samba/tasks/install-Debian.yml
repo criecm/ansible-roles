@@ -21,3 +21,11 @@
     state: present
   tags: samba, pkg
   when: smb_is_pdc and not smb_ldapsam_editposix and not smb_ad_realm | length > 0
+
+- name: installe heimdal client
+  apt:
+    name: 
+      - heimdal-clients
+    state: present
+  tags: samba,pkg
+  when: not smb_is_pdc and smb_ad_realm | length > 0

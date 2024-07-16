@@ -26,6 +26,14 @@
   security = user
 {% else %}
   security = domain
+
+  idmap config *: backend = tdb
+  idmap config *: range = 1000000-1999999
+  idmap config {{ ansible_hostname }}: backend = nss
+  idmap config {{ ansible_hostname }}: range = 2000-4999
+  idmap config {{ smb_domain }}: backend = nss
+  idmap config {{ smb_domain }}: range = 5000-99999
+
 {% endif %}
 
 {% if smb_ips %}

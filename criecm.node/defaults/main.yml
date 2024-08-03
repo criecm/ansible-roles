@@ -1,6 +1,6 @@
 ---
 # defaults file for criecm.node
-node_version: 12
+node_version: 20
 
 node_update_git: True
 

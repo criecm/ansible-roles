@@ -54,6 +54,16 @@
   with_items: '{{ node_app.confs | default([]) }}'
   register: confs
 
+- name: deploy_command
+  command:
+    cmd: '{{ node_app.deploy_command }}'
+  args:
+    chdir: '{{ node_app.path }}'
+  become_user: '{{ node_app.user }}'
+  become: yes
+  become_method: su
+  when: node_app.deploy_command | default(False)
+
 - name: npm install
   npm:
     path: '{{ node_app.path }}'
@@ -64,7 +74,7 @@
   become_user: '{{ node_app.user }}'
   become: yes
   become_method: su
-  when: node_has_package_json.stat.exists
+  when: node_has_package_json.stat.exists and not node_app.deploy_command | default(False)
 
 - name: bower
   block:

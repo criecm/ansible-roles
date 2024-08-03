@@ -51,6 +51,8 @@ Install/run node apps on FreeBSD (could be easily adapted)
   NODE_ENV value
 * `envvars ({})`
   dict of environment variables
+* `deploy_command ('')`
+  command to deploy code (instead of automatic npm or bower)
 
 ## Dependencies
 

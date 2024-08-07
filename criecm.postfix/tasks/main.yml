@@ -50,7 +50,7 @@
     postfix_new_config: '{{ postfix_default_config | combine(postfix_config) }}'
 
 - name: postfix main.cf set config
-  command: 'postconf {{ item.key }}="{{ item.value }}"'
+  shell: "postconf {{ item.key }}='{{ item.value }}'"
   with_dict: '{{ postfix_new_config }}'
   notify: restart postfix
   when: not item.key in postconf.keys() or item.value != postconf[item.key]

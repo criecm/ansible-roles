@@ -8,5 +8,5 @@ fcgiwrap_netmagis_flags="-f"
 fcgiwrap_netmagis_socket="{{ netmagis_socket }}"
 fcgiwrap_netmagis_socket_owner="{{ www_user }}"
 fcgiwrap_netmagis_socket_mode="750"
-#fcgiwrap_netmagis_socket="tcp:{{ ansible_default_ipv4 | default('*') }}:9000"
+#fcgiwrap_netmagis_socket="tcp:{{ ansible_default_ipv4.address | default('*') }}:9000"
 

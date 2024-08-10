@@ -35,7 +35,7 @@ debug		no
 
 # List of Netmagis users who can bypass the nologin test, separated by a space.
 # They are created when the database is created with netmagis-dbcreate
-rootusers	"{% for user in netmagis_rootusers %}{{user}} {% endfor %}"
+rootusers	"{{ netmagis_rootusers | join(" ") }}"
 
 # Root certificate authorities (used only when authenticating against a CAS
 # server)
@@ -46,7 +46,8 @@ cafile		/usr/local/share/certs/ca-root-nss.crt
 ##############################################################################
 
 dumpdir		/var/netmagis/dbdump
-dbcopy		netmagis-sandbox
+#dbcopy		netmagis-sandbox
+dbcopy		""
 
 ##############################################################################
 # Server scripts (BIND, ISC-DHCPD, Sendmail/Postfix)

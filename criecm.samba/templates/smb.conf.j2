@@ -21,6 +21,7 @@
   idmap config {{ smb_domain }}: backend = nss
   idmap config {{ smb_domain }}: range = 5000-99999
 
+  disable netbios = yes
 {%   endif %}
 {% elif is_dc or smb_domain == "" %}
   security = user

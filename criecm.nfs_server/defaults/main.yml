@@ -2,6 +2,6 @@ nfsv4_enable: True
 nfsv4_sec: "sys"
 nfsv4_only: True
 
-nfsd_flags: '-t {% if not nfsv4_only | default(False) %}-u {% endif %}-n 10'
+nfsd_flags: '-t {% if not nfsv4_only | default(False) %}-u {% endif %}-n {{ ansible_processor_count }}'
 mountd_add_flags: '-l'
 mountd_port: '4046'

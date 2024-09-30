@@ -140,6 +140,9 @@
 {% if smb_log_level %}
   log level = {{ smb_log_level }}
 {% endif %}
+{% if smb_use_syslog | default(2) %}
+  logging = syslog@{{ smb_use_syslog }}{% if not smb_use_syslog_only | default(False) %} files{% endif %}
+{% endif %}
 
 # See the chapter 'Samba performance issues' in the Samba HOWTO Collection
 # and the manual pages for details.
@@ -155,8 +158,14 @@
 # WINS Support - Tells the NMBD component of Samba to enable it's WINS Server
 {% if smb_is_wins %}
   wins support = yes
+{%   if ansible_os_family == "FreeBSD" %}
+  nmbd bind explicit broadcast = no
+{%   endif %}
 {% elif smb_wins_server %}
   wins server = {{ smb_wins_server }}
+{%   if ansible_os_family == "FreeBSD" %}
+  nmbd bind explicit broadcast = no
+{%   endif %}
 {% else %}
   wins support = no
 {% endif %}

@@ -35,7 +35,7 @@ smb_dc_logon_path:
 
 smb_os_level:
 
-smb_logging: 'syslog@2'
+smb_use_syslog: '2'
 # man smb.conf
 smb_log_level: '1 auth:2'
 

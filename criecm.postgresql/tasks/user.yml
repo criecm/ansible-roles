@@ -6,6 +6,10 @@
   become_method: su
   register: pg_actual
 
+- name: set pg_version
+  set_fact:
+    pg_version: '{{ pg_actual.version.major }}'
+
 - name: 'pg user {{ pg_user.name }}'
   postgresql_user:
     name: '{{ pg_user.name }}'

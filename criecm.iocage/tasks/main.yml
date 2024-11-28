@@ -154,7 +154,6 @@
     properties: '{{ default_properties }}'
     state: set
   when: default_properties | default(False)
-  ignore_errors: True
 
 #- name: get iocage current jails
 #  shell: "/usr/local/sbin/iocage list |grep '^[0-9]' | awk '{print $5}'"

@@ -7,11 +7,14 @@
 upstream {{ upstream }} {
 # site.backends={{ site.backends }}
 {%     for srv in site.backends %}
-	# server {{ srv | regex_replace("^.*://","") }};
-	server {{ srv }};
+	server {{ srv | regex_replace("^.*://","") }};
 {%     endfor %}
 {%     if site.backends | count > 1 %}
-	sticky cookie {{ site.id }}LBID expires=1h path=/;
+{%       if "ngx_http_sticky_module" in nginx_modules %}
+	sticky name={{ site.id }}LBID {% if site.tls_only %}secure {% endif %}httponly;
+{%       else %}
+        ip_hash;
+{%       endif %}
 {%     endif %}
 }
 {%   elif "fcgisocket" in site %}
@@ -58,13 +61,13 @@ server {
 {%     if site.listen_ips | count > 0 %}
 {%       for ip in site.listen_ips %}
 	listen	{{ ip }}:{{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
-{%         if not site.tls_only | default(site.tls) and port != "80" %}
+{%         if not site.tls_only and port != "80" %}
 	listen  {{ ip }}:80;
 {%         endif %}
 {%       endfor %}
 {%     else %}
         listen {{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
-{%       if not site.tls_only | default(site.tls) and port != "80" %}
+{%       if not site.tls_only and port != "80" %}
         listen 80;
 {%       endif %}
 {%     endif %}

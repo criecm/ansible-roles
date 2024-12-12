@@ -51,6 +51,7 @@ A proxy definition contains:
     * `group` (ansible group) mandatory
     * `port` (backends's port) - default to `backends_port`
     * `opts` options to add to each backend
+    * `onemaster (False)`: all servers but first one are backups
   * `backends` is a static list of backends, each containing:
     * `name` short name mandatory
     * `address` IP or name mandatory

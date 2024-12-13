@@ -111,6 +111,7 @@ server {
 	root	{{ site.webroot | default(site.rootdir) }};
 
 {% if not site.nginx_includes | list() %}
+# no site.nginx_includes: default /
 	location / {
 		root	{{ site.webroot | default(site.rootdir) }};
 		index	{{ site.default_index | default("index.html index.htm") }};

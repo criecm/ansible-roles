@@ -31,13 +31,14 @@ tls_certs_dir: /etc/ssl
 
 nginx_debian_package: nginx
 
-syslog_facility: local5
+nginx_syslog_facility: local5
+nginx_access_syslog_facility: local4
 
 do_local_log: True
 
 mysite: ''
 
-syslog_server: False
+nginx_syslog_server: '{{ syslog_server | default(False) }}'
 
 # https://thoughts.t37.net/optimisations-nginx-bien-comprendre-sendfile-tcp-nodelay-et-tcp-nopush-2ab3f33432ca
 nginx_sendfile: 'off'

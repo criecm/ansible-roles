@@ -121,9 +121,10 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   (let another role enrich it before calling out vhost.yml by himself — see below)
 * `nginx_debian_package (nginx)`
   Debian package for nginx (nginx-full, nginx-lite, …)
-* `syslog_server ('')`
+* `nginx_syslog_server ('')`
   nginx will log errors there
-* `syslog_facility (local5)`:
+* `nginx_syslog_facility (local5)`:
+* `nginx_access_syslog_facility (local4)`:
 * `do_local_log (True)`:
   keep logs locally
 * `do_local_access_log (do_local_log)`;

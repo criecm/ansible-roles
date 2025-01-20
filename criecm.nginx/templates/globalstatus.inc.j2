@@ -1,6 +1,8 @@
 # nginx status
 location = {{ nginx_status_path }} {
 	stub_status;
+	allow 127.0.0.1;
+	allow ::1;
 {% for net in monitoring_from | intersect(admin_from) %}
 	allow {{ net }};
 {% endfor %}

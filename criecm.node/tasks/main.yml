@@ -17,5 +17,3 @@
   with_items: '{{ node_apps }}'
   loop_control:
     loop_var: oneapp
-
-

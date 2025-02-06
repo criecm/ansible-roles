@@ -38,7 +38,7 @@ do_local_log: True
 
 mysite: ''
 
-nginx_syslog_server: '{{ syslog_server | default(False) }}'
+nginx_syslog_server: '{% if syslog_server | default(False) %}{{ syslog_server | ansible.utils.ipwrap }}{% endif %}'
 
 # https://thoughts.t37.net/optimisations-nginx-bien-comprendre-sendfile-tcp-nodelay-et-tcp-nopush-2ab3f33432ca
 nginx_sendfile: 'off'

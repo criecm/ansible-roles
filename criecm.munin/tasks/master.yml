@@ -5,9 +5,21 @@
 - name: config master
   lineinfile:
     dest: '{{ munin_etcdir }}/munin.conf'
-    line: 'rrdcached_socket /var/run/rrdcached.sock'
-    regexp: '^rrdcached_socket'
+    line: '{{ item.key }} {{ item.value }}'
+    regexp: '^{{ item.key }} '
     insertafter: '^include'
+  with_dict:
+    dbdir: "{{ munin_dbdir }}"
+    rrdcached_socket: "/var/run/rrdcached.sock"
+    cgitmpdir: "{{ munin_dbdir }}/cgi-tmp"
+    graph_strategy: "cgi"
+    html_strategy: "cgi"
+    munin_cgi_graph_jobs: "8"
+    cgiurl_graph: "{{ munin_base_url }}/cgi-graph"
+    max_graph_jobs: "10"
+    max_processes: "12"
+    #timeout_fetch_all_nodes: "240"
+    #timeout_fetch_one_node: "180"
 
 - name: munin user
   user:
@@ -16,6 +28,15 @@
     generate_ssh_key: yes
     ssh_key_comment: munin async user
     shell: /bin/sh
+
+- name: ssh munin config
+  copy:
+    dest: '~ansible/.ssh/config'
+    content: |
+      Host *
+        #IdentityFile /var/munin/.ssh/id_rsa
+        ForwardX11 no
+        StrictHostKeyChecking accept-new
 
 - name: list installed hosts
   find:

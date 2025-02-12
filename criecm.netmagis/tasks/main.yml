@@ -100,6 +100,22 @@
   notify: restart dhcpd
   tags: dhcpd, netmagis
 
+- name: getoui script
+  copy:
+    dest: /home/netmagis/updateoui.sh
+    src: updateoui.sh
+    mode: '0550'
+- name: create manuf file
+  copy:
+    dest: /usr/local/www/nginx/manuf
+    content: ''
+    force: no
+    mode: '0644'
+    owner: netmagis
+  file:
+    path: /usr/local/www/nginx/manuf
+    mode: '0644'
+    owner: netmagis
 - block:
   - cron:
       name: generate zones
@@ -129,6 +145,13 @@
       user: netmagis
       minute: '0'
       hour: '12'
+  - cron:
+      name: make wireshark-format manuf file
+      job: '/home/netmagis/updateoui.sh'
+      user: netmagis
+      minute: '1'
+      hour: '3'
+      day: '1'
   - cron:
       name: Refresh OUI table every 1st of month at 03:05
       job: '{{ prefix }}/sbin/netmagis-getoui'

@@ -9,7 +9,7 @@
 - name: set php version
   set_fact:
     php_version: '{{ get_php_version.stdout_lines[0] | regex_replace("^PHP ([0-9]+\.[0-9]+)\..*$","\1") }}'
-  when: not get_php_version.failed and php_upgrade
+  when: not get_php_version.failed and not php_upgrade
 
 - name: show php version
   debug:

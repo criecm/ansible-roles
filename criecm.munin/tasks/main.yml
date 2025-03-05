@@ -14,13 +14,13 @@
       skip: True
   tags: munin,vars
 
-- name: munin node
-  include_tasks: node.yml
-  when: munin_host | length > 0
-  tags: munin-node,vars
-
 - name: munin master
   include_tasks: master.yml
   when: munin_host == inventory_hostname and munin_role == 'master'
   #or ( munin_host not in ansible_play_batch and munin_aggr_templates | count > 0 )
   tags: munin-master,vars
+
+- name: munin node
+  include_tasks: node.yml
+  when: munin_host | length > 0
+  tags: munin-node,vars

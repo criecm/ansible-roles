@@ -9,9 +9,10 @@
     regexp: '^{{ item.key }} '
     insertafter: '^include'
   with_dict:
-    dbdir: "{{ munin_dbdir }}"
+    dbdir: "{{ munin_dbdir | default(munin_default_dbdir) }}"
+    htmldir: "{{ munin_htmldir | default(munin_default_htmldir) }}"
     rrdcached_socket: "/var/run/rrdcached.sock"
-    cgitmpdir: "{{ munin_dbdir }}/cgi-tmp"
+    cgitmpdir: "/var/munin/cgi-tmp"
     graph_strategy: "cgi"
     html_strategy: "cgi"
     munin_cgi_graph_jobs: "8"
@@ -31,12 +32,20 @@
 
 - name: ssh munin config
   copy:
-    dest: '~ansible/.ssh/config'
+    dest: '~munin/.ssh/config'
     content: |
       Host *
-        #IdentityFile /var/munin/.ssh/id_rsa
+        IdentityFile /var/munin/.ssh/id_rsa
         ForwardX11 no
         StrictHostKeyChecking accept-new
+
+- name: munin-cgi tmp dir
+  file:
+    path: /var/munin/cgi-tmp
+    state: directory
+    mode: '6751'
+    owner: www
+    group: www
 
 - name: list installed hosts
   find:

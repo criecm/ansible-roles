@@ -13,9 +13,6 @@ common_version: 5
 # write resolv.conf
 do_resolvconf: True
 
-# install nut
-do_nut: True
-
 # basedn LDAP
 ldap_base:
 # URI LDAP
@@ -170,10 +167,6 @@ git_ssh_key:
 # serveur ocsinventory
 ocsinventory_server: ''
 ocsinventory_tag: ''
-
-# NUT
-nut_monitor: ''
-nut_mode: netclient
 
 # monitoring IPs
 monitoring_from: []

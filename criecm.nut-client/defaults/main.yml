@@ -1,0 +1,4 @@
+---
+# defaults file for criecm.nut-client
+nut_monitor: ''
+nut_mode: netclient

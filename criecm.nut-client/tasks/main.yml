@@ -1,0 +1,33 @@
+---
+# tasks file for criecm.nut-client
+- name: install NUT
+  package:
+    name: '{{ nut_package }}'
+    state: present
+  when: nut_monitor | length > 0
+
+- name: upsmon.conf
+  template:
+    src: upsmon.conf.j2
+    dest: '{{ nutconfdir }}/upsmon.conf'
+    mode: '0640'
+    group: '{{ nut_group }}'
+  notify: restart upsmon
+  when: nut_monitor | length > 0
+
+- name: nut.conf
+  copy:
+    content: |
+      MODE={{ nut_mode }}
+    dest: '{{ nutconfdir }}/nut.conf'
+    mode: '0640'
+    group: '{{ nut_group }}'
+  when: nut_monitor | length > 0 and nut_mode | length > 0
+
+- name: service upsmon
+  service:
+    name: '{{ upsmon_service }}'
+    state: started
+    enabled: True
+  register: upsmonstart
+  when: nut_monitor | length > 0

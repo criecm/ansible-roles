@@ -1,0 +1,7 @@
+---
+# handlers file for criecm.nut-client
+- name: restart upsmon
+  service:
+    name: '{{ upsmon_service }}'
+    state: restarted
+  when: not upsmonstart.changed

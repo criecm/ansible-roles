@@ -9,7 +9,8 @@
     line: 'allow ^{{ munin_server | replace(".","\.") }}$'
     regexp: '^allow.*{{ munin_server | replace(".","\\.") }}\$$'
     insertafter: 'allow '
-  notify: restart munin
+  notify:
+    - restart munin node
   with_items:
     - '{{ munin_servers }}'
     - '127.0.0.1'

@@ -287,8 +287,3 @@
     installed_mariadb_version: '{% if pkgvers.stdout_lines | count > 0 
       %}{{ pkgvers.stdout_lines[0] }}{% endif %}'
   when: do_upgrade_mariadb | bool
-
-- name: mariadb-upgrade
-  command: 'mariadb-upgrade'
-  when: do_upgrade_mariadb | bool and installed_mariadb_version is version(old_installed_mariadb_version,">")
-  throttle: 1

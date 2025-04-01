@@ -102,10 +102,12 @@
   when: samba_join_user | length > 0 and smb_ad_realm | length > 0 and not smb_is_pdc and testjoin.rc != 0
   tags: samba, config
 
-#- name: move to OU ## On peut pas le faire sur le client mais sur le DC (c'est certainement pas ça) : delegate_to: {{% inventory_hostname[DC] where hostvars[inventory_hostname]['smb_is_pdc'] %}}
-#  command: 'samba-tool computer move {{ ansible_hostname }} OU=Servers'
-#  when: samba_join_user | length > 0 and smb_ad_realm | length > 0 and testjoin.rc != 0 and not is_dc
-#  tags: samba, config
+- name: move to OU ## On peut pas le faire sur le client mais sur le DC (c'est certainement pas ça) : delegate_to: {{% inventory_hostname[DC] where hostvars[inventory_hostname]['smb_is_pdc'] %}}
+  command: 'samba-tool computer move {{ ansible_hostname }} OU={{ samba_join_ou }}'
+  #when: samba_join_user | length > 0 and smb_ad_realm | length > 0 and testjoin.rc != 0 and not is_dc
+  when: samba_join_user | length > 0 and smb_ad_realm | length > 0 and not is_dc
+  delegate_to: "{{ groups['smbpdc'][0] }}" # | select('in', hostvars.keys()) | selectattr('smb_is_pdc', 'defined') | selectattr('smb_is_pdc', 'equalto', True) | list | first }}"
+  tags: samba, config
 
 - name: save NT4 ldap passwd (IDMAP)
   command: 'net idmap set secret {{ smb_domain }} {{ smb_ldap_readpw | default(smb_ldap_adminpw) }}'

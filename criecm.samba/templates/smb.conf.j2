@@ -38,7 +38,8 @@
 {% endif %}
 
 {% if smb_ips %}
-  interfaces ={% for ip in smb_ips %} {{ ip }}{% endfor %} 127.0.0.1 ::1
+  interfaces ={% for ip in smb_ips %} {{ ip }}{% endfor %}{% if not smb_is_dc %} 127.0.0.1 ::1{% endif %}
+
   bind interfaces only = yes
 {% endif %}
 {% if smb_allow %}

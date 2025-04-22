@@ -9,7 +9,7 @@
     src: haproxy.conf.j2
     dest: '{{ haproxy_config_file }}'
     backup: yes
-  notify: restart haproxy
+  notify: reload haproxy
 
 - name: syslog config
   copy:

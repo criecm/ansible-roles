@@ -7,7 +7,7 @@
     name: syslogd
     state: restarted
 
-- name: restart haproxy
+- name: reload haproxy
   service:
     name: haproxy
-    state: restarted
+    state: reloaded

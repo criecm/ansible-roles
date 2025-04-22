@@ -111,7 +111,6 @@ Protocols {{ site.protocols }}
 
 {% for prefix in site.prefixes %}
 {% if "backends" in prefix %}
-  ProxyPreserveHost On
 {%   if not prefix.prefixbackend | default(False) %}
 {%     if prefix.backends | count() > 1 %}
   # prefix {{ prefix.path }} load balancer
@@ -125,7 +124,6 @@ Protocols {{ site.protocols }}
     BalancerMember {{ myback }}{% if myback is not search("route=") %} route={{ myback | regex_replace("^.*//([^/\.]*).*","\\1") }}{% endif %}{% if myback is not search("connectiontimeout=") %} connectiontimeout=3{% endif %}
 
 {%       endfor %}
-    Require all granted
     ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }}B
   </Proxy>
 
@@ -164,15 +162,17 @@ Protocols {{ site.protocols }}
 {%     endfor %}
 {%   endif %}
 
-{%   if prefix.allow_from_nets | default([]) | count > 0 %}
+{%   if prefix.allow_from_nets | default([]) | count + prefix.allow_from | default([]) | count + prefix.apache_includes | default([]) | count > 0 %}
+{%     if prefix.allow_from_nets | default([]) | count > 0 %}
     # prefix."{{ prefix.path }}".allow_from_nets
-{%     for net in prefix.allow_from_nets %}
+{%       for net in prefix.allow_from_nets %}
     Require ip {{ net }}
-{%     endfor %}
-    Require all denied
-{%   else %}
-{%     if not "apache_includes" in prefix %}
-    Require all granted
+{%       endfor %}
+{%     endif %}
+{%     if prefix.allow_from | default([]) | count > 0 %}
+{%       for cond in prefix.allow_from %}
+    Require {{ cond }}
+{%       endfor %}
 {%     endif %}
 {%   endif %}
 {%   if "options" in prefix %}

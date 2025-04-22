@@ -121,7 +121,7 @@
 - name: phpapp config dir(s)
   file:
     state: directory
-    path: '{{ item.dest | regex_replace("^([^/])",site.rootdir+"/\1") | regex_replace("/[^/]+$","") }}'
+    path: '{{ item.dest | default( item.src | regex_replace(".j2$","") | basename ) | regex_replace("^([^/])",site.rootdir+"/\1") | regex_replace("/[^/]+$","") }}'
     mode: '0751'
     owner: '{{ item.owner | default(site.maintainer) }}'
     group: '{{ item.group | default(site.group) }}'
@@ -131,7 +131,7 @@
 - name: phpapp config files
   template:
     src: '{{ item.src }}'
-    dest: '{{ item.dest | regex_replace("^([^/])",site.rootdir+"/\1") }}'
+    dest: '{{ item.dest | default( item.src | regex_replace(".j2$","") | basename ) | regex_replace("^([^/])",site.rootdir+"/\1") }}'
     mode: '{{ item.mode | default("0640") }}'
     owner: '{{ item.owner | default(site.maintainer) }}'
     group: '{{ item.group | default(site.group) }}'

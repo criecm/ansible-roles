@@ -6,7 +6,7 @@ worker_processes	{{ nginx_processes }};
 error_log	{{ nginx_log_dir }}/nginx-error.log info;
 {% endif %}
 {% if nginx_syslog_server %}
-error_log syslog:server={{ nginx_syslog_server }},facility={{ nginx_syslog_facility }},tag=nginx;
+error_log syslog:server={{ nginx_syslog_server | ansible.utils.ipwrap }},facility={{ nginx_syslog_facility }},tag=nginx;
 {% endif %}
 
 include modules.d/*.conf;
@@ -32,7 +32,7 @@ http {
 	{% endif %}
 
 	{% if nginx_syslog_server and nginx_access_syslog_facility %}
-	access_log syslog:server={{ nginx_syslog_server }},facility={{ nginx_access_syslog_facility }} main;
+	access_log syslog:server={{ nginx_syslog_server | ansible.utils.ipwrap }},facility={{ nginx_access_syslog_facility }} main;
 	{% endif %}
 
 	resolver_timeout        3s;

@@ -61,14 +61,14 @@ server {
 # site.listen_ips={{ site.listen_ips }}
 {%     if site.listen_ips | count > 0 %}
 {%       for ip in site.listen_ips %}
-	listen	{{ ip }}:{{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
-{%         if not site.tls_only and port != "80" %}
+	listen	{{ ip }}:{{ siteport }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
+{%         if not site.tls_only and siteport != "80" %}
 	listen  {{ ip }}:80;
 {%         endif %}
 {%       endfor %}
 {%     else %}
-        listen {{ port }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
-{%       if not site.tls_only and port != "80" %}
+        listen {{ siteport }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
+{%       if not site.tls_only and siteport != "80" %}
         listen 80;
 {%       endif %}
 {%     endif %}

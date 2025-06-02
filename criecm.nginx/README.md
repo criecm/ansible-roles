@@ -156,6 +156,8 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   - HTTPS accelerator included via X-Forwarded-Proto header
   - original client IP kept via realip module
   Can be overriden per site
+* `only_proxified (False)`
+  In case you want to disallow direct access
 
 ### per-site variables (site.X)
 
@@ -182,10 +184,12 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   server aliases
 * `nginx_lines ([])`
   config stanzas to be added to site's config
-* `nginx_includes`
+* `nginx_includes ([])`
   files or templates included inside `server {}` block
   if there is a space, first part is the template src and second one is the dest name
   see *Files / Templates locations* for path
+* `nginx_precludes ([])`
+  same, but these files are included *before* `server {}` block
 * `upstream`
   allows to fix upstream name (for reuse in template/prefixes)
 

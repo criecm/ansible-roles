@@ -11,7 +11,7 @@ upstream {{ upstream }} {
 {%     endfor %}
 {%     if site.backends | count > 1 %}
 {%       if "ngx_http_sticky_module" in nginx_modules %}
-	sticky name={{ site.id }}LBID {% if site.tls_only %}secure {% endif %}httponly;
+	sticky name={{ site.id }}LBID{% if site.tls_only %} secure{% endif %};
 {%       else %}
         ip_hash;
 {%       endif %}
@@ -24,6 +24,12 @@ upstream {{ upstream }} {
 	  server {% if site.fcgisocket | regex_search("^\/") %}unix:{% endif %}{{ site.fcgisocket }};
 }
 {%   endif %}
+{% endif %}
+{% if site.nginx_precludes | default([]) | count() > 0 %}
+# site.nginx.precludes={{ site.nginx_precludes | default([]) }}
+{%   for preclude in site.nginx_precludes %}
+	include {{ preclude | regex_replace("^.* ","") | basename | regex_replace("\.j2$","") }};
+{%   endfor %}
 {% endif %}
 {% if site.tls_redir | default(False) and not site.proxified_by %}
 ## redirect http to https

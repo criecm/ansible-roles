@@ -24,6 +24,7 @@ default_site:
   name: ''
   aliases: []
   nginx_includes: []
+  nginx_precludes: []
   rootdir: '{{ onesite_home | default("/home/"+onesite.id) }}/{{ onesite.id }}'
   rootsrc: ''
   listen_ips: '{{ ips }}'

@@ -15,6 +15,14 @@
   when: '"nginx_includes" in site'
   notify: reload nginx
 
+- name: site precludes
+  template:
+    dest: '{{ nginx_etcdir }}/{{ item | regex_replace("^.* ","") | basename | regex_replace("\.j2$","") }}'
+    src: '{{ lookup("first_found", include_locations | product(["/"+item | regex_replace(" .*$","") ]) | map("join") | list) }}'
+  with_items: '{{ site.nginx_precludes }}'
+  when: '"nginx_precludes" in site'
+  notify: reload nginx
+
 - name: conf includes
   copy:
     src: '{{ item }}'

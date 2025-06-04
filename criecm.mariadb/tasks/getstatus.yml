@@ -8,6 +8,19 @@
     loop_var: distrib_status
   run_once: yes
 
+- name: old mariadb_service on FreeBSD
+  block:
+    - name: stat rc script
+      stat:
+        path: /usr/local/etc/rc.d/mysql-server
+      register: statoldrc
+    - name: set fact if needed
+      set_fact:
+        mariadb_service: mysql_server
+        cacheable: yes
+      when: not statoldrc.stat.exists
+  when: ansible_os_family == "FreeBSD"
+
 - name: get running {{ mariadb_process_name }}
   command: pgrep {{ mariadb_process_name }}
   register: mypids

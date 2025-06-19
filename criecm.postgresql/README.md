@@ -15,7 +15,7 @@ FreeBSD machine (or jail or ?)
   IP or network to allow admin user from in pg_hba.conf
 * `pg_allowed_hosts` ([])
   list of adresses allowed to connect to any DB with any user
-* `pg_version (detected or 13)`:
+* `pg_version (detected or 15)`:
 * `pg_upgrade (False)`:
   Version changes won't occur unless you make it True and accept the risk
 * `pg_basedir (/var/db/postgres)`:
@@ -113,10 +113,8 @@ Create db and some users
             hosts: [ 10.2.5.0/24 ]
 	    priv: 'SELECT/table1:INSERT'
 
-Only create one user and db
+Only create one user and db on an existing server
     - hosts: dbhost
-      vars:
-        forgedb: '{{ hostvars[groups["forge"][0]].redmine.db }}'
       tasks:
         - include_role:
             name: criecm.postgresql

@@ -79,6 +79,7 @@
   failed_when: false
   changed_when: false
   register: ldapUserClassInLoginConf
+  when: ldap_force_homedir_by_class | length > 0
 
 # verifie qu'on l'a bien mis nous-memes
 - name: check ldap_force_homedir_by_class by ansible
@@ -90,6 +91,7 @@
   failed_when: false
   changed_when: false
   register: ldapUserClassByAnsible
+  when: ldap_force_homedir_by_class | length > 0
 
 # place ou modifie le block SI il manque ou qu'on l'a mis ici-meme
 - name: login.conf

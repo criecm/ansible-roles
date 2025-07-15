@@ -91,8 +91,12 @@ if [ -z "$winner" -a $NODESDOWN -eq $NBNODES ]; then
       hisuuid=$(ssh_galeraboot $node getuuid)
       if [ "$hisuuid" != "$uuid" ]; then
         echo "UUID check: $node has $hisuuid while we have $uuid"
-        echo " not the same cluster ???"
-        exit 1
+        if [ "$hisuuid" = "00000000-0000-0000-0000-000000000000" ]; then
+          echo " let's say it's a new member"
+        else
+          echo " not the same cluster ???"
+          exit 1
+        fi
       fi
     fi
     last=$(ssh_galeraboot $node getlast || echo -1)

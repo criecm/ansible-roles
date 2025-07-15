@@ -19,19 +19,21 @@ if ! [ -d "$DATADIR" ]; then
   exit 1
 fi
 STATUS=$(pgrep -qx $pname && echo running || echo down)
-if ! [ -s $DATADIR/grastate.dat ]; then
+if ! [ -e $DATADIR/grastate.dat ]; then
   echo "no $DATADIR/grastate.dat: exit" >&2
   exit 1
 fi
 UUID=$(grep ^uuid: $DATADIR/grastate.dat | awk '{print $2}')
 if ! [ -n "$UUID" ]; then
-  echo "no uuid in $DATADIR/grastate.dat: exit" >&2
-  exit 1
+  UUID="00000000-0000-0000-0000-000000000000"
+#  echo "no uuid in $DATADIR/grastate.dat: exit" >&2
+#  exit 1
 fi
 SAFE=$(grep ^safe_to_bootstrap $DATADIR/grastate.dat | awk '{print $2}')
-if ! [ -n "$SAFE" -a $SAFE -eq 0 -o $SAFE -eq 1 ]; then
-  echo "no safe_to_bootstrap in $DATADIR/grastate.dat ($SAFE): exit"
-  exit 1
+if [ -z "$SAFE" ] || [ $SAFE -ne 0 -a $SAFE -ne 1 ]; then
+  SAFE=0
+#  echo "no safe_to_bootstrap in $DATADIR/grastate.dat ($SAFE): exit"
+#  exit 1
 fi
 
 case "$SSH_ORIGINAL_COMMAND" in
@@ -69,7 +71,7 @@ case "$SSH_ORIGINAL_COMMAND" in
     fi
   ;;
   getuuid)
-    echo $UUID
+    echo ${UUID}
     break
   ;;
   getlast)
@@ -93,7 +95,7 @@ case "$SSH_ORIGINAL_COMMAND" in
     break
   ;;
   getsafe)
-    echo $SAFE
+    echo ${SAFE}
     break
   ;;
   setsafe)

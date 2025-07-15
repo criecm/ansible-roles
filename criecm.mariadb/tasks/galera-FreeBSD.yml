@@ -124,7 +124,7 @@
     wsrep_node_name: '"{% for node in galera.nodes %}{% if node.name == ansible_hostname %}{{ node.name }}{% endif %}{% endfor %}"'
     wsrep_provider: /usr/local/lib/libgalera_smm.so
     wsrep_provider_options: '{{ galera.wsrep_provider_options | default("") }}'
-    wsrep_sst_method: 'rsync'
+    wsrep_sst_method: 'mariabackup'
     wsrep_on: 1
   when: 'not ( mariadb_current_config[item.key] | default(False) and mariadb_current_config[item.key] == item.value )'
   notify: restart mariadb

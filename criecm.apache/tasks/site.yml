@@ -133,7 +133,7 @@
     line: 'Listen {{ item }}'
     regexp: 'Listen {{ item | regex_escape() }}'
     insertafter: 'Listen'
-  loop: '{{ lookup("flattened",[site.listen],wantlist=True) }}'
+  loop: '{{ lookup("community.general.flattened",[site.listen],wantlist=True) }}'
   when: '( ansible_os_family == "FreeBSD" and not item | regex_search("80$") ) or
         ( not item | regex_search("(80|443)$") )'
 

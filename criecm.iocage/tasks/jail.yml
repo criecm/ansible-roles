@@ -162,9 +162,13 @@
     path: '/iocage/jails/{{ iocage_jail.name }}/root/usr/local/sbin/pkg'
   register: pkg_installed
 
+- name: install pkg in jail
+  shell: 'env ASSUME_ALWAYS_YES=yes pkg -j ioc-{{ iocage_jail.name }} bootstrap -y'
+  when: not pkg_installed.stat.exists
+
 - name: install python in jail
-  shell: 'env ASSUME_ALWAYS_YES=yes pkg -j ioc-{{ iocage_jail.name }} install -y pkg python python3 rsync'
-  when: not pkg_installed.stat.exists and jail.name not in iocage_fact.ansible_facts.iocage_templates
+  shell: 'env ASSUME_ALWAYS_YES=yes pkg -j ioc-{{ iocage_jail.name }} install -y python python3 rsync'
+  when: jail.name not in iocage_fact.ansible_facts.iocage_templates
 
 - name: add jail to inventory
   add_host:

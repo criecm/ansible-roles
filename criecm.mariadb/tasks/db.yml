@@ -18,6 +18,7 @@
     encoding: '{{ mydb.encoding | default("utf8") }}'
     collation: '{{ mydb.collation | default("utf8_unicode_ci") }}'
     state: present
+  run_once: '{{ galera_is_running }}'
 
 # and associated user
 - name: new user
@@ -29,6 +30,7 @@
     password: '{{ mydb.pass }}'
     update_password: on_create
     state: present
+  run_once: '{{ galera_is_running }}'
 
 - name: store password if new
   copy:
@@ -36,6 +38,7 @@
     content: '{{ mydb.pass }}'
     mode: '0400'
   when: '"pass" not in mariadb'
+  run_once: '{{ galera_is_running }}'
 
 - name: fact db_pass
   set_fact:

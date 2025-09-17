@@ -13,7 +13,6 @@
 - name: 'pg user {{ pg_user.name }}'
   postgresql_user:
     name: '{{ pg_user.name }}'
-    priv: '{{ pg_user.priv | default(omit) }}'
     role_attr_flags: '{{ pg_user.role_attr_flags | default(omit) }}'
     password: '{{ pg_user.password | default(pg_user.name+pg_random | hash("sha256")) }}'
     state: present
@@ -30,6 +29,18 @@
   become_user: '{{ pg_owner }}'
   become_method: su
   when: '"db" in pg_user.keys() and not pg_user.db in pg_actual.databases.keys() and not pg_user.db in pg_dbs | map(attribute="name") and not pg_user.db == "all"'
+
+- name: assign privileges if needed
+  community.postgresql.postgresql_privs:
+    login_db: '{{ pg_user.db }}'
+    privs: '{{ pg_user.priv }}'
+    objs: '{% if pg_user.priv == "SELECT" %}TABLES,SEQUENCES{% else %}ALL_IN_SCHEMA{% endif %}'
+    roles: '{{ pg_user.name }}'
+    type: default_privs
+  become: True
+  become_user: '{{ pg_owner }}'
+  become_method: su
+  when: '"db" in pg_user.keys() and "priv" in pg_user.keys() and not pg_user.db == "all" and not pg_user.db == pg_user.name'
 
 - name: access in pg_hba.conf for {{ pg_user.name }}
   blockinfile:

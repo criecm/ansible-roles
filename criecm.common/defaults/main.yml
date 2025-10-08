@@ -199,8 +199,8 @@ openbsd_base_pkgs:
 debian_base_pkgs:
   - '{{ root_shell | basename }}'
   - git
-  - ntp
-  - ntpdate
+  - '{% if ansible_distribution_major_version | int > 11 %}ntpsec{% else %}ntp{% endif %}'
+  - '{% if ansible_distribution_major_version | int > 11 %}ntpsec-ntpdate{% else %}ntpdate{% endif %}'
   - vim
   - 'python{{ ansible_python_version | regex_replace("([2-3])\..*$","\1") }}-pip'
 

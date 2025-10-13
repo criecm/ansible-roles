@@ -1,0 +1,83 @@
+---
+- name: get ntp servers
+  command: "awk '/^server/{print $2}' {{ time_client.config }}"
+  register: already_ntp_servers
+  changed_when: False
+  check_mode: False
+
+- name: get ntp pools
+  command: "awk '/^pool/{print $2}' {{ time_client.config }}"
+  register: already_ntp_pools
+  changed_when: False
+  check_mode: False
+
+- name: set pool name
+  set_fact:
+    poolname: '{% if ansible_os_family == "OpenBSD" %}servers{% else %}pool{% endif %}'
+    iburst: '{% if ansible_os_family == "OpenBSD" %}{% else %} iburst{% endif %}'
+
+- name: remove ntp server {{ ntpserver }}
+  lineinfile:
+    path: '{{ time_client.config }}'
+    regexp: '^server +{{ ntpserver }}.*'
+    state: absent
+  loop: '{{ already_ntp_servers.stdout_lines }}'
+  loop_control:
+    loop_var: ntpserver
+  when: not ntpserver in ntp_servers
+  notify: restart time_client
+
+- name: add ntp server {{ ntpserver }}
+  lineinfile:
+    path: '{{ time_client.config }}'
+    line: 'server {{ ntpserver }}{{ iburst }}'
+    regexp: '^server +{{ ntpserver }}.*'
+    state: present
+  loop: '{{ ntp_servers }}'
+  loop_control:
+    loop_var: ntpserver
+  notify: restart time_client
+
+- name: remove ntp pool {{ ntppool }}
+  lineinfile:
+    path: '{{ time_client.config }}'
+    regexp: '^{{ poolname }} +{{ ntppool }}.*'
+    state: absent
+  loop: '{{ already_ntp_pools.stdout_lines }}'
+  loop_control:
+    loop_var: ntppool
+  when: not ntppool in ntp_pools
+  notify: restart time_client
+
+- name: add ntp pool {{ ntppool }}
+  lineinfile:
+    path: '{{ time_client.config }}'
+    line: '{{ poolname }} {{ ntppool }}{{ iburst }}'
+    regexp: '^pool +{{ ntppool }}.*'
+    state: present
+  loop: '{{ ntp_pools }}'
+  loop_control:
+    loop_var: ntppool
+  notify: restart time_client
+
+- name: load and use ptp_kvm on a VM
+  block:
+    - name: load kernel module
+      community.general.modprobe:
+        name: ptp_kvm
+        persistent: present
+        state: present
+    - name: add chrony config for PHC
+      lineinfile:
+        path: '{{ time_client.config }}'
+        line: 'refclock PHC /dev/ptp0 poll 2 stratum 3'
+      notify: restart time_client
+  when: 'ansible_virtualization_role == "guest" and ansible_virtualization_type == "kvm" and ntp_use_ptp_kvm'
+
+- name: add 
+  lineinfile:
+    path: '{{ time_client.config }}'
+    line: 'tos minclock {{ ntp_tos_min_clock }} minsane {{ ntp_tos_min_sane_clock }}'
+    regexp: '^tos minclock'
+    state: present
+  when: actual_min_clock.stdout_lines[0] | default(ntp_tos_min_clock) != ntp_tos_min_clock

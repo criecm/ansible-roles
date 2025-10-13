@@ -1,0 +1,15 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for criecm.time
+# serveurs ntp
+ntp_servers: []
+ntp_pools:
+  - pool.ntp.org
+
+ntp_use_ptp_kvm: True
+
+ntp_tos_min_clock: 4
+ntp_tos_min_sane_clock: 3
+ntp_tos_max_clock: 11
+
+ntp_listen_addrs: []

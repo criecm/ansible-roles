@@ -1,0 +1,104 @@
+---
+- name: get ntp servers
+  command: "awk '/^server/{print $2}' {{ time_client.config }}"
+  register: already_ntp_servers
+  changed_when: False
+  check_mode: False
+
+- name: get ntp pools
+  command: "awk '/^pool/{print $2}' {{ time_client.config }}"
+  register: already_ntp_pools
+  changed_when: False
+  check_mode: False
+
+- name: get min clock
+  command: "awk '/^tos minclock/{print $3}' {{ time_client.config }}"
+  register: actual_min_clock
+  changed_when: False
+  check_mode: False
+
+- name: get listen addresses
+  command: "awk '/^interface listen/{print $3}'"
+  register: actual_listens
+  changed_when: False
+  check_mode: False
+
+- name: remove listen addresses
+  lineinfile:
+    path: '{{ time_client.config }}'
+    regex: '^interface listen {{ address }}'
+    state: absent
+  when: not address in ntp_listen_addrs
+  loop: '{{ actual_listens.stdout_lines }}'
+  loop_control:
+    loop_var: address
+  notify: restart time_client
+
+- name: add listen addresses
+  lineinfile:
+    path: '{{ time_client.config }}'
+    line: 'interface listen {{ address }}'
+    state: present
+  when: not address in actual_listens
+  loop: '{{ ntp_listen_addrs }}'
+  loop_control:
+    loop_var: address
+  notify: restart time_client
+
+- name: set pool name
+  set_fact:
+    poolname: '{% if ansible_os_family == "OpenBSD" %}servers{% else %}pool{% endif %}'
+    iburst: '{% if ansible_os_family == "OpenBSD" %}{% else %} iburst{% endif %}'
+
+- name: remove ntp server {{ ntpserver }}
+  lineinfile:
+    path: '{{ time_client.config }}'
+    regexp: '^server +{{ ntpserver }}.*'
+    state: absent
+  loop: '{{ already_ntp_servers.stdout_lines }}'
+  loop_control:
+    loop_var: ntpserver
+  when: not ntpserver in ntp_servers
+  notify: restart time_client
+
+- name: add ntp server {{ ntpserver }}
+  lineinfile:
+    path: '{{ time_client.config }}'
+    line: 'server {{ ntpserver }}{{ iburst }}'
+    regexp: '^server +{{ ntpserver }}.*'
+    state: present
+  loop: '{{ ntp_servers }}'
+  loop_control:
+    loop_var: ntpserver
+  notify: restart time_client
+
+- name: remove ntp pool {{ ntppool }}
+  lineinfile:
+    path: '{{ time_client.config }}'
+    regexp: '^{{ poolname }} +{{ ntppool }}.*'
+    state: absent
+  loop: '{{ already_ntp_pools.stdout_lines }}'
+  loop_control:
+    loop_var: ntppool
+  when: not ntppool in ntp_pools
+  notify: restart time_client
+
+- name: add ntp pool {{ ntppool }}
+  lineinfile:
+    path: '{{ time_client.config }}'
+    line: '{{ poolname }} {{ ntppool }}{{ iburst }}'
+    regexp: '^pool +{{ ntppool }}.*'
+    state: present
+  loop: '{{ ntp_pools }}'
+  loop_control:
+    loop_var: ntppool
+  notify: restart time_client
+
+- name: set minclock
+  lineinfile:
+    path: '{{ time_client.config }}'
+    line: 'tos minclock {{ ntp_tos_min_clock }} minsane {{ ntp_tos_min_sane_clock }} maxclock {{ ntp_tos_max_clock }}'
+    regexp: '^tos minclock'
+    state: present
+  when: actual_min_clock.stdout_lines[0] | default(ntp_tos_min_clock) != ntp_tos_min_clock
+  notify: restart time_client

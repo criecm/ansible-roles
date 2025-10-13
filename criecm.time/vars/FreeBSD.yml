@@ -1,0 +1,4 @@
+---
+time_client:
+  config: /etc/ntp.conf
+  service: ntpd

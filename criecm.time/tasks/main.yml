@@ -1,0 +1,30 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for criecm.time
+- name: use system vars if any
+  include_vars: '{{ item }}'
+  with_first_found:
+    - files:
+      - '{{ ansible_os_family }}.yml'
+      skip: True
+
+- name: install time client {{ time_client }}
+  package:
+    name: '{{ time_client.package }}'
+    state: '{% if do_upgrade | default(False) %}latest{% else %}present{% endif %}'
+  when: time_client.package | default(False)
+
+- name: ntp config
+  include_tasks: ntp_config.yml
+  when: time_client.config is search("ntp.conf")
+
+- name: chrony config
+  include_tasks: chrony_config.yml
+  when: time_client.config is search("chrony.conf")
+
+- name: start time service
+  service:
+    name: '{{ time_client.service }}'
+    state: started
+  register: start_time_client
+  when: 'time_client.service | default(False)'

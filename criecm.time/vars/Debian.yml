@@ -1,0 +1,5 @@
+---
+time_client:
+  config: /etc/chrony/chrony.conf
+  service: chrony
+  package: chrony

@@ -144,13 +144,3 @@
   * `ldap_tls_reqcert` (never)
     value for same name in ldap.conf
 
-### Network Time Protocol (ntp)
-
-If any of `ntp_servers` or `ntp_pools` is non-empty
-  the role will take care of ntp(d).conf and ntp service
-  * `ntp_servers` ([])
-    list of ntp servers
-  * `ntp_pools` ([])
-    list of ntp pools
-  * `ntp_listen_addrs` ([])
-    IP's to listen to (OpenBSD won't listen anywhere without it, can be '*')

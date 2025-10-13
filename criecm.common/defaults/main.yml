@@ -26,21 +26,6 @@ root_shell: zsh
 # etcprefix (/usr/local or not)
 etcprefix: ''
 
-# ntp
-ntp_service: ntp
-
-# config ntp
-ntp_config: ntp.conf
-
-# serveurs ntp
-ntp_servers: []
-
-ntp_pools: []
-
-ntp_listen_addrs: []
-
-ntp_leapfile:
-
 # mailrelays selected by network
 # ex: - { network: 10.0.0.0/24, relay: smtp.internal }
 #     - { network: 192.168.0.0/24, relay: smtp.special }
@@ -199,7 +184,6 @@ openbsd_base_pkgs:
 debian_base_pkgs:
   - '{{ root_shell | basename }}'
   - git
-  - '{% if ansible_distribution_major_version | int > 11 %}ntpsec{% else %}ntp{% endif %}'
   - '{% if ansible_distribution_major_version | int > 11 %}ntpsec-ntpdate{% else %}ntpdate{% endif %}'
   - vim
   - 'python{{ ansible_python_version | regex_replace("([2-3])\..*$","\1") }}-pip'

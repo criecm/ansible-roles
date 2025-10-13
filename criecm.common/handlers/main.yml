@@ -46,11 +46,6 @@
     name: rsyslog
     state: restarted
 
-- name: restart ntpd
-  service:
-    name: '{{ ntp_service }}'
-    state: restarted
-
 - name: debian regen locales
   command: /usr/sbin/locale-gen
 

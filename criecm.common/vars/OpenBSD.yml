@@ -2,8 +2,6 @@
 ldap_etcdir: /etc/openldap
 mailaliases: /etc/mail/aliases
 prefix: /usr/local
-ntp_service: ntpd
-ntp_config: ntpd.conf
 smartd_service: smartd
 resolver_options:
   - edns0

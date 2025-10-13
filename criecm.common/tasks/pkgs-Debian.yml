@@ -9,7 +9,6 @@
 - name: pkgs pkg machine physique
   apt:
     name:
-      - ntp
       - ntpdate
       - snmpd
     state: present

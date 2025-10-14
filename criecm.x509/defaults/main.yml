@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for criecm.x509
+# x509 CA certificate
+x509_ca_file: ''
+
+# and its place on filesystem
+x509_ca_path: /etc/ssl/ca.crt
+

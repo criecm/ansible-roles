@@ -1,0 +1,22 @@
+- name: CA local (debian)
+  file:
+    dest: '/usr/share/ca-certificates/local'
+    state: directory
+  when: ansible_os_family == "Debian"
+- name: register local CA (debian)
+  copy:
+    src: '{{ x509_ca_file }}'
+    dest: /usr/share/ca-certificates/local/local.crt
+    mode: '0644'
+  register: accopied
+  when: ansible_os_family == "Debian"
+- name: ca-certificates.conf (debian)
+  lineinfile:
+    line: 'local/local.crt'
+    regexp: '^local/local(ac)?.crt$'
+    dest: /etc/ca-certificates.conf
+  register: certline
+  when: ansible_os_family == "Debian"
+- name: update-ca-certificates
+  command: '/usr/sbin/update-ca-certificates'
+  when: certline.changed | default(False)

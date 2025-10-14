@@ -1,0 +1,72 @@
+- name: CA local (FreeBSD)
+  file:
+    dest: '/usr/local/etc/ssl/certs'
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == "FreeBSD"
+
+- name: register local CA (FreeBSD)
+  copy:
+    src: '{{ x509_ca_file }}'
+    dest: '/usr/local/etc/ssl/certs/{{ x509_ca_file | regex_replace("^.*\/","") }}'
+    mode: '0644'
+  register: newcert
+  when: ansible_os_family == "FreeBSD"
+
+- name: certctl rehash
+  command: '/usr/sbin/certctl rehash'
+  when: newcert.changed | default(False)
+
+- name: list java packages
+  command: 'pkg query -x %n openjdk'
+  register: java_pkg_list
+  check_mode: False
+  failed_when: False
+  changed_when: False
+
+- name: java cacerts
+  block:
+    - name: ca-certificates-java.jar
+      copy:
+        src: ca-certificates-java.jar
+        dest: /root/ca-certificates-java.jar
+        mode: '0644'
+    - name: mkdir /etc/ssl/certs/java
+      file:
+        path: /etc/ssl/certs/java
+        state: directory
+        mode: '0755'
+    - name: stat /etc/ssl/certs/java/cacerts
+      stat:
+        path: /etc/ssl/certs/java/cacerts
+      register: stat_cacerts
+    - name: stat /usr/local/etc/ssl/certs
+      stat:
+        path: /usr/local/etc/ssl/certs
+      register: stat_local_certs
+    - name: post-upgrade.sh/java_cacerts
+      blockinfile:
+        dest: /root/post-upgrade.sh
+        marker: '# {mark} ANSIBLE java-cacerts BLOCK'
+        block: |
+          mkdir -p /etc/ssl/certs/java
+          lastcacerts=$(stat -f %m /etc/ssl/certs/java/cacerts || echo 0)
+          for d in /usr/share/certs/trusted /usr/local/etc/ssl/certs /usr/share/certs/untrusted; do
+            lastd=$(stat -f %m "$d")
+            if [ "$lastd" -gt "$lastcacerts" ]; then
+              ( find /usr/share/certs/trusted /usr/local/etc/ssl/certs -type f | sed 's@^@+@'; find /usr/share/certs/untrusted | sed 's@^@-@' ) | java -Xmx64m -jar /root/ca-certificates-java.jar -storepass 'changeit'
+              break
+            fi
+          done
+          for jre in $(ls -d /usr/local/openjdk*); do
+            [ -d "$jre/jre" ] && jre="$jre/jre"
+            if [ ! -L "$jre/lib/security/cacerts" ]; then
+              echo "$jre/lib/security/cacerts -> /etc/ssl/certs/java/cacerts"
+              mv $jre/lib/security/cacerts $jre/lib/security/cacerts.orig
+              ln -s /etc/ssl/certs/java/cacerts $jre/lib/security/cacerts
+            fi
+          done
+        mode: '0750'
+    - name: run post-upgrade.sh
+      command: /root/post-upgrade.sh
+  when: x509_ca_file != "" and java_pkg_list.stdout_lines | count() > 0

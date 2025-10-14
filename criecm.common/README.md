@@ -1,11 +1,6 @@
 # common - base system role
 
-* CA x509
 * client OpenLDAP + config
-* config mail relay (only `is_mailrelay == False and mailrelay != ''`)
-  * Debian: postfix
-  * FreeBSD: sendmail
-  * OpenBSD: smtpd
 * lignes de config sshd (en variables, voir defaults/main.yml)
 * syslog centralisé:
   * sauf si `is_syslogd=True`
@@ -46,8 +41,6 @@
     will be user if no match is found in `resolvers` and jail has IPv6
   * `dns64_resolvers ([])`
     for IP6-only hosts, overrides `resolvers` mechanism with DNS64-enabled resolvers
-  * `rootmailto` ()
-    mail to forward root's mail
   * `gits_root` ('/root')
     path for relative path in `gits`
   * `gits_group ('')`
@@ -118,19 +111,6 @@
     If defined, all logs will be send there
   * `syslog_auth_server` (`syslog_server`)
     Auth logs will be send there
-
-### x509
-
-  * `x509_ca_file` ('')
-    source file for x509 AC certificate(s)
-  * `x509_ca_path` (/etc/ssl/ca.crt)
-    dest path for above cert file
-
-### Mailrelay
-  * `is_mailrelay` (False)
-    Does not configure mail relay if True
-  * `host_mailrelay` ()
-    If defined, name/IP of the mail relay
 
 ### Ssh
   * `sshd_allow_groups` ('')

@@ -26,30 +26,6 @@ root_shell: zsh
 # etcprefix (/usr/local or not)
 etcprefix: ''
 
-# mailrelays selected by network
-# ex: - { network: 10.0.0.0/24, relay: smtp.internal }
-#     - { network: 192.168.0.0/24, relay: smtp.special }
-#     - { network: 0.0.0.0/0, relay: smtp.default }
-mailrelays: []
-
-# mail relay to configure (force over mailrelays)
-host_mailrelay: ''
-
-# is mail relay ? (host var)
-is_mailrelay: False
-
-# mail aliases file
-mailaliases: /etc/aliases
-
-# redirect mail for root to...
-rootmailto:
-
-# x509 CA certificate
-x509_ca_file: ''
-
-# and its place on filesystem
-x509_ca_path: /etc/ssl/ca.crt
-
 # value for TLS_REQCERT in ldap.conf (and others)
 ldap_tls_reqcert: never
 

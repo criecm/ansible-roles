@@ -6,7 +6,7 @@ galaxy_info:
 
   license: BSD
 
-  min_ansible_version: 2.7
+  min_ansible_version: 2.11
 
   platforms:
     - name: FreeBSD
@@ -17,14 +17,15 @@ galaxy_info:
         - all
     - name: Debian
       versions:
-        - stretch
-        - buster
+        - bullseye
+        - bookworm
+        - trixie
 
   galaxy_tags:
-    - mailviarelay
     - syslog
     - packages
     - sshd
     - authorizedkeys
 
-dependencies: []
+dependencies:
+  - criecm.time

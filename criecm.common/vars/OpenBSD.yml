@@ -1,6 +1,5 @@
 ---
 ldap_etcdir: /etc/openldap
-mailaliases: /etc/mail/aliases
 prefix: /usr/local
 smartd_service: smartd
 resolver_options:

@@ -4,23 +4,6 @@
     name: '{{ ssh_service_name | default("sshd") }}'
     state: restarted
 
-- name: reconfigure postfix
-  command: 'dpkg-reconfigure --frontend noninteractive postfix'
-  when: ansible_distribution == 'Debian'
-
-- name: reload postfix
-  service:
-    name: postfix
-    state: reloaded
-
-- name: restart smtpd
-  service:
-    name: smtpd
-    state: restarted
-
-- name: newaliases
-  command: /usr/bin/newaliases
-
 - name: restart bsnmpd
   service:
     name: bsnmpd

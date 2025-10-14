@@ -149,57 +149,6 @@
   when: do_sys and not is_jail and not is_vm and do_sys and do_smartd and disks | count > 0
   tags: smartd
 
-# x509
-- name: x509
-  block:
-    - name: Installe CA local
-      copy:
-        src: '{{ x509_ca_file }}'
-        dest: '{{ x509_ca_path }}'
-        owner: root
-        group: '0'
-        mode: '0644'
-    - name: CA local (debian)
-      file:
-        dest: '/usr/share/ca-certificates/local'
-        state: directory
-      when: ansible_os_family == "Debian"
-    - name: register local CA (debian)
-      copy:
-        src: '{{ x509_ca_file }}'
-        dest: /usr/share/ca-certificates/local/local.crt
-        mode: '0644'
-      register: accopied
-      when: ansible_os_family == "Debian"
-    - name: ca-certificates.conf (debian)
-      lineinfile:
-        line: 'local/local.crt'
-        regexp: '^local/local(ac)?.crt$'
-        dest: /etc/ca-certificates.conf
-      register: certline
-      when: ansible_os_family == "Debian"
-    - name: update-ca-certificates
-      command: '/usr/sbin/update-ca-certificates'
-      when: certline.changed | default(False)
-    - name: CA local (FreeBSD)
-      file:
-        dest: '/usr/local/etc/ssl/certs'
-        state: directory
-        mode: '0755'
-      when: ansible_os_family == "FreeBSD"
-    - name: register local CA (FreeBSD)
-      copy:
-        src: '{{ x509_ca_file }}'
-        dest: '/usr/local/etc/ssl/certs/{{ x509_ca_file | regex_replace("^.*\/","") }}'
-        mode: '0644'
-      register: newcert
-      when: ansible_os_family == "FreeBSD"
-    - name: certctl rehash
-      command: '/usr/sbin/certctl rehash'
-      when: newcert.changed | default(False)
-  when: x509_ca_file | default("") is not match("^$")
-  tags: x509
-
 # syslog
 - name: syslog client
   include_tasks: 'syslog-{{ ansible_os_family }}.yml'
@@ -250,27 +199,6 @@
     loop_var: cron
   tags: crons
   when: crons | union(host_crons) | union(role_crons) | count > 0 and do_sys
-
-# mailrelay
-- name: mailrelay
-  include_tasks: 'mailrelay-{{ ansible_os_family }}.yml'
-  when: mailrelay | length > 0 and not is_mailrelay and do_sys
-  tags: mailrelay
-
-- name: alias mail root
-  lineinfile:
-    dest: "{{ mailaliases }}"
-    line: "root: {{ rootmailto }}"
-    regexp: '^root:'
-  notify: newaliases
-  when: rootmailto and do_sys
-  tags: mailclient
-
-- name: export mailrelay var
-  set_fact:
-    mailrelay: '{{ mailrelay }}'
-    cacheable: yes
-  tags: vars,mailrelay
 
 # ocsinventory agent
 - name: ocsinventory agent

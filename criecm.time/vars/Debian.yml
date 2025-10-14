@@ -1,5 +1,5 @@
 ---
 time_client:
-  config: /etc/chrony/chrony.conf
-  service: chrony
-  package: chrony
+  config: '{% if not "container" in ansible_virtualization_tech_guest %}/etc/chrony/chrony.conf{% endif %}'
+  service: '{% if not "container" in ansible_virtualization_tech_guest %}chrony{% endif %}'
+  package: '{% if not "container" in ansible_virtualization_tech_guest %}chrony{% endif %}'

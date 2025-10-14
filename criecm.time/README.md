@@ -3,6 +3,8 @@ Role Name
 
 Sets time client from ntp or local source
 
+Won't do anything in host is a container or jail
+
 Requirements
 ------------
 

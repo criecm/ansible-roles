@@ -6,6 +6,8 @@
     name: nss-pam-ldapd
     state: present
   tags: nssldap
+  when: ldap_nss | bool
+
 - name: active client LDAP FreeBSD
   lineinfile:
     dest: '/etc/rc.conf'
@@ -17,6 +19,7 @@
     - { regexp: '^nslcd_enable', line: 'nslcd_enable="YES"' }
     - { regexp: '^nslcd_supervisor', line: 'nslcd_supervisor="YES"' }
   tags: nssldap
+  when: ldap_nss | bool
 
 - name: Config nss
   block:
@@ -79,7 +82,7 @@
   failed_when: false
   changed_when: false
   register: ldapUserClassInLoginConf
-  when: ldap_force_homedir_by_class | length > 0
+  when: ldap_force_homedir_by_class | length > 0 and ldap_nss | bool
 
 # verifie qu'on l'a bien mis nous-memes
 - name: check ldap_force_homedir_by_class by ansible
@@ -91,7 +94,7 @@
   failed_when: false
   changed_when: false
   register: ldapUserClassByAnsible
-  when: ldap_force_homedir_by_class | length > 0
+  when: ldap_force_homedir_by_class | length > 0 and ldap_nss | bool
 
 # place ou modifie le block SI il manque ou qu'on l'a mis ici-meme
 - name: login.conf
@@ -113,7 +116,7 @@
   with_nested:
     - '{{ pam_config_dirs }}'
     - '{{ pam_ldap_services }}'
-  when: 'pam_ldap_services | count > 0'
+  when: 'ldap_nss | bool and pam_ldap_services | count > 0'
   register: statpam
 
 - name: modify pam configs

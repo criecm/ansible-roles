@@ -2,7 +2,7 @@
 # config client ldap Debian
 
 - block:
-  - name: config client LDAP Debian 8/9
+  - name: config client LDAP Debian
     debconf:
       name: '{{ item.name }}'
       question: '{{ item.question }}'
@@ -29,4 +29,6 @@
         - libnss-ldapd
         - libpam-ldapd
       state: present
+
+  when: ldap_nss | bool
   tags: nssldap

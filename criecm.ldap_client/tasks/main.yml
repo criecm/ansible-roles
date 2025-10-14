@@ -2,12 +2,56 @@
 # config client ldap
 
 - name: OS vars
-  include_vars: 'vars/{{ ansible_os_family }}.yml'
-  tags: nssldap
+  include_vars:
+    dir: vars
+    files_matching: '{{ ansible_os_family }}.yml'
+
+- name: openldap config dir
+  file:
+    path: '{{ ldap_etcdir }}'
+    state: directory
+    owner: 0
+    group: '0'
+    mode: '0755'
+  when: ldap_base | length > 0
 
 - name: OS tasks
-  include_tasks: 'tasks/{{ ansible_os_family }}.yml'
-  tags: nssldap
+  include_tasks: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+      errors: 'ignore'
+
+- name: ldap.conf
+  lineinfile:
+    dest: '{{ ldap_etcdir }}/ldap.conf'
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+    create: yes
+    state: present
+  with_items:
+    - { regexp: '^BASE', line: 'BASE {{ ldap_base }}' }
+    - { regexp: '^URI', line: 'URI {{ ldap_uri }}' }
+    - { regexp: '^TLS_REQCERT', line: 'TLS_REQCERT {{ ldap_tls_reqcert }}' }
+    - { regexp: '^TLS_CACERT', line: 'TLS_CACERT {{ x509_ca_path }}' }
+
+- name: TLS config if needed
+  lineinfile:
+    dest: '{{ ldap_etcdir }}/ldap.conf'
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+    create: yes
+    state: present
+  with_items:
+    - { regexp: '^TLS_REQCERT', line: 'TLS_REQCERT {{ ldap_tls_reqcert }}' }
+    - { regexp: '^TLS_CACERT', line: 'TLS_CACERT {{ x509_ca_path }}' }
+  when: x509_ca_file | default("") | bool
+
+- name: chmod 644 ldap.conf
+  file:
+    path: '{{ ldap_etcdir }}/ldap.conf'
+    mode: '0644'
+  check_mode: False
 
 - name: Config nslcd.conf
   template:
@@ -15,6 +59,7 @@
     src: nslcd.conf.j2
     mode: '0600'
   notify: restart ldap client
+  when: ldap_nss | bool
   tags: nssldap
 
 - name: ensure nslcd is started
@@ -22,3 +67,4 @@
     name: nslcd
     state: started
   tags: nssldap
+  when: ldap_nss | bool

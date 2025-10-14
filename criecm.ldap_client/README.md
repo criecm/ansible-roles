@@ -40,6 +40,7 @@ UNIX accounts via LDAP (nslcd) (Debian,FreeBSD)
 ```
 - hosts: mymachines
   roles:
+    - criecm.x509
     - criecm.ldap_client
   vars:
     ldap_base: dc=univ,dc=fr
@@ -57,6 +58,7 @@ UNIX accounts via LDAP (nslcd) (Debian,FreeBSD)
 ```
 - hosts: mailsrv
   roles:
+    - criecm.x509
     - criecm.ldap_client
     - a mailserver role
   vars:

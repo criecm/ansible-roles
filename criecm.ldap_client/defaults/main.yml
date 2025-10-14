@@ -19,7 +19,7 @@ pam_ldap_services: []
 pam_config_dirs: [ /etc/pam.d ]
 pam_config_dir: /etc/pam.d
 ldap_validnames: ''
-ldap_nss: True
+ldap_nss: False
 ldap_autofs: False
 ldap_starttls: False
 ldap_tls_reqcert: 'allow'

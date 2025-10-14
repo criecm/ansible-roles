@@ -1,6 +1,5 @@
 # common - base system role
 
-* client OpenLDAP + config
 * lignes de config sshd (en variables, voir defaults/main.yml)
 * syslog centralisé:
   * sauf si `is_syslogd=True`
@@ -115,12 +114,3 @@
 ### Ssh
   * `sshd_allow_groups` ('')
     define AllowGroups in `/etc/ssh/sshd_config`
-
-### LDAP basic config
-  * `ldap_base` ('')
-    baseDN ldap (for ldap.conf)
-  * `ldap_uri` ('ldaps://ldapr.univ.fr/ ldaps://ldap.univ.fr/')
-    URI for ldap.conf
-  * `ldap_tls_reqcert` (never)
-    value for same name in ldap.conf
-

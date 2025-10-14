@@ -1,6 +1,5 @@
 ---
 etcprefix: /usr/local
-ldap_etcdir: /usr/local/etc/openldap
 prefix: /usr/local
 smartd_service: smartd
 resolver_options:

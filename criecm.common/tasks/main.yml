@@ -97,12 +97,6 @@
     force: no
   tags: vimrc
 
-# gits helper
-- name: gits
-  include_tasks: gits.yml
-  when: gits | union(host_gits) | union(role_gits) | union(group_gits) | count() > 0
-  tags: gits
-
 # post-upgrade.sh script
 - name: post-upgrade.sh
   copy:

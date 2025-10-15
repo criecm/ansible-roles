@@ -40,20 +40,6 @@
     will be user if no match is found in `resolvers` and jail has IPv6
   * `dns64_resolvers ([])`
     for IP6-only hosts, overrides `resolvers` mechanism with DNS64-enabled resolvers
-  * `gits_root` ('/root')
-    path for relative path in `gits`
-  * `gits_group ('')`
-    group to own gits_root
-  * `gits_mode ('0750')`
-    dir mode for gits_root
-  * `gits`, `host_gits`, `group_gits` and `role_gits` ([])
-    lists of dicts: each MUST have at least
-      * `repo`: git url to clone there
-      * `dest`: destination path (absolute or relative to gits_root)
-    and MAY have:
-      * `umask` ('0022')
-      * `update` (False)
-      * `version` (master)
   * `crons`,`host_crons`,`role_crons`:
     list of dicts for cron module
   * `cronvars ({})`

@@ -23,4 +23,6 @@ galaxy_info:
     - openldap
 
 dependencies:
+  - criecm.x509
+  - criecm.time
   - criecm.ldap_client

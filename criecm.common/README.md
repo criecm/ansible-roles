@@ -5,7 +5,6 @@
   * sauf si `is_syslogd=True`
   * seulement si `syslog_server` existe
 * deploiement des cles ssh `files/{{ ssh_keys_dir }}/*.pub`
-* /usr/local/admin/sysutils/common depuis GIT (et plus selon variables)
 * cron daily/weekly ecm (et supression des anciens de CVS)
 * snmpd (TODO: Debian et OpenBSD)
 * preferred shell pour root + it's config + aliases

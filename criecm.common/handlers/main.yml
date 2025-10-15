@@ -4,16 +4,6 @@
     name: '{{ ssh_service_name | default("sshd") }}'
     state: restarted
 
-- name: restart bsnmpd
-  service:
-    name: bsnmpd
-    state: restarted
-
-- name: restart snmpd
-  service:
-    name: snmpd
-    state: restarted
-
 - name: touch console.log
   file:
     path: /var/log/console.log

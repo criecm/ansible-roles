@@ -1,0 +1,48 @@
+---
+# snmp
+- name: install bsnmp-ucd
+  package:
+    name: bsnmp-ucd
+    state: present
+
+# currently bugged
+#- name: hosts.allow
+#  block:
+#    - name: allow
+#      blockinfile:
+#        marker: '# {mark} ANSIBLE monitoring_from'
+#        block: |
+#          snmpd: localhost 127.0.0.1 [::1] : ALLOW
+#          {% for thing in monitoring_from %}
+#          {%   if thing | ipaddr("address") %}
+#          snmpd: {{ thing | ipwrap }}: ALLOW
+#          {%   elif thing | ipaddr("ipv4") %}
+#          snmpd: {{ thing | ipaddr("network") }}/{{ thing | ipaddr("netmask") }}: ALLOW
+#          {%   endif %}
+#          {% endfor %}
+#        dest: /etc/hosts.allow
+#        insertbefore: '^ALL *: *ALL *: *allow'
+#    - name: deny all
+#      lineinfile:
+#        line: 'snmpd: ALL: DENY'
+#        dest: /etc/hosts.allow
+#        regexp: '^snmpd:.*DENY'
+#        insertafter: '^# END ANSIBLE monitoring_from'
+#  when: monitoring_from | count() > 0
+
+- name: config snmpd
+  lineinfile:
+    line: '{{ item.line }}'
+    regexp: '{{ item.regexp }}'
+    dest: /etc/snmpd.config
+  with_items:
+    - { line: 'begemotSnmpdModulePath."ucd" = "/usr/local/lib/snmp_ucd.so"', regexp: '^begemotSnmpdModulePath.*snmp_ucd' }
+# bug cpu snmp hostres (freebsd < 11.2 ou < 10.5)
+#    - { line: 'begemotSnmpdModulePath."hostres" = "/usr/lib/snmp_hostres.so"', regexp: '^begemotSnmpdModulePath.*snmp_hostres' }
+  notify: restart bsnmpd
+
+- name: enable bsnmpd
+  service:
+    name: bsnmpd
+    state: started
+    enabled: yes

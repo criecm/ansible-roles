@@ -1,5 +1,10 @@
 ---
 # snmpd
+- name: install snmpd
+  package:
+    name: snmpd
+    state: present
+
 - name: snmpd config file
   lineinfile:
     line: '{{ item.line }}'

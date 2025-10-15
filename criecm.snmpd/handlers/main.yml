@@ -1,0 +1,12 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for criecm.snmpd
+- name: restart bsnmpd
+  service:
+    name: bsnmpd
+    state: restarted
+ 
+- name: restart snmpd
+  service:
+    name: snmpd
+    state: restarted

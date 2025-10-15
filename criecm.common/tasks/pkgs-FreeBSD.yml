@@ -39,7 +39,6 @@
 - name: pkgs pkg machine physique
   pkgng:
     name:
-      - bsnmp-ucd
       - dmidecode
       - ipmitool
       - smartmontools

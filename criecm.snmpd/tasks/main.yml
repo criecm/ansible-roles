@@ -1,0 +1,16 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for criecm.snmpd
+- name: os vars
+  include_vars:
+    dir: vars
+    files_matching: '{{ ansible_os_family }}.yml'
+
+- name: os tasks
+  include_tasks: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+      errors: 'ignore'
+  when: do_snmp
+

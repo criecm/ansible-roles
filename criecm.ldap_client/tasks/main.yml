@@ -6,6 +6,12 @@
     dir: vars
     files_matching: '{{ ansible_os_family }}.yml'
 
+- name: openldap client package
+  package:
+    name: '{{ openldap_package }}'
+    state: present
+  when: ldap_base | length > 0
+
 - name: openldap config dir
   file:
     path: '{{ ldap_etcdir }}'
@@ -32,8 +38,7 @@
   with_items:
     - { regexp: '^BASE', line: 'BASE {{ ldap_base }}' }
     - { regexp: '^URI', line: 'URI {{ ldap_uri }}' }
-    - { regexp: '^TLS_REQCERT', line: 'TLS_REQCERT {{ ldap_tls_reqcert }}' }
-    - { regexp: '^TLS_CACERT', line: 'TLS_CACERT {{ x509_ca_path }}' }
+  when: ldap_base | length > 0
 
 - name: TLS config if needed
   lineinfile:
@@ -45,7 +50,7 @@
   with_items:
     - { regexp: '^TLS_REQCERT', line: 'TLS_REQCERT {{ ldap_tls_reqcert }}' }
     - { regexp: '^TLS_CACERT', line: 'TLS_CACERT {{ x509_ca_path }}' }
-  when: x509_ca_file | default("") | bool
+  when: ldap_base | length > 0 and x509_ca_file | default("") | length > 0
 
 - name: chmod 644 ldap.conf
   file:

@@ -9,7 +9,7 @@
   when: x509_ca_file != ""
 
 # tasks file for criecm.x509
-- name: os vars
+- name: os tasks
   include_tasks: '{{ item }}'
   with_first_found:
     - files:

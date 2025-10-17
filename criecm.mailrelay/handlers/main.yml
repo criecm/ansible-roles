@@ -1,0 +1,20 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for criecm.mailrelay
+- name: reconfigure postfix
+  command: 'dpkg-reconfigure --frontend noninteractive postfix'
+  when: ansible_distribution == 'Debian'
+
+- name: reload postfix
+  service:
+    name: postfix
+    state: reloaded
+
+- name: restart smtpd
+  service:
+    name: smtpd
+    state: restarted
+
+- name: newaliases
+  command: /usr/bin/newaliases
+

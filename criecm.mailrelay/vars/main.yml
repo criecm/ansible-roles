@@ -1,0 +1,6 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for criecm.mailrelay
+# mailrelays selection - host_mailrelay always override
+rels: '{% for relay in mailrelays %}{% if ansible_all_ipv4_addresses | ansible.utils.ipaddr(relay.network) %}{{ relay.relay }},{% endif %}{% endfor %}'
+mailrelay: '{% if host_mailrelay == "" %}{{ rels | regex_replace(",.*","") }}{% else %}{{ host_mailrelay }}{% endif %}'

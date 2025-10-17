@@ -1,0 +1,23 @@
+---
+- name: os vars
+  include_vars:
+    dir: vars
+    files_matching: '{{ ansible_os_family }}.yml'
+
+# mailrelay by OS family
+- name: 'mailrelay {{ ansible_os_family }}'
+  include_tasks: '{{ ansible_os_family }}.yml'
+  when: mailrelay | length > 0 and not is_mailrelay
+
+- name: alias mail root
+  lineinfile:
+    dest: "{{ mailaliases }}"
+    line: "root: {{ rootmailto }}"
+    regexp: '^root:'
+  notify: newaliases
+  when: rootmailto != ""
+
+- name: export mailrelay var
+  set_fact:
+    mailrelay: '{{ mailrelay }}'
+    cacheable: yes

@@ -60,7 +60,7 @@
 {% endif %}
 
   aio read size = 16384
-  aio write size = 0
+  aio write size = 16384
   use sendfile = Yes
 
 {% if ansible_os_family == "FreeBSD" %}

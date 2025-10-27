@@ -101,13 +101,6 @@ group_pkgs: []
 ocsinventory_server: ''
 ocsinventory_tag: ''
 
-# crons
-crons: []
-host_crons: []
-role_crons: []
-# cron variables
-cronvars: {}
-
 openbsd_pkg_mirror: http://ftp.openbsd.org
 
 freebsd_base_pkgs:

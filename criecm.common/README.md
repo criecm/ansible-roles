@@ -5,7 +5,6 @@
   * sauf si `is_syslogd=True`
   * seulement si `syslog_server` existe
 * deploiement des cles ssh `files/{{ ssh_keys_dir }}/*.pub`
-* cron daily/weekly ecm (et supression des anciens de CVS)
 * preferred shell pour root + it's config + aliases
 * packages supplementaires (variable `pkgs`)
 
@@ -38,10 +37,6 @@
     will be user if no match is found in `resolvers` and jail has IPv6
   * `dns64_resolvers ([])`
     for IP6-only hosts, overrides `resolvers` mechanism with DNS64-enabled resolvers
-  * `crons`,`host_crons`,`role_crons`:
-    list of dicts for cron module
-  * `cronvars ({})`
-    dict of crontab(5) variables
   * `ocsinventory_server` ('')
     If present, install and configure openinventory-agent
   * `root_shell` (zsh)

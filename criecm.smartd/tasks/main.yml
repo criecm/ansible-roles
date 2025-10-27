@@ -1,0 +1,51 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for criecm.smartd
+- name: os vars
+  include_vars:
+    dir: vars
+    files_matching: '{{ ansible_os_family }}.yml'
+
+- name: install smartmontools
+  package:
+    name: '{{ smartd_package }}'
+    state: present
+  when: not is_virt
+
+- name: lsdisks
+  shell: |
+    smartctl --scan-open | awk '/^\// {gsub("#.*$",""); args=""; dev=$1; for(i=2;i<=NF;i++){args=args" "$i;}printf("smartctl -a %s %s > /dev/null && echo %s %s\n",dev,args,dev,args);}' | sh
+  register: lsdisks
+  ignore_errors: true
+  changed_when: false
+  when: not is_virt
+
+- name: disks fact
+  set_fact:
+    disks: '{{ lsdisks.stdout_lines | default([]) }}'
+    cacheable: true
+  when: not is_virt and not disks | default([]) | count > 0
+  tags: smartd
+
+- name: smartd
+  block:
+    - name: get smartd.conf status
+      command: 'grep ^/ {{ etcprefix }}/etc/smartd.conf'
+      ignore_errors: yes
+      changed_when: False
+      register: smarted
+    - name: (re)write smartd.conf
+      template:
+        src: smartd.conf.j2
+        dest: '{{ etcprefix }}/etc/smartd.conf'
+        force: '{% if smarted.rc == 0 %}no{% else %}yes{% endif %}'
+      notify: restart smartd
+    - name: ensure smartd started
+      service:
+        name: '{{ smartd_service }}'
+        state: started
+        enabled: true
+      register: smartd_started
+  when: not is_virt and disks | count > 0
+  tags: smartd
+

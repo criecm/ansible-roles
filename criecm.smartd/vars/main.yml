@@ -1,0 +1,4 @@
+---
+smartd_service: smartd
+smartd_package: smartmontools
+etcprefix: ''

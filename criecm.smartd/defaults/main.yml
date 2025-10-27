@@ -1,0 +1,4 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for criecm.smartd
+is_virt: '{% if ansible_virtualization_tech_guest | default([]) | count > 0 %}True{% else %}False{% endif %}'

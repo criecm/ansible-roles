@@ -111,8 +111,6 @@ role_crons: []
 # cron variables
 cronvars: {}
 
-do_smart: True
-
 openbsd_pkg_mirror: http://ftp.openbsd.org
 
 freebsd_base_pkgs:

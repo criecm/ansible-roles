@@ -48,10 +48,6 @@
   * `root_shell` (zsh)
     Set your preferred one here :) (or set it empty to skip all this)
     put your rc file in {{ playbook_dir }}/files/{{ root_shell }}rc
-  * `do_smart (True if not jail/vm)`
-    configure smartd for disks alerts
-  * `smart_mailto ('')`
-    Here comes your email address if you wish to receive alerts by mail
   * `backup_dir (files/backups/{{ inventory_hostname }})`
     copy ssh host keys and restore /root/ files from here if any
   * `monitoring_from ([])`
@@ -64,7 +60,7 @@
   * `pkg_repo_conf` (pkgecm.conf)
     name of a pkg repo config file to be installed first
   * `is_jail` (False)
-    if True, will skip hardware monitoring tools (smart, ipmi, snmp, dmidecode)
+    if True, will skip hardware monitoring tools (ipmi, snmp, dmidecode)
   * `freebsd_base_pkgs ([git,rsync,vim-console,root_shell])`
     list of packages to install
 

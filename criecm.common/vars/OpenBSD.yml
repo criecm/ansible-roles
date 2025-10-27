@@ -1,6 +1,5 @@
 ---
 prefix: /usr/local
-smartd_service: smartd
 resolver_options:
   - edns0
   - timeout:2

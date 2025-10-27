@@ -40,15 +40,3 @@
   notify: debian regen locales
   tags: locales
   when: do_sys
-## list disks
-#- name: list disks
-#  shell: "lsblk | awk '{if($6~/^disk$/){print $1;}}'"
-#  changed_when: False
-#  check_mode: False
-#  register: lsdisks
-#  when: do_smartd
-#
-#- set_fact:
-#    disks: '{{ lsdisks.stdout_lines }}'
-#    cacheable: True
-#  when: do_smartd

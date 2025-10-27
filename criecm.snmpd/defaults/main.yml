@@ -2,3 +2,6 @@
 ---
 # defaults file for criecm.snmpd
 do_snmp: True
+
+# monitoring IPs
+monitoring_from: []

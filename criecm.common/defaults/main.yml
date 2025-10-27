@@ -101,9 +101,6 @@ group_pkgs: []
 ocsinventory_server: ''
 ocsinventory_tag: ''
 
-# monitoring IPs
-monitoring_from: []
-
 # crons
 crons: []
 host_crons: []

@@ -6,7 +6,6 @@
   * seulement si `syslog_server` existe
 * deploiement des cles ssh `files/{{ ssh_keys_dir }}/*.pub`
 * cron daily/weekly ecm (et supression des anciens de CVS)
-* snmpd (TODO: Debian et OpenBSD)
 * preferred shell pour root + it's config + aliases
 * packages supplementaires (variable `pkgs`)
 
@@ -50,8 +49,6 @@
     put your rc file in {{ playbook_dir }}/files/{{ root_shell }}rc
   * `backup_dir (files/backups/{{ inventory_hostname }})`
     copy ssh host keys and restore /root/ files from here if any
-  * `monitoring_from ([])`
-    list of networks to allow for snmp
   * `http_proxy ('')`
     To set http_proxy and https_proxy global values (FreeBSD only)
 
@@ -60,7 +57,7 @@
   * `pkg_repo_conf` (pkgecm.conf)
     name of a pkg repo config file to be installed first
   * `is_jail` (False)
-    if True, will skip hardware monitoring tools (ipmi, snmp, dmidecode)
+    if True, will skip hardware monitoring tools (ipmi, dmidecode)
   * `freebsd_base_pkgs ([git,rsync,vim-console,root_shell])`
     list of packages to install
 

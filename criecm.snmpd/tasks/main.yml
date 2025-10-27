@@ -12,5 +12,3 @@
     - files:
         - '{{ ansible_os_family }}.yml'
       errors: 'ignore'
-  when: do_snmp
-

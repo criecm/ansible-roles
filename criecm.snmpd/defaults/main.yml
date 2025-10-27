@@ -1,7 +1,5 @@
 #SPDX-License-Identifier: MIT-0
 ---
 # defaults file for criecm.snmpd
-do_snmp: True
-
 # monitoring IPs
 monitoring_from: []

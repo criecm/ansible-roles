@@ -1,0 +1,8 @@
+#SPDX-License-Identifier: MIT-0
+---
+# crons
+crons: []
+host_crons: []
+role_crons: []
+# cron variables
+cronvars: {}

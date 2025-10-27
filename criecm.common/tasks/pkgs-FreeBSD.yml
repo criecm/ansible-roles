@@ -3,7 +3,7 @@
 - name: pkg boostrap
   ansible.builtin.command:
     cmd: 'env ASSUME_ALWAYS_YES=yes pkg bootstrap'
-    creates: /usr/local/bin/pkg
+    creates: /usr/local/sbin/pkg
   check_mode: False
 
 - name: 'pkg repo {{ pkg_repo_conf }}'

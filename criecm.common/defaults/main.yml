@@ -58,9 +58,6 @@ dns64_resolvers: []
 # force rewrite of resolv.conf
 overwrite_resolvconf: False
 
-# timezone
-host_timezone: 'Europe/Paris'
-
 # default prefix for commands
 prefix: /usr
 

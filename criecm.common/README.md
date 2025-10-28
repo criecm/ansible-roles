@@ -25,7 +25,6 @@
 
 ## Variables
 
-  * `host_timezone` (Europe/Paris)
   * `is_resolver` (False)
     if True, will use 127.0.0.1 in resolv.conf first
   * `resolvers ( [] )`

@@ -23,4 +23,5 @@ galaxy_info:
 
   galaxy_tags: [ syslog ]
 
-dependencies: []
+dependencies:
+  - criecm.time

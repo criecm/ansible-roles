@@ -23,4 +23,5 @@ galaxy_info:
     - nss
     - pam
 
-dependencies: []
+dependencies:
+  - criecm.time

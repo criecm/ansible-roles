@@ -30,4 +30,4 @@ galaxy_info:
     - pam
 
 dependencies:
-  - role: criecm.common
+  - role: criecm.x509

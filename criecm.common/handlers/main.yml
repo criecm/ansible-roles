@@ -4,28 +4,8 @@
     name: '{{ ssh_service_name | default("sshd") }}'
     state: restarted
 
-- name: touch console.log
-  file:
-    path: /var/log/console.log
-    state: touch
-
-- name: restart BSD syslogd
-  service:
-    name: syslogd
-    state: restarted
-
-- name: restart Debian rsyslog
-  service:
-    name: rsyslog
-    state: restarted
-
 - name: debian regen locales
   command: /usr/sbin/locale-gen
-
-- name: restart smartd
-  service:
-    name: '{{ smartd_service }}'
-    state: restarted
 
 - name: post-upgrade
   command: '/root/post-upgrade.sh'

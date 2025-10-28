@@ -22,7 +22,6 @@ galaxy_info:
         - trixie
 
   galaxy_tags:
-    - syslog
     - packages
     - sshd
     - authorizedkeys

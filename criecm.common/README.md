@@ -1,9 +1,6 @@
 # common - base system role
 
 * lignes de config sshd (en variables, voir defaults/main.yml)
-* syslog centralisé:
-  * sauf si `is_syslogd=True`
-  * seulement si `syslog_server` existe
 * deploiement des cles ssh `files/{{ ssh_keys_dir }}/*.pub`
 * preferred shell pour root + it's config + aliases
 * packages supplementaires (variable `pkgs`)
@@ -75,13 +72,6 @@
     additionnal packages to install using distribution's package system
   * `host_pkgs` `role_pkgs` ([])
     other packages defined in inventory or roles (or whatever)
-
-### Syslog
-
-  * `syslog_server` ()
-    If defined, all logs will be send there
-  * `syslog_auth_server` (`syslog_server`)
-    Auth logs will be send there
 
 ### Ssh
   * `sshd_allow_groups` ('')

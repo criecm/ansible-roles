@@ -101,12 +101,6 @@
     mode: '0755'
     force: no
 
-# syslog
-- name: syslog client
-  include_tasks: 'syslog-{{ ansible_os_family }}.yml'
-  when: not is_syslogd and do_sys
-  tags: syslog
-
 # ocsinventory agent
 - name: ocsinventory agent
   include_tasks: 'ocsinventory-{{ ansible_os_family }}.yml'

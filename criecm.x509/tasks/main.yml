@@ -14,5 +14,5 @@
   with_first_found:
     - files:
         - '{{ ansible_os_family }}.yml'
-      errors: 'ignore'
+      skip: True
   when: x509_ca_file != ""

@@ -1,0 +1,16 @@
+---
+# bidouille: replace est utilise pour detecter la presence du CA
+- name: is CA in /etc/ssl/cert.pem
+  replace:
+    dest: /etc/ssl/cert.pem
+    regexp: '{{ lookup("file", x509_ca_file) | regex_escape() }}'
+  check_mode: True
+  failed_when: False
+  changed_when: False
+  register: ca_in_cert_pem
+- name: insert CA in /etc/ssl/cert.pem
+  blockinfile:
+    marker: '{mark} ansible criecm.x509 CA {{ x509_ca_path }}'
+    block: '{{ lookup("file", x509_ca_file) }}'
+    dest: /etc/ssl/cert.pem
+  when: not ca_in_cert_pem.msg

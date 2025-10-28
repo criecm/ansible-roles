@@ -1,0 +1,26 @@
+#SPDX-License-Identifier: MIT-0
+galaxy_info:
+  author: Geoffroy Desvernay
+  description: sysadm
+  company: Ecole Centrale Méditerranée
+
+  platforms:
+    - name: FreeBSD
+      versions:
+        - all
+    - name: OpenBSD
+      versions:
+        - all
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+        - trixie
+
+  license: BSD-3-Clause
+
+  min_ansible_version: 2.11
+
+  galaxy_tags: [ syslog ]
+
+dependencies: []

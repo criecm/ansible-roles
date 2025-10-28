@@ -1,0 +1,8 @@
+---
+# tasks file for criecm.syslog
+- name: os tasks
+  include_tasks: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+  when: syslog_server != ""

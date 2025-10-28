@@ -1,0 +1,18 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for criecm.syslog
+- name: touch console.log
+  file:
+    path: /var/log/console.log
+    state: touch
+
+- name: restart BSD syslogd
+  service:
+    name: syslogd
+    state: restarted
+
+- name: restart Debian rsyslog
+  service:
+    name: rsyslog
+    state: restarted
+

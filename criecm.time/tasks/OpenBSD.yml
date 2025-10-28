@@ -1,0 +1,10 @@
+---
+# timezone
+- name: timezone
+  file:
+    src: '/usr/share/zoneinfo/{{ host_timezone }}'
+    dest: '/etc/localtime'
+    state: link
+    force: yes
+  tags: timezone
+  when: host_timezone | default(False)

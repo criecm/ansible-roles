@@ -1,0 +1,17 @@
+---
+# timezone
+- name: timezone
+  block:
+    - name: get timezone
+      command: cat /etc/timezone
+      register: zoneinfo
+      changed_when: False
+      check_mode: False
+      ignore_errors: True
+    - name: set timezone
+      copy:
+        dest: /etc/timezone
+        content: '{{ host_timezone }}'
+      when: zoneinfo.stdout != host_timezone
+  tags: timezone
+  when: host_timezone | default(False)

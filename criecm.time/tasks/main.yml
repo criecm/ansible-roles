@@ -8,6 +8,14 @@
       - '{{ ansible_os_family }}.yml'
       skip: True
 
+# set localtime by system
+- name: os tasks
+  include_tasks: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+      skip: True
+
 - name: install time client {{ time_client }}
   package:
     name: '{{ time_client.package }}'

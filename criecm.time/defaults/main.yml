@@ -13,3 +13,5 @@ ntp_tos_min_sane_clock: 3
 ntp_tos_max_clock: 11
 
 ntp_listen_addrs: []
+
+host_timezone: ''

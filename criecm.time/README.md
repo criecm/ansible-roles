@@ -13,6 +13,7 @@ none
 Role Variables
 --------------
 
+* `host_timezone ()`: if defined, set the host timezone
 * `ntp_servers ([])`
 * `ntp_pools (["pool.ntp.org"])`
 * `ntp_use_ptp_kvm (True)`: only when in a linux kvm guest, use host's clock using PHC source instead of ntp servers/pools
@@ -33,7 +34,7 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - { role: criecm.time, ntp_servers: [ fr.pool.ntp.org ] }
+         - { role: criecm.time, ntp_pools: [ fr.pool.ntp.org ] }
 
 License
 -------

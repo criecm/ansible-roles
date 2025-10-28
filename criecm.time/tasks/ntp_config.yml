@@ -58,7 +58,7 @@
   loop: '{{ already_ntp_servers.stdout_lines }}'
   loop_control:
     loop_var: ntpserver
-  when: not ntpserver in ntp_servers
+  when: ( ntp_servers | count() > 0 or ntp_pools | count() > 0 ) and not ntpserver in ntp_servers
   notify: restart time_client
 
 - name: add ntp server {{ ntpserver }}
@@ -80,7 +80,7 @@
   loop: '{{ already_ntp_pools.stdout_lines }}'
   loop_control:
     loop_var: ntppool
-  when: not ntppool in ntp_pools
+  when: ( ntp_servers | count() > 0 or ntp_pools | count() > 0 ) and not ntppool in ntp_pools
   notify: restart time_client
 
 - name: add ntp pool {{ ntppool }}

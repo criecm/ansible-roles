@@ -1,31 +1,35 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Deploy x509 CA certificate(s)
 
-Requirements
-------------
+Including java certs
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+On FreeBSD, if `x509_ca_file` is defined:
+  * all pkg installed jdk/jre will be modified to replace their cacerts file by
+    a symlink to /etc/ssl/java/cacerts, which is created by Debian's certificates-java.jar
+    using FreeBSD's CA database (including your CA)
+
+A block is added in /root/post-install.sh to let you call it after pkg upgrade
+(can also be run by cron)
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+  * `x509_ca_file` ('')
+    source file for x509 AC certificate(s)
+  * `x509_ca_path` (/etc/ssl/ca.crt)
+    dest path for above cert file
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
     - hosts: servers
       roles:
-         - { role: username.rolename, x: 42 }
+         - { role: username.x509, x509_ca_file: files/myca.crt }
 
 License
 -------
@@ -35,4 +39,4 @@ BSD
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Yes another sysadmin

@@ -31,39 +31,49 @@
         src: ca-certificates-java.jar
         dest: /root/ca-certificates-java.jar
         mode: '0644'
-    - name: mkdir /etc/ssl/certs/java
+    - name: mkdir /etc/ssl/java
       file:
-        path: /etc/ssl/certs/java
+        path: /etc/ssl/java
         state: directory
         mode: '0755'
-    - name: stat /etc/ssl/certs/java/cacerts
-      stat:
-        path: /etc/ssl/certs/java/cacerts
-      register: stat_cacerts
-    - name: stat /usr/local/etc/ssl/certs
-      stat:
-        path: /usr/local/etc/ssl/certs
-      register: stat_local_certs
     - name: post-upgrade.sh/java_cacerts
       blockinfile:
         dest: /root/post-upgrade.sh
         marker: '# {mark} ANSIBLE java-cacerts BLOCK'
         block: |
-          mkdir -p /etc/ssl/certs/java
-          lastcacerts=$(stat -f %m /etc/ssl/certs/java/cacerts || echo 0)
+          # le cacerts doit aller dans /etc/ssl/java/cacerts
+          [ -d /etc/ssl/java ] || mkdir -p /etc/ssl/java
+          if [ -e /etc/ssl/certs/java ]; then
+            if [ ! -f /etc/ssl/java/cacerts ]; then
+              # on recupere le cacerts dans /etc/ssl/certs/java si on a que lui
+              [ -f /etc/ssl/certs/java/cacerts ] && mv /etc/ssl/certs/java/cacerts /etc/ssl/java/cacerts
+            fi
+            # on supprime /etc/ssl/certs/java
+            rm -rf /etc/ssl/certs/java
+          fi
+          # MAJ du cacerts si besoin
+          lastcacerts=$(stat -f %m /etc/ssl/java/cacerts || echo 0)
           for d in /usr/share/certs/trusted /usr/local/etc/ssl/certs /usr/share/certs/untrusted; do
             lastd=$(stat -f %m "$d")
             if [ "$lastd" -gt "$lastcacerts" ]; then
+              # /etc/ssl/certs/java doit etre un lien vers /etc/ssl/java (pour /root/ca-certificates-java.jar)
+              # (/root/ca-certificates-java.jar genere /etc/ssl/certs/java/cacerts)
+              ln -s /etc/ssl/java /etc/ssl/certs/java
               ( find /usr/share/certs/trusted /usr/local/etc/ssl/certs -type f | sed 's@^@+@'; find /usr/share/certs/untrusted | sed 's@^@-@' ) | java -Xmx64m -jar /root/ca-certificates-java.jar -storepass 'changeit'
+              #rm /etc/ssl/certs/java
               break
             fi
           done
+          # les cacerts du/des jre/jdk doivent pointer vers /etc/ssl/java/cacerts
           for jre in $(ls -d /usr/local/openjdk*); do
             [ -d "$jre/jre" ] && jre="$jre/jre"
             if [ ! -L "$jre/lib/security/cacerts" ]; then
-              echo "$jre/lib/security/cacerts -> /etc/ssl/certs/java/cacerts"
+              echo "$jre/lib/security/cacerts -> /etc/ssl/java/cacerts"
               mv $jre/lib/security/cacerts $jre/lib/security/cacerts.orig
-              ln -s /etc/ssl/certs/java/cacerts $jre/lib/security/cacerts
+              ln -s /etc/ssl/java/cacerts $jre/lib/security/cacerts
+            elif [ "$(stat -f %Y $jre/lib/security/cacerts)" != "/etc/ssl/java/cacerts" ]; then
+              rm $jre/lib/security/cacerts
+              ln -s /etc/ssl/java/cacerts $jre/lib/security/cacerts
             fi
           done
         mode: '0750'

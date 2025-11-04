@@ -6,3 +6,12 @@
   environment:
     PKG_PATH: "http://{{ openbsd_pkg_mirror }}/pub/OpenBSD/{{ ansible_distribution_version }}/packages/{{ ansible_architecture }}/"
   tags: baseconf, pkg
+
+- name: upgrade all if wanted
+  command: pkg_add -uI
+  when: do_upgrade | default(False)
+
+- name: force setup after pkg upgrade
+  ansible.builtin.setup:
+    gather_subset: [ "min" ]
+  when: do_upgrade | default(False)

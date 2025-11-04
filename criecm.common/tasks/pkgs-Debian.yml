@@ -6,6 +6,12 @@
     state: present
   tags: pkgs
 
+- name: upgrade all if wanted
+  apt:
+    update_cache: True
+    upgrade: safe
+  when: do_upgrade | default(False)
+
 - name: pkgs pkg machine physique
   apt:
     name:
@@ -13,3 +19,8 @@
     state: present
   when: not is_jail and not is_vm
   tags: pkgs
+
+- name: force setup after pkg upgrade
+  ansible.builtin.setup:
+    gather_subset: [ "min" ]
+  when: do_upgrade | default(False)

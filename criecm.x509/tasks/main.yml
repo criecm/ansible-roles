@@ -1,4 +1,11 @@
 ---
+- name: mkdir pour CA local (FreeBSD)
+  file:
+    dest: '/usr/local/etc/ssl/certs'
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == "FreeBSD"
+
 - name: Installe CA local
   copy:
     src: '{{ x509_ca_file }}'

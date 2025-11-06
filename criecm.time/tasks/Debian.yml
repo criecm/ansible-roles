@@ -14,4 +14,4 @@
         content: '{{ host_timezone }}'
       when: zoneinfo.stdout != host_timezone
   tags: timezone
-  when: host_timezone | default(False)
+  when: host_timezone | default("") != ""

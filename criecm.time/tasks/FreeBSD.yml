@@ -19,6 +19,6 @@
       command: 'tzsetup {{ host_timezone }}'
       when: zoneinfo.stdout != host_timezone or
           ( statzone.stat.checksum != statlocaltime.stat.checksum )
-  when: host_timezone | default(False)
+  when: 'host_timezone | default("") != ""'
   tags: timezone
 

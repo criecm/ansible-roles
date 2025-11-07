@@ -7,4 +7,4 @@
     state: link
     force: yes
   tags: timezone
-  when: host_timezone | default(False)
+  when: 'host_timezone | default("") != ""'

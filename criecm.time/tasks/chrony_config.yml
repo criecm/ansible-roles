@@ -16,7 +16,7 @@
     poolname: '{% if ansible_os_family == "OpenBSD" %}servers{% else %}pool{% endif %}'
     iburst: '{% if ansible_os_family == "OpenBSD" %}{% else %} iburst{% endif %}'
 
-- name: remove ntp server {{ ntpserver }}
+- name: remove ntp server
   lineinfile:
     path: '{{ time_client.config }}'
     regexp: '^server +{{ ntpserver }}.*'
@@ -24,10 +24,11 @@
   loop: '{{ already_ntp_servers.stdout_lines }}'
   loop_control:
     loop_var: ntpserver
+    label: '{{ ntpserver }}'
   when: not ntpserver in ntp_servers
   notify: restart time_client
 
-- name: add ntp server {{ ntpserver }}
+- name: add ntp server
   lineinfile:
     path: '{{ time_client.config }}'
     line: 'server {{ ntpserver }}{{ iburst }}'
@@ -36,9 +37,10 @@
   loop: '{{ ntp_servers }}'
   loop_control:
     loop_var: ntpserver
+    label: '{{ ntpserver }}'
   notify: restart time_client
 
-- name: remove ntp pool {{ ntppool }}
+- name: remove ntp pool
   lineinfile:
     path: '{{ time_client.config }}'
     regexp: '^{{ poolname }} +{{ ntppool }}.*'
@@ -46,10 +48,11 @@
   loop: '{{ already_ntp_pools.stdout_lines }}'
   loop_control:
     loop_var: ntppool
+    label: '{{ ntppool }}'
   when: not ntppool in ntp_pools
   notify: restart time_client
 
-- name: add ntp pool {{ ntppool }}
+- name: add ntp pool
   lineinfile:
     path: '{{ time_client.config }}'
     line: '{{ poolname }} {{ ntppool }}{{ iburst }}'
@@ -58,6 +61,7 @@
   loop: '{{ ntp_pools }}'
   loop_control:
     loop_var: ntppool
+    label: '{{ ntppool }}'
   notify: restart time_client
 
 - name: load and use ptp_kvm on a VM

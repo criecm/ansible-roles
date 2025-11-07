@@ -8,4 +8,4 @@
   apt:
     name: munin-async
     state: present
-  when: munin_async
+  when: munin_async | bool

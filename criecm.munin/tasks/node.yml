@@ -16,7 +16,7 @@
     - '127.0.0.1'
   loop_control:
     loop_var: munin_server
-  when: not munin_async or munin_async_and_node
+  when: not munin_async | bool or munin_async_and_node | bool
   tags: munin-node
 
 - name: listen localhost only
@@ -25,7 +25,7 @@
     line: 'host 127.0.0.1'
     regexp: '^host '
     insertafter: 'host'
-  when: munin_async and not munin_async_and_node
+  when: munin_async | bool and not munin_async_and_node | bool
   tags: munin-node
   ignore_errors: "{{ ansible_check_mode }}"
 
@@ -37,7 +37,7 @@
     name: munin-async
     home: '{{ munin_async_home }}'
     shell: /bin/sh
-  when: munin_async
+  when: munin_async | bool
   tags: munin-node
 
 - name: munin_async_key
@@ -45,7 +45,7 @@
     key: '{{ munin_async_key }}'
     key_options: 'no-port-forwarding,no-X11-forwarding,no-agent-forwarding,no-pty,no-user-rc,command="{{ munin_async_path }} -s {{ munin_async_spool }} --spoolfetch"'
     user: munin-async
-  when: munin_async
+  when: munin_async | bool
   tags: munin-node
   ignore_errors: "{{ ansible_check_mode }}"
 
@@ -62,7 +62,7 @@
     name: '{{ munin_asyncd_service }}'
     enabled: yes
     state: started
-  when: munin_async
+  when: munin_async | bool
   notify:
     - restart munin node
     - restart munin asyncd

@@ -20,19 +20,19 @@
   package:
     name: '{{ time_client.package }}'
     state: '{% if do_upgrade | default(False) %}latest{% else %}present{% endif %}'
-  when: time_client.package | default(False)
+  when: time_client.package | default("") != ""
 
 - name: ntp config
   include_tasks: ntp_config.yml
-  when: time_client.config is search("ntp.conf")
+  when: time_client.config | default("") is search("ntp.conf")
 
 - name: chrony config
   include_tasks: chrony_config.yml
-  when: time_client.config is search("chrony.conf")
+  when: time_client.config | default("") is search("chrony.conf")
 
 - name: start time service
   service:
     name: '{{ time_client.service }}'
     state: started
   register: start_time_client
-  when: 'time_client.service | default(False)'
+  when: 'time_client.service | default("") != ""

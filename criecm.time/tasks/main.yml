@@ -28,7 +28,7 @@
 
 - name: chrony config
   include_tasks: chrony_config.yml
-  when: 'time_client.config | default("") is search("chrony.conf")'
+  when: 'time_client.config | default("") != "" is search("chrony.conf")'
 
 - name: start time service
   service:

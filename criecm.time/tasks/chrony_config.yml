@@ -1,12 +1,12 @@
 ---
 - name: get ntp servers
-  command: "awk '/^server/{print $2}' {{ time_client.config }}"
+  command: "awk '/^server/{print $2}' {{ time_client_config }}"
   register: already_ntp_servers
   changed_when: False
   check_mode: False
 
 - name: get ntp pools
-  command: "awk '/^pool/{print $2}' {{ time_client.config }}"
+  command: "awk '/^pool/{print $2}' {{ time_client_config }}"
   register: already_ntp_pools
   changed_when: False
   check_mode: False
@@ -18,7 +18,7 @@
 
 - name: remove ntp server
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     regexp: '^server +{{ ntpserver }}.*'
     state: absent
   loop: '{{ already_ntp_servers.stdout_lines }}'
@@ -30,7 +30,7 @@
 
 - name: add ntp server
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     line: 'server {{ ntpserver }}{{ iburst }}'
     regexp: '^server +{{ ntpserver }}.*'
     state: present
@@ -42,7 +42,7 @@
 
 - name: remove ntp pool
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     regexp: '^{{ poolname }} +{{ ntppool }}.*'
     state: absent
   loop: '{{ already_ntp_pools.stdout_lines }}'
@@ -54,7 +54,7 @@
 
 - name: add ntp pool
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     line: '{{ poolname }} {{ ntppool }}{{ iburst }}'
     regexp: '^pool +{{ ntppool }}.*'
     state: present
@@ -73,14 +73,14 @@
         state: present
     - name: add chrony config for PHC
       lineinfile:
-        path: '{{ time_client.config }}'
+        path: '{{ time_client_config }}'
         line: 'refclock PHC /dev/ptp0 poll 2 stratum 3'
       notify: restart time_client
   when: 'ansible_virtualization_role == "guest" and ansible_virtualization_type == "kvm" and ntp_use_ptp_kvm'
 
 - name: add 
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     line: 'tos minclock {{ ntp_tos_min_clock }} minsane {{ ntp_tos_min_sane_clock }}'
     regexp: '^tos minclock'
     state: present

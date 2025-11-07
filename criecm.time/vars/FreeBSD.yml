@@ -1,4 +1,4 @@
 ---
-time_client:
-  config: '{% if not "jails" in ansible_virtualization_tech_guest %}/etc/ntp.conf{% endif %}'
-  service: '{% if not "jails" in ansible_virtualization_tech_guest %}ntpd{% endif %}'
+time_client_config: '{% if not "jails" in ansible_virtualization_tech_guest %}/etc/ntp.conf{% else %}False{% endif %}'
+time_client_service: '{% if not "jails" in ansible_virtualization_tech_guest %}ntpd{% else %}False{% endif %}'
+time_client_package: 'False'

@@ -1,5 +1,4 @@
 ---
-time_client:
-  config: /etc/ntp.conf
-  service: ntpd
-
+time_client_config: /etc/ntp.conf
+time_client_service: ntpd
+time_client_package: 'False'

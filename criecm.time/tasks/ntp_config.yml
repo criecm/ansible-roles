@@ -1,18 +1,18 @@
 ---
 - name: get ntp servers
-  command: "awk '/^server/{print $2}' {{ time_client.config }}"
+  command: "awk '/^server/{print $2}' {{ time_client_config }}"
   register: already_ntp_servers
   changed_when: False
   check_mode: False
 
 - name: get ntp pools
-  command: "awk '/^pool/{print $2}' {{ time_client.config }}"
+  command: "awk '/^pool/{print $2}' {{ time_client_config }}"
   register: already_ntp_pools
   changed_when: False
   check_mode: False
 
 - name: get min clock
-  command: "awk '/^tos minclock/{print $3}' {{ time_client.config }}"
+  command: "awk '/^tos minclock/{print $3}' {{ time_client_config }}"
   register: actual_min_clock
   changed_when: False
   check_mode: False
@@ -25,7 +25,7 @@
 
 - name: remove listen addresses
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     regex: '^interface listen {{ address }}'
     state: absent
   when: not address in ntp_listen_addrs
@@ -36,7 +36,7 @@
 
 - name: add listen addresses
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     line: 'interface listen {{ address }}'
     state: present
   when: not address in actual_listens
@@ -52,7 +52,7 @@
 
 - name: remove ntp server
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     regexp: '^server +{{ ntpserver }}.*'
     state: absent
   loop: '{{ already_ntp_servers.stdout_lines }}'
@@ -64,7 +64,7 @@
 
 - name: add ntp server
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     line: 'server {{ ntpserver }}{{ iburst }}'
     regexp: '^server +{{ ntpserver }}.*'
     state: present
@@ -76,7 +76,7 @@
 
 - name: remove ntp pool
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     regexp: '^{{ poolname }} +{{ ntppool }}.*'
     state: absent
   loop: '{{ already_ntp_pools.stdout_lines }}'
@@ -88,7 +88,7 @@
 
 - name: add ntp pool
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     line: '{{ poolname }} {{ ntppool }}{{ iburst }}'
     regexp: '^pool +{{ ntppool }}.*'
     state: present
@@ -100,7 +100,7 @@
 
 - name: set minclock
   lineinfile:
-    path: '{{ time_client.config }}'
+    path: '{{ time_client_config }}'
     line: 'tos minclock {{ ntp_tos_min_clock }} minsane {{ ntp_tos_min_sane_clock }} maxclock {{ ntp_tos_max_clock }}'
     regexp: '^tos minclock'
     state: present

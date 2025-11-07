@@ -1,5 +1,4 @@
 ---
-time_client:
-  config: '{% if not "container" in ansible_virtualization_tech_guest %}/etc/chrony/chrony.conf{% endif %}'
-  service: '{% if not "container" in ansible_virtualization_tech_guest %}chrony{% endif %}'
-  package: '{% if not "container" in ansible_virtualization_tech_guest %}chrony{% endif %}'
+time_client_config: '{% if not "container" in ansible_virtualization_tech_guest %}/etc/chrony/chrony.conf{% else %}False{% endif %}'
+time_client_service: '{% if not "container" in ansible_virtualization_tech_guest %}chrony{% else %}False{% endif %}'
+time_client_package: '{% if not "container" in ansible_virtualization_tech_guest %}chrony{% else %}False{% endif %}'

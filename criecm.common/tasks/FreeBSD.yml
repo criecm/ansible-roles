@@ -62,7 +62,7 @@
       command: 'pwd_mkdb /etc/master.passwd'
       when: statpwd.results[0].stat.mtime > statpwd.results[1].stat.mtime
   tags: vars, sanity
-  when: do_sys
+  when: do_sys | bool
 
 - name: list disks
   block:
@@ -83,7 +83,7 @@
       command: 'kldload mfip'
       ignore_errors: True
       when: has_mfi.stdout_lines | count() > 0 and loadrc.changed
-  when: do_sys and not is_vm
+  when: do_sys | bool and not is_vm
 
 - name: hardening freebsd
   block:
@@ -102,7 +102,7 @@
       with_items: '{{ common_freebsd_sysctls }}'
       when: 'freebsd_allow_see_other | default(False)'
   tags: baseconf, security
-  when: do_sys or do_ssi
+  when: do_sys | bool or do_ssi | bool
 
 - name: stat /home
   stat:

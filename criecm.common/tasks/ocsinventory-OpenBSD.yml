@@ -34,7 +34,7 @@
       args:
         chdir: /root/Ocsinventory-Unix-Agent-2.9.3
         creates: /usr/local/bin/ocsinventory-agent
-  when: not ocsinstalled.stat.exists or do_upgrade | default(False)
+  when: not ocsinstalled.stat.exists or do_upgrade | default(False) | bool
 
 # config ocs
 - name: mkdir confdir

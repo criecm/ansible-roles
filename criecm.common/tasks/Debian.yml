@@ -10,7 +10,7 @@
     name: debconf-utils
     state: present
   tags: baseconf, pkg
-  when: do_sys
+  when: do_sys | bool
 
 # locales
 - name: set locales
@@ -23,4 +23,4 @@
     loop_var: locale
   notify: debian regen locales
   tags: locales
-  when: do_sys
+  when: do_sys | bool

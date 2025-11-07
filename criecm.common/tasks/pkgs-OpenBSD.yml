@@ -9,9 +9,9 @@
 
 - name: upgrade all if wanted
   command: pkg_add -uI
-  when: do_upgrade | default(False)
+  when: do_upgrade | default(False) | bool
 
 - name: force setup after pkg upgrade
   ansible.builtin.setup:
     gather_subset: [ "min" ]
-  when: do_upgrade | default(False)
+  when: do_upgrade | default(False) | bool

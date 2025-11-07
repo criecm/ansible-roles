@@ -31,7 +31,7 @@
 
 - name: upgrade pkgs
   command: 'pkg upgrade -fy'
-  when: do_upgrade | default(False)
+  when: do_upgrade | default(False) | bool
 
 # packages standard
 - name: pkgs
@@ -48,10 +48,10 @@
       - dmidecode
       - ipmitool
     state: present
-  when: not is_jail and not is_vm
+  when: not is_jail | bool and not is_vm | bool
   tags: pkgs
 
 - name: force setup after pkg upgrade
   ansible.builtin.setup:
     gather_subset: [ "min" ]
-  when: do_upgrade | default(False)
+  when: do_upgrade | default(False) | bool

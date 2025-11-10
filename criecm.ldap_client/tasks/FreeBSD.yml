@@ -11,13 +11,15 @@
 - name: active client LDAP FreeBSD
   lineinfile:
     dest: '/etc/rc.conf'
-    regexp: '{{ item.regexp }}'
-    line: '{{ item.line }}'
+    regexp: '{{ truc.regexp }}'
+    line: '{{ truc.line }}'
     state: present
-  with_items:
+  loop:
     - { regexp: '^nscd_enable', line: 'nscd_enable="NO"' }
     - { regexp: '^nslcd_enable', line: 'nslcd_enable="YES"' }
     - { regexp: '^nslcd_supervisor', line: 'nslcd_supervisor="YES"' }
+  loop_control:
+    loop_var: truc
   tags: nssldap
   when: ldap_nss | bool
 
@@ -26,26 +28,30 @@
     - name: Config nsswitch.conf FreeBSD for DC
       lineinfile:
         dest: '/etc/nsswitch.conf'
-        regexp: '{{ item.regexp }}'
-        line: '{{ item.line }}'
+        regexp: '{{ truc.regexp }}'
+        line: '{{ truc.line }}'
         state: present
-      with_items:
+      loop:
         - { regexp: '^group_compat:', line: 'group_compat: ldap' }
         - { regexp: '^passwd_compat:', line: 'passwd_compat: ldap' }
         - { regexp: '^group:', line: 'group: files ldap winbind' }
         - { regexp: '^passwd:', line: 'passwd: files ldap winbind' }
+      loop_control:
+        loop_var: truc
       when: smb_is_dc | default(false)
     - name: Config nsswitch.conf FreeBSD
       lineinfile:
         dest: '/etc/nsswitch.conf'
-        regexp: '{{ item.regexp }}'
-        line: '{{ item.line }}'
+        regexp: '{{ truc.regexp }}'
+        line: '{{ truc.line }}'
         state: present
-      with_items:
+      loop:
         - { regexp: '^group_compat:', line: 'group_compat: ldap' }
         - { regexp: '^passwd_compat:', line: 'passwd_compat: ldap' }
         - { regexp: '^group:', line: 'group: compat' }
         - { regexp: '^passwd:', line: 'passwd: compat' }
+      loop_control:
+        loop_var: truc
       when: not (smb_is_dc | default(false))
     - name: Enable LDAP /etc/passwd
       lineinfile:

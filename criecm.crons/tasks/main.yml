@@ -7,7 +7,7 @@
     env: True
     user: root
   tags: crons
-  when: cronvars
+  when: cronvars | bool
   with_dict: '{{ cronvars }}'
   loop_control:
     loop_var: cronvar

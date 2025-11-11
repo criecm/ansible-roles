@@ -67,12 +67,6 @@
     state: link
   when: etcprefix != ""
 
-# sshd config and keys
-- name: root ssh access and authorized_keys
-  include_tasks: sshd.yml
-  when: do_sys | bool
-  tags: sshd
-
 # pkgs
 - name: install packages
   include_tasks: 'pkgs-{{ ansible_os_family }}.yml'

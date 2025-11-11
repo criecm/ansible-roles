@@ -67,13 +67,6 @@ is_jail: False
 # for kvm/...
 is_vm: False
 
-# default sshd lines
-#ex:  - { line: 'PermitUserEnvironment yes', regexp: '^PermitUserEnvironment', insertafter: '^#[[:space:]]*PermitUserEnvironment' }
-default_sshd_lines: []
-
-# host specific lines
-sshd_lines: []
-
 # host specific pkgs
 pkgs: []
 
@@ -116,8 +109,6 @@ backup_dir: '{{ playbook_dir }}/files/backups/{{ ansible_hostname }}'
 
 common_freebsd_sysctls:
   - { regexp: '^security.bsd.see_other_uids=', line: 'security.bsd.see_other_uids=0' }
-
-ssh_keys_dir: ''
 
 debian_locales:
   - en_US.UTF-8 UTF-8

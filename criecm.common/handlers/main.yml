@@ -1,9 +1,4 @@
 ---
-- name: restart sshd
-  service:
-    name: '{{ ssh_service_name | default("sshd") }}'
-    state: restarted
-
 - name: debian regen locales
   command: /usr/sbin/locale-gen
 

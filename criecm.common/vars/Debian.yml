@@ -1,5 +1,4 @@
 ---
-ssh_service_name: ssh
 resolver_options:
   - edns0
   - timeout:2

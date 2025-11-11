@@ -1,24 +1,11 @@
 # common - base system role
 
-* lignes de config sshd (en variables, voir defaults/main.yml)
-* deploiement des cles ssh `files/{{ ssh_keys_dir }}/*.pub`
 * preferred shell pour root + it's config + aliases
 * packages supplementaires (variable `pkgs`)
 
 ## templates and files
 
-### sshd config and authorized keys
-  
-  * `{{ ssh_keys_dir }}` can be a directory containing ssh keys to add (.pub) or delete (.del)
-     from root's authorized_keys
-  * Files matching `{{ ssh_keys_dir }}/*.pub` will be authorized on root account
-  * Files matching `{{ ssh_keys_dir }}/*.del` will be removed
-  * vimrc file in files/ will be installed as /root/.vimrc
-
-### ssh keys
-
-  * Files matching `{{ playbook_dir }}/files/ssh/{{ inventory_hostname }}/ssh_host.*_key(.pub)?`
-    will be installed on host's ssh daemon.
+* vimrc file in files/ will be installed as /root/.vimrc
 
 ## Variables
 
@@ -39,7 +26,7 @@
     Set your preferred one here :) (or set it empty to skip all this)
     put your rc file in {{ playbook_dir }}/files/{{ root_shell }}rc
   * `backup_dir (files/backups/{{ inventory_hostname }})`
-    copy ssh host keys and restore /root/ files from here if any
+    copy/restore /root/ files from here if any
   * `http_proxy ('')`
     To set http_proxy and https_proxy global values (FreeBSD only)
 
@@ -72,7 +59,3 @@
     additionnal packages to install using distribution's package system
   * `host_pkgs` `role_pkgs` ([])
     other packages defined in inventory or roles (or whatever)
-
-### Ssh
-  * `sshd_allow_groups` ('')
-    define AllowGroups in `/etc/ssh/sshd_config`

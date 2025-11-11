@@ -1,0 +1,13 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for criecm.sshd
+# default sshd lines
+#ex:  - { line: 'PermitUserEnvironment yes', regexp: '^PermitUserEnvironment', insertafter: '^#[[:space:]]*PermitUserEnvironment' }
+default_sshd_lines: []
+
+# host specific
+sshd_lines: []
+
+ssh_keys_dir: ''
+
+ssh_backup_dir: ''

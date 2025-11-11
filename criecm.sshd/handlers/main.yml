@@ -1,0 +1,7 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for criecm.sshd
+- name: restart sshd
+  service:
+    name: '{{ ssh_service_name }}'
+    state: restarted

@@ -16,3 +16,4 @@
     dest: /etc/rsyslog.d/ecm.conf
     mode: '0600'
   notify: restart Debian rsyslog
+  when: syslog_server | default(False) | bool

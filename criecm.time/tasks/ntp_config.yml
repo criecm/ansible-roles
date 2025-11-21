@@ -1,27 +1,22 @@
 ---
-- name: get ntp servers
-  command: "awk '/^server/{print $2}' {{ time_client_config }}"
-  register: already_ntp_servers
+- name: set pool name
+  set_fact:
+    poolname: '{% if ansible_os_family == "OpenBSD" %}servers{% else %}pool{% endif %}'
+    iburst: '{% if ansible_os_family == "OpenBSD" %}{% else %} iburst{% endif %}'
+
+- name: get ntp config
+  slurp:
+    src: '{{ time_client_config }}'
+  register: slurpntpconf
   changed_when: False
   check_mode: False
 
-- name: get ntp pools
-  command: "awk '/^pool/{print $2}' {{ time_client_config }}"
-  register: already_ntp_pools
-  changed_when: False
-  check_mode: False
-
-- name: get min clock
-  command: "awk '/^tos minclock/{print $3}' {{ time_client_config }}"
-  register: actual_min_clock
-  changed_when: False
-  check_mode: False
-
-- name: get listen addresses
-  command: "awk '/^interface listen/{print $3}'"
-  register: actual_listens
-  changed_when: False
-  check_mode: False
+- name: get ntp vars
+  set_fact:
+    already_ntp_servers: "{{ slurpntpconf['content'] | b64decode | split('\n') | select('match','^server ') | map('regex_replace','^server *','') }}"
+    already_ntp_pools: "{{ slurpntpconf['content'] | b64decode | split('\n') | select('match','^'+poolname+' ') | map('regex_replace','^'+poolname+' *','') }}"
+    already_listen: "{{ slurpntpconf['content'] | b64decode | split('\n') | select('match','^interface listen ') | map('regex_replace','^interface listen *','') }}"
+    already_min_clock: "{{ slurpntpconf['content'] | b64decode | split('\n') | select('match','^tos minclock') | map('regex_replace','^tos minclock *','') | map('regex_replace',' .*$','') }}"
 
 - name: remove listen addresses
   lineinfile:
@@ -29,7 +24,7 @@
     regex: '^interface listen {{ address }}'
     state: absent
   when: not address in ntp_listen_addrs
-  loop: '{{ actual_listens.stdout_lines }}'
+  loop: '{{ already_listen }}'
   loop_control:
     loop_var: address
   notify: restart time_client
@@ -39,23 +34,18 @@
     path: '{{ time_client_config }}'
     line: 'interface listen {{ address }}'
     state: present
-  when: not address in actual_listens
+  when: not address in already_listen
   loop: '{{ ntp_listen_addrs }}'
   loop_control:
     loop_var: address
   notify: restart time_client
-
-- name: set pool name
-  set_fact:
-    poolname: '{% if ansible_os_family == "OpenBSD" %}servers{% else %}pool{% endif %}'
-    iburst: '{% if ansible_os_family == "OpenBSD" %}{% else %} iburst{% endif %}'
 
 - name: remove ntp server
   lineinfile:
     path: '{{ time_client_config }}'
     regexp: '^server +{{ ntpserver }}.*'
     state: absent
-  loop: '{{ already_ntp_servers.stdout_lines }}'
+  loop: '{{ already_ntp_servers }}'
   loop_control:
     loop_var: ntpserver
     label: '{{ ntpserver }}'
@@ -79,7 +69,7 @@
     path: '{{ time_client_config }}'
     regexp: '^{{ poolname }} +{{ ntppool }}.*'
     state: absent
-  loop: '{{ already_ntp_pools.stdout_lines }}'
+  loop: '{{ already_ntp_pools }}'
   loop_control:
     loop_var: ntppool
     label: '{{ ntppool }}'
@@ -104,5 +94,5 @@
     line: 'tos minclock {{ ntp_tos_min_clock }} minsane {{ ntp_tos_min_sane_clock }} maxclock {{ ntp_tos_max_clock }}'
     regexp: '^tos minclock'
     state: present
-  when: actual_min_clock.stdout_lines[0] | default(ntp_tos_min_clock) != ntp_tos_min_clock
+  when: already_min_clock | default(ntp_tos_min_clock) != ntp_tos_min_clock
   notify: restart time_client

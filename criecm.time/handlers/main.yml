@@ -5,4 +5,4 @@
   service:
     name: '{{ time_client_service }}'
     state: restarted
-  when: time_client_service | default(False) and not start_time_client_changed
+  when: time_client_service | default(False) and not start_time_client.changed | default(False)

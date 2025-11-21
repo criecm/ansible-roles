@@ -15,3 +15,5 @@ ntp_tos_max_clock: 11
 ntp_listen_addrs: []
 
 host_timezone: ''
+
+time_client_package: ''

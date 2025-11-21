@@ -20,7 +20,7 @@
   package:
     name: '{{ time_client_package }}'
     state: '{% if do_upgrade | default(False) %}latest{% else %}present{% endif %}'
-  when: 'time_client_package | bool'
+  when: 'time_client_package | default("") != ""'
 
 - name: ntp config
   include_tasks: ntp_config.yml
@@ -35,4 +35,4 @@
     name: '{{ time_client_service }}'
     state: started
   register: start_time_client
-  when: 'time_client_service | bool'
+  when: 'time_client_service | default("") != ""'

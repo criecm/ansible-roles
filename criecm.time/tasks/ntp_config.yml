@@ -43,13 +43,13 @@
 - name: remove ntp server
   lineinfile:
     path: '{{ time_client_config }}'
-    regexp: '^server +{{ ntpserver }}.*'
+    regexp: '^server +{{ ntpserver }}'
     state: absent
-  loop: '{{ already_ntp_servers }}'
+  loop: '{{ already_ntp_servers | map("regex_replace"," .*","") }}'
   loop_control:
     loop_var: ntpserver
     label: '{{ ntpserver }}'
-  when: ( ntp_servers | count() > 0 or ntp_pools | count() > 0 ) and not ntpserver in ntp_servers
+  when: ( ntp_servers | count() > 0 or ntp_pools | count() > 0 ) and not ntpserver in ntp_servers | map("regex_replace"," .*","")
   notify: restart time_client
 
 - name: add ntp server
@@ -69,11 +69,11 @@
     path: '{{ time_client_config }}'
     regexp: '^{{ poolname }} +{{ ntppool }}.*'
     state: absent
-  loop: '{{ already_ntp_pools }}'
+  loop: '{{ already_ntp_pools | map("regex_replace"," .*","") }}'
   loop_control:
     loop_var: ntppool
     label: '{{ ntppool }}'
-  when: ( ntp_servers | count() > 0 or ntp_pools | count() > 0 ) and not ntppool in ntp_pools
+  when: ( ntp_servers | count() > 0 or ntp_pools | count() > 0 ) and not ntppool in ntp_pools | map("regex_replace"," .*","")
   notify: restart time_client
 
 - name: add ntp pool

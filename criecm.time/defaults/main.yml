@@ -16,4 +16,6 @@ ntp_listen_addrs: []
 
 host_timezone: ''
 
-time_client_package: ''
+time_client_package: '{{ distrib_time_client_package | default("") }}'
+time_client_service: '{{ distrib_time_client_service | default("") }}'
+time_client_config: '{{ distrib_time_client_config | default("") }}'

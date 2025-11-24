@@ -35,7 +35,7 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
 ```yaml
 # backend
 ---
-# of course this one may need criecm.node, criecm.tomcat, criecm.php-fpm or …
+# of course this one may need criecm.node, criecm.tomcat, criecm.php_fpm or …
 # and contain many hosts
 - hosts: backends
   roles:
@@ -242,4 +242,4 @@ You can call site.yml directly with:
           vars:
             vhost: '{{ site }}'
 
-It's already integrated with criecm.php-fpm if ever ;)
+It's already integrated with criecm.php_fpm if ever ;)

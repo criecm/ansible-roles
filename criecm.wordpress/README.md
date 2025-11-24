@@ -9,7 +9,7 @@ Requirements
 Role Variables
 --------------
 
-* `sites ([])`: list of dicts for each wordpress install, as used by criecm.nginx and criecm.php-fpm roles, plus
+* `sites ([])`: list of dicts for each wordpress install, as used by criecm.nginx and criecm.php_fpm roles, plus
 
 * `mysite ('')`: if defined, only this site will be processed
 

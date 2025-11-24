@@ -1,5 +1,5 @@
 ---
-# handlers file for criecm.nut-client
+# handlers file for criecm.nut_client
 - name: restart upsmon
   service:
     name: '{{ upsmon_service }}'

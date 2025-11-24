@@ -1,0 +1,7 @@
+---
+# vars file for criecm.nut_client
+upsmon_service: '{% if ansible_os_family == "FreeBSD" %}nut_upsmon{% elif ansible_os_family == "OpenBSD" %}upsmon{% else %}nut_client{% endif %}'
+nut_package: '{% if ansible_os_family == "Debian" %}nut_client{% else %}nut{% endif %}'
+nutconfdir: '{% if ansible_os_family == "FreeBSD" %}/usr/local{% endif %}/etc/nut'
+nut_group: '{% if ansible_os_family == "OpenBSD" %}_ups{% else %}nut{% endif %}'
+nut_user: '{% if ansible_os_family == "OpenBSD" %}_ups{% else %}nut{% endif %}'

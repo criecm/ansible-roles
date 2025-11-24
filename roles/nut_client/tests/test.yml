@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - criecm.nut-client
+    - criecm.nut_client

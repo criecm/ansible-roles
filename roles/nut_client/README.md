@@ -1,4 +1,4 @@
-# criecm.nut-client
+# criecm.nut_client
 
 configure nut client
 
@@ -13,7 +13,7 @@ configure nut client
 
     - hosts: servers
       roles:
-         - { role: criecm.nut-client, nut_monitor: 'myups@nut.server 1 upsuser "upsuser_pass" primary' }
+         - { role: criecm.nut_client, nut_monitor: 'myups@nut.server 1 upsuser "upsuser_pass" primary' }
 
 # License
 

@@ -1,5 +1,5 @@
 ---
-# tasks file for criecm.nut-client
+# tasks file for criecm.nut_client
 - name: install NUT
   package:
     name: '{{ nut_package }}'

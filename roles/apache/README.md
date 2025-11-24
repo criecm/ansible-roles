@@ -54,7 +54,7 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
 
 ### optional (sane defaults)
 * `rootdir (system-dependant/{{name}})`:
-  You have to populate it elsewhere (criecm.php-fpm does it from vars, or in your playbook)
+  You have to populate it elsewhere (criecm.php_fpm does it from vars, or in your playbook)
 * `webroot (rootdir)`:
   If you need a different web root
 * `listen ([*:80] or [*:443])`

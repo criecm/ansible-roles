@@ -19,5 +19,5 @@ galaxy_info:
 
 dependencies:
   - criecm.nginx
-  - criecm.php-fpm
+  - criecm.php_fpm
   

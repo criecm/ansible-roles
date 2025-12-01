@@ -26,6 +26,10 @@
   include_tasks: ntp_config.yml
   when: 'time_client_config is search("/ntp.conf")'
 
+- name: ntpd config
+  include_tasks: ntpd_config.yml
+  when: 'time_client_config is search("/ntpd.conf")'
+
 - name: chrony config
   include_tasks: chrony_config.yml
   when: 'time_client_config is search("/chrony.conf")'

@@ -1,0 +1,83 @@
+---
+- name: get ntp config
+  slurp:
+    src: '{{ time_client_config }}'
+  register: slurpntpconf
+  changed_when: False
+  check_mode: False
+
+- name: get ntp vars
+  set_fact:
+    already_ntp_servers: "{{ slurpntpconf['content'] | b64decode | split('\n') | select('match','^server ') | map('regex_replace','^server *','') }}"
+    already_ntp_pools: "{{ slurpntpconf['content'] | b64decode | split('\n') | select('match','^servers ') | map('regex_replace','^servers *','') }}"
+    already_listen: "{{ slurpntpconf['content'] | b64decode | split('\n') | select('match','^listen on ') | map('regex_replace','^listen on *','') }}"
+
+- name: remove listen addresses
+  lineinfile:
+    path: '{{ time_client_config }}'
+    regex: '^listen on {{ address }}'
+    state: absent
+  when: not address in ntp_listen_addrs
+  loop: '{{ already_listen }}'
+  loop_control:
+    loop_var: address
+  notify: restart time_client
+
+- name: add listen addresses
+  lineinfile:
+    path: '{{ time_client_config }}'
+    line: 'listen on {{ address }}'
+    state: present
+  when: not address in already_listen
+  loop: '{{ ntp_listen_addrs }}'
+  loop_control:
+    loop_var: address
+  notify: restart time_client
+
+- name: remove ntp server
+  lineinfile:
+    path: '{{ time_client_config }}'
+    regexp: '^server +{{ ntpserver }}'
+    state: absent
+  loop: '{{ already_ntp_servers | map("regex_replace"," .*","") }}'
+  loop_control:
+    loop_var: ntpserver
+    label: '{{ ntpserver }}'
+  when: ( ntp_servers | count() > 0 or ntp_pools | count() > 0 ) and not ntpserver in ntp_servers | map("regex_replace"," .*","")
+  notify: restart time_client
+
+- name: add ntp server
+  lineinfile:
+    path: '{{ time_client_config }}'
+    line: 'server {{ ntpserver }}'
+    regexp: '^server +{{ ntpserver }}.*'
+    state: present
+  loop: '{{ ntp_servers }}'
+  loop_control:
+    loop_var: ntpserver
+    label: '{{ ntpserver }}'
+  notify: restart time_client
+
+- name: remove ntp pool
+  lineinfile:
+    path: '{{ time_client_config }}'
+    regexp: '^servers +{{ ntppool }}.*'
+    state: absent
+  loop: '{{ already_ntp_pools | map("regex_replace"," .*","") }}'
+  loop_control:
+    loop_var: ntppool
+    label: '{{ ntppool }}'
+  when: ( ntp_servers | count() > 0 or ntp_pools | count() > 0 ) and not ntppool in ntp_pools | map("regex_replace"," .*","")
+  notify: restart time_client
+
+- name: add ntp pool
+  lineinfile:
+    path: '{{ time_client_config }}'
+    line: 'servers {{ ntppool }}'
+    regexp: '^pool +{{ ntppool }}.*'
+    state: present
+  loop: '{{ ntp_pools }}'
+  loop_control:
+    loop_var: ntppool
+    label: '{{ ntppool }}'
+  notify: restart time_client

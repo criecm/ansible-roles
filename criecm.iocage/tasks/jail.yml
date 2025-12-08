@@ -9,7 +9,7 @@
   template:
     src: '{{ jail.fstab }}'
     dest: '/iocage/jails/{{ jail.name }}/fstab'
-  when: '"fstab" in jail and jail.fstab != "" and jail.name not in iocage_fact.ansible_facts.iocage_templates'
+  when: '"fstab" in jail and jail.fstab != ""'
   check_mode: True
   register: jail_fstab
 
@@ -19,7 +19,7 @@
       iocage:
         name: '{{ jail.name }}'
         state: stopped
-    - name: copy fstab
+    - name: copy new fstab
       template:
         src: '{{ jail.fstab }}'
         dest: '/iocage/jails/{{ jail.name }}/fstab'

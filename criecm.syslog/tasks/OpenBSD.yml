@@ -4,9 +4,9 @@
     dest: /etc/syslog.conf
     insertbefore: '^!'
     regexp: '^[^#]+notice.*@.*'
-    line: '*.notice;cron,ftp,kern,lpr,mail,user.none	@{{ syslog_server | ansible.utils.ipwrap }}'
+    line: '*.notice;cron,ftp,kern,lpr,{% if syslog_maillog_server != "" %}mail,{% endif %}user.none	@{{ syslog_server | ansible.utils.ipwrap }}'
   notify: restart BSD syslogd
-  when: syslog_server | default(False)
+  when: syslog_server | default("") != ""
 
 - name: syslog central / auth
   lineinfile:
@@ -15,4 +15,13 @@
     regexp: '^auth.*@.*'
     line: 'auth.info;authpriv.info					@{{ syslog_auth_server | default(syslog_server) | ansible.utils.ipwrap }}'
   notify: restart BSD syslogd
-  when: syslog_server | default(False)
+  when: syslog_server | default("") != ""
+
+- name: mail log
+  lineinfile:
+    dest: /etc/syslog.conf
+    insertbefore: '^!'
+    line: mail.*      @{{ syslog_maillog_server | ansible.utils.ipwrap }}
+    regexp: '^mail\..*@.*'
+  notify: restart BSD syslogd
+  when: syslog_maillog_server != ""

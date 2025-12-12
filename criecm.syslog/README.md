@@ -10,6 +10,8 @@ Role Variables
     IP/name of syslog server (IP recommended !) - do nothing if empty
   * `syslog_auth_server (syslog_server)`
     different syslog for auth data
+  * `syslog_maillog_server ('')`
+    IP/name of syslog server for separated maillog
 
 Dependencies
 ------------

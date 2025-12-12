@@ -11,15 +11,23 @@
       security.*;auth.*             @{{ syslog_auth_server | default(syslog_server) | ansible.utils.ipwrap }}
     dest: /usr/local/etc/syslog.d/authlog.conf
   notify: restart BSD syslogd
-  when: syslog_auth_server | default(False) or syslog_server | default(False)
+  when: syslog_auth_server != "" or syslog_server != ""
 
 - name: common log
   copy:
     content: |
-      *.*                           @{{ syslog_server | ansible.utils.ipwrap }}
+      *.*,{% if syslog_maillog_server != "" %}mail.none,{% endif %}auth.none,security.none                           @{{ syslog_server | ansible.utils.ipwrap }}
     dest: /usr/local/etc/syslog.d/centrallog.conf
   notify: restart BSD syslogd
-  when: syslog_server | default(False)
+  when: syslog_server | default("") != ""
+
+- name: mail log
+  copy:
+    content: |
+      mail.*      @{{ syslog_maillog_server | ansible.utils.ipwrap }}
+    dest: /usr/local/etc/syslog.d/maillog.conf
+  notify: restart BSD syslogd
+  when: syslog_maillog_server != ""
 
 - name: console.log
   lineinfile:
@@ -39,8 +47,8 @@
   command: 'sysrc syslogd_flags="-c -s"'
   when: sysrc_syslogd_flags.rc > 0 or
     ( sysrc_syslogd_flags.stdout_lines is search("-ss") and
-      ( syslog_server | default(False) or
-        syslog_auth_server | default(False) ) )
+      ( syslog_server != "" or
+        syslog_auth_server != "" ) )
   notify: restart BSD syslogd
 
 - name: mkdir /usr/local/etc/newsyslog.conf.d

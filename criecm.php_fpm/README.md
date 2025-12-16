@@ -78,6 +78,9 @@ php-cli.ini additional vars can be set with `php_cli_vars` dict
   * `group`: group for files (`{{group}}`)
   * `mode`: chmod -R (u=rwX,g=rX,o=rX)
 
+* `installcommand ("")`:
+  command used to install, launched if rootdir does not exists
+
 * `configfiles` ([]) list of dicts:
   * `src`: template path, relative to playbooks dir (no default, ex:files/mytpl.j2)
   * `dest`: path on dest, absolute or relative to `{{rootdir}}` (default: src basename without .j2)

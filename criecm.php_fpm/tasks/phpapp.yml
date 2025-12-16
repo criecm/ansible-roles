@@ -109,6 +109,16 @@
   become_method: su
   failed_when: False
 
+- name: phpapp install command
+  command: '{{ site.installcommand }}'
+  args:
+    creates: '{{ site.rootdir }}'
+    chdir: '{{ site.home }}'
+  become: yes
+  become_user: '{{ site.maintainer }}'
+  become_method: su
+  when: '"installcommand" in site'
+
 - name: chown rootdir to maintainer
   file:
     path: '{{ site.rootdir }}'

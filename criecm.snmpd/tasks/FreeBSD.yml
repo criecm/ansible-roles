@@ -32,11 +32,13 @@
 
 - name: config snmpd
   lineinfile:
-    line: '{{ item.line }}'
-    regexp: '{{ item.regexp }}'
+    line: '{{ snmp_config_item.line }}'
+    regexp: '{{ snmp_config_item.regexp }}'
     dest: /etc/snmpd.config
-  with_items:
+  loop:
     - { line: 'begemotSnmpdModulePath."ucd" = "/usr/local/lib/snmp_ucd.so"', regexp: '^begemotSnmpdModulePath.*snmp_ucd' }
+  loop_control:
+    loop_var: snmp_config_item
 # bug cpu snmp hostres (freebsd < 11.2 ou < 10.5)
 #    - { line: 'begemotSnmpdModulePath."hostres" = "/usr/lib/snmp_hostres.so"', regexp: '^begemotSnmpdModulePath.*snmp_hostres' }
   notify: restart bsnmpd

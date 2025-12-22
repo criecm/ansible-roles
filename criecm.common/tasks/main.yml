@@ -12,7 +12,7 @@
 
 - name: get date
   command: 'date +%s'
-  register: now
+  register: curdate
   changed_when: False
   check_mode: False
   tags: vars
@@ -21,7 +21,7 @@
   set_fact:
     do_sys: '{% if "criecm" in ansible_local and
           ( ( ansible_local.criecm.common.version | default(0) | int ) >= ( common_version | int )
-            or ( ansible_local.criecm.common.last | default(0) | int ) >= ( now.stdout | int - 86400) )
+            or ( ansible_local.criecm.common.last | default(0) | int ) >= ( curdate.stdout | int - 86400) )
           and not do_sysadm %}no{% else %}yes{% endif %}'
   tags: vars
 
@@ -110,6 +110,6 @@
       version={{ common_version }}
       is_jail={{ is_jail }}
       is_vm={{ is_vm }}
-      last={{ now.stdout }}
+      last={{ curdate.stdout }}
     create: yes
   when: do_sys | bool

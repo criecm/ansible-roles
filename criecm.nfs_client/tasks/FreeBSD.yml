@@ -14,7 +14,7 @@
     rpc_lockd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p {{ lockd_port }}"
     rpc_statd_flags: "{% for ip in nfs_bind_ips %}-h {{ ip }} {% endfor %}-p {{ statd_port }}"
   notify: freebsd restart nfs all
-  when: item.value != '' and not nfsv4_only
+  when: item.value != '' and not nfsv4_only | bool
 
 - name: disable NFSv3
   block:
@@ -35,7 +35,7 @@
         - lockd
         - statd
         - rpcbind
-  when: nfsv4_only
+  when: nfsv4_only | bool
 
 - name: rc.conf NFSv4
   lineinfile:
@@ -48,13 +48,13 @@
     nfscbd_enable: "YES"
     nfsuserd_enable: "{% if idmap_domain | default(False) %}YES{% else %}NO{% endif %}"
     nfsuserd_flags: "{% if idmap_domain | default(False) %}-domain {{idmap_domain}} {% endif %}-usermax 10000"
-  when: item.value != '' and nfsv4_enable
+  when: item.value != '' and nfsv4_enable | bool
 
 - name: rpcbind started
   service:
     name: rpcbind
     state: started
-  when: not nfsv4_only
+  when: not nfsv4_only | bool
 
 # automount /users
 - block:
@@ -88,4 +88,4 @@
       regexp: '^\+'
     notify: freebsd autofs reload
 
-  when: ldap_autofs
+  when: ldap_autofs | bool

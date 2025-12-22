@@ -27,7 +27,7 @@
       dest: /usr/sbin/start-statd
       mode: '0755'
       owner: root
-    when: not nfsv4_only
+    when: not nfsv4_only | bool
   - name: idmapd
     template:
       src: idmapd.conf.j2
@@ -35,7 +35,7 @@
       mode: '0644'
       owner: root
     notify: debian restart nfs all
-    when: nfsv4_enable
+    when: nfsv4_enable | bool
   # https://www.kernel.org/doc/html/latest/filesystems/nfs/client-identifier.html
   - name: set nfs4.unique_id
     block:
@@ -44,7 +44,7 @@
         register: clientidset
         failed_when: False
         changed_when: False
-        check_mode: False
+        check_mtde: False
       - name: fact grub nfs4_unique_id
         set_fact: 
           grub_nfs4_unique_id: '{% if clientidset.stdout_lines | count() > 0
@@ -131,4 +131,4 @@
         dest: /etc/nsswitch.conf
       when: ansible_distribution_major_version | int > 11
       notify: debian autofs restart
-    when: ldap_autofs
+    when: ldap_autofs | bool

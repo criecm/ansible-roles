@@ -1,6 +1,6 @@
 ---
 - include_role:
     name: criecm.ldap_client
-  when: ldap_autofs
+  when: ldap_autofs | bool
 
 - include_tasks: 'tasks/{{ansible_os_family}}.yml'

@@ -10,7 +10,7 @@
   package:
     name: '{{ smartd_package }}'
     state: present
-  when: not is_virt
+  when: not is_virt | bool
 
 - name: lsdisks
   shell: |
@@ -18,13 +18,13 @@
   register: lsdisks
   ignore_errors: true
   changed_when: false
-  when: not is_virt
+  when: not is_virt | bool
 
 - name: disks fact
   set_fact:
     disks: '{{ lsdisks.stdout_lines | default([]) }}'
     cacheable: true
-  when: not is_virt and not disks | default([]) | count > 0
+  when: not is_virt | bool and not disks | default([]) | count > 0
   tags: smartd
 
 - name: smartd
@@ -46,6 +46,6 @@
         state: started
         enabled: true
       register: smartd_started
-  when: not is_virt and disks | count > 0
+  when: not is_virt | bool and disks | count > 0
   tags: smartd
 

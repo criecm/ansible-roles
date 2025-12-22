@@ -10,6 +10,7 @@
     - name: stat localzone
       stat:
         path: /etc/localtime
+        follow: true
       register: statlocaltime
     - name: stat /usr/share/zoneinfo/{{ host_timezone }}
       stat:

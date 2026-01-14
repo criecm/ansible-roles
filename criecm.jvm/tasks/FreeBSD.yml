@@ -1,0 +1,36 @@
+---
+
+- name: install jvm
+  pkgng:
+    name:
+      - '{{ freebsd_jdk_pkg }}'
+    state: present
+
+- name: show java opts
+  debug:
+    msg: '{{ prop.key }}={{ prop.value }}'
+  loop: '{{ jvm_net_opts | combine(jvm_proxy_opts) | dict2items }}'
+  loop_control:
+    loop_var: prop
+
+- name: java_net opts
+  lineinfile:
+    dest: '{{ jvm_jre_dir }}/conf/net.properties'
+    line: '{{ prop.key }}={{ prop.value }}'
+    regex: '^{{ prop.key }}='
+    insertafter: '{{ prop.key }} *='
+  loop: '{{ jvm_net_opts | combine(jvm_proxy_opts) | dict2items }}'
+  loop_control:
+    loop_var: prop
+
+- name: java_opts
+  set_fact:
+    this_jvm_java_opts: "{% for opt in jvm_java_opts | combine(jvm_ipv6_opts) | dict2items %} -D{{ opt.key }}={{ opt.value | regex_replace('\"','\\\"') }}{% endfor %}"
+    this_jvm_java_selector: '{{ jvm_jre_dir | regex_replace("^.*/","") | regex_replace("\.","_") }}_java'
+
+- name: set java opts for {{ freebsd_jdk_pkg }}
+  lineinfile:
+    dest: /usr/local/etc/javavm_opts.conf
+    line: 'JAVAVM_OPTS_{{ this_jvm_java_selector }}="{{ this_jvm_java_opts }}"'
+    regex: '^JAVAVM_OPTS_{{ this_jvm_java_selector }}='
+    state: '{% if this_jvm_java_opts != "" %}present{% else %}absent{% endif %}'

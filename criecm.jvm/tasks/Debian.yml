@@ -1,0 +1,28 @@
+---
+
+- name: install java
+  apt:
+    name:
+      - '{{ debian_jdk_pkg }}'
+      - default-jre
+    state: present
+
+- name: java_net opts
+  lineinfile:
+    dest: '{{ jvm_jre_dir }}/conf/net.properties'
+    line: '{{ prop.key }}={{ prop.value }}'
+    regex: '^{{ prop.key }}='
+    insertafter: '{{ prop.key }} *='
+  loop: '{{ jvm_net_opts | combine(jvm_proxy_opts) | dict2items }}'
+  loop_control:
+    loop_var: prop
+
+- name: get default java
+  command: java -XshowSettings:properties --version
+  register: javavers
+  changed_when: False
+  check_mode: False
+
+- name: set default java
+  command: 'update-java-alternatives -s {{ jvm_jre_dir }}'
+  when: javavers.stderr_lines | select("match","^ *java.specification.version") | first | regex_replace("^.*= *","") != jvm_java_version and jvm_set_default

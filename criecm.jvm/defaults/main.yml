@@ -1,0 +1,13 @@
+---
+# upgrade this to trigger re-install
+jvm_role_version: 1
+#https://github.com/magro/memcached-session-manager/wiki/SetupAndConfiguration
+jvm_java_version: 21
+freebsd_jdk_pkg: 'openjdk{{ jvm_java_version }}'
+debian_jdk_pkg: 'openjdk-{{ jvm_java_version }}-jre'
+jvm_set_default: True
+jvm_prefer_system_ipv6: True
+jvm_java_opts: {}
+jvm_proxy_opts: {}
+jvm_net_opts: {}
+jvm_ipv6_opts: {}

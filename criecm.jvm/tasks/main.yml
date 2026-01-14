@@ -1,0 +1,59 @@
+---
+- name: OS vars
+  include_vars: '{{ ansible_os_family }}.yml'
+  tags: jvm, vars
+
+- name: default java config
+  command: 'java -XshowSettings:properties -version'
+  check_mode: False
+  changed_when: False
+  failed_when: False
+  register: curjavavers
+
+- name: set proxy opts
+  set_fact:
+    jvm_proxy_opts:
+      http.proxyHost: '{{ jvm_http_proxy | regex_replace(":[0-9]*$","") }}'
+      http.proxyPort: '{{ jvm_http_proxy | regex_replace("^.*:","") }}'
+      http.nonProxyHosts: '{{ jvm_no_proxy }}'
+      https.proxyHost: '{{ jvm_http_proxy | regex_replace(":[0-9]*$","") }}'
+      https.proxyPort: '{{ jvm_http_proxy | regex_replace("^.*:","") }}'
+      ftp.proxyHost: '{{ jvm_http_proxy | regex_replace(":[0-9]*$","") }}'
+      ftp.proxyPort: '{{ jvm_http_proxy | regex_replace("^.*:","") }}'
+      ftp.nonProxyHosts: '{{ jvm_no_proxy }}'
+  when: jvm_http_proxy != ""
+
+- name: set ipv6 pref
+  set_fact:
+    jvm_ipv6_opts:
+      java.net.preferIPv4Stack: 'false'
+      java.net.preferIPv6Addresses: 'system'
+  when: ansible_all_ipv6_addresses | reject('match','fe80:') | count() > 0 and jvm_prefer_system_ipv6
+
+- name: do_sys or not
+  set_fact:
+    do_sys: '{% if "criecm" in ansible_local and "jvm" in ansible_local.criecm and ansible_local.criecm.jvm.version | default(0) | int >= jvm_role_version and not do_sysadm | default(False) %}no{% else %}yes{% endif %}'
+
+- name: OS tasks
+  include_tasks: '{{ ansible_os_family }}.yml'
+  tags: jvm, pkg
+
+# x509 if needed
+- name: install x509 CA
+  include_role:
+    name: criecm.x509
+  when: x509_ca_file | default("") != ""
+
+- name: set jre_dir fact
+  set_fact:
+    jre_dir: '{{ jvm_jre_dir }}'
+    cacheable: True
+
+- name: fact done
+  blockinfile:
+    path: '{% if ansible_os_family == "FreeBSD" %}/usr/local{% endif %}/etc/ansible/facts.d/criecm.fact'
+    marker: '# {mark} ANSIBLE criecm.jvm BLOCK'
+    block: |
+      [jvm]
+      version={{ jvm_role_version }}
+    create: yes

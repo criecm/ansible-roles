@@ -1,11 +1,22 @@
 ---
 
+- name: get current nginx config
+  shell: "nginx -qTV || echo '' | grep -Ev '^[[:space:]]*(#.*)?$'"
+  register: curconf
+  failed_when: False
+
+- name: nginx facts
+  set_fact:
+    has_http2: '{% if curconf.stderr is search("--with-http_v2_module") %}True{% else %}False{% endif %}'
+    has_http3: '{% if curconf.stderr is search("--with-http_v3_module") %}True{% else %}False{% endif %}'
+
 - name: site vars
   include_vars: site.yml
 
 - name: site fact
   set_fact:
     site: '{{ default_site | combine(onesite) }}'
+    http3_reuseport: '{% if curconf.stdout is search("listen + [\[\]0-9a-fA-F\.:]*"+siteport+" *quic +reuseport") %}{% else %} reuseport{% endif %}'
 
 - name: site includes
   template:

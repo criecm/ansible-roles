@@ -131,6 +131,8 @@ nginx web server, with one to many websites, for FreeBSD 11,12 and Debian 9,10
   keeps access log locally
 * `do_http2 (False)`
   activate http2 when using tls
+* `do_http3 (False)`
+  enable quic with tls
 * `mysite ('')`:
   if defined, will only process this `site.id`
   (use `ansible-playbook ... -e mysite=thisone` where `thisone` is your site's `id`)

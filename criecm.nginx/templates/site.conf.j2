@@ -31,9 +31,9 @@ upstream {{ upstream }} {
 	include {{ preclude | regex_replace("^.* ","") | basename | regex_replace("\.j2$","") }};
 {%   endfor %}
 {% endif %}
-{% if site.tls_redir | default(False) and not site.proxified_by %}
+{% if site.tls_redir | default(False) %}
 ## redirect http to https
-# site.tls_redir | default(False) and not site.proxified_by
+# site.tls_redir | default(False)
 server {
 {%   if ansible_all_ipv4_addresses | count > 0 %}
 	listen *:80;
@@ -49,34 +49,52 @@ server {
 
 server {
 {% if "listen" in site %}
+{%   set hastls=namespace(n=0) %}
 # site.listen={{ site.listen }}
 {%   for l in site.listen %}
-	listen {{ l }}{% if site.tls_cert and not site.listen | join(" ") is search("ssl") %} ssl{% if site.http2 %};
-	http2 on{% endif %}{% endif %};
-{%   endfor %}
-{% else %}
-{%   if site.proxified_by %}
-# site.proxified_by={{ site.proxified_by }}
-{%   if ansible_all_ipv4_addresses | count > 0 %}
-	listen *:80;
-{%   endif %}
-{%   if ansible_all_ipv6_addresses | count > 0 %}
-	listen [::]:80;
-{%   endif %}
-{%   else %}
-# site.listen_ips={{ site.listen_ips }}
-{%     if site.listen_ips | count > 0 %}
-{%       for ip in site.listen_ips %}
-	listen	{{ ip }}:{{ siteport }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
-{%         if not site.tls_only and siteport != "80" %}
-	listen  {{ ip }}:80;
-{%         endif %}
-{%       endfor %}
+{%     if l is search("(443|ssl)$") and site.tls_cert | default("") != "" %}
+{%       set tls=true %}
+{%       set hastls.n = 1 %}
+# listen {{ l }}: tls={{ tls }} hastls.n={{ hastls.n }} site.http3={{ site.http3 }}
 {%     else %}
-        listen {{ siteport }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
+{%       set tls=false %}
+{%     endif %}
+	listen {{ l }}{% if tls and not l is search("ssl") %} ssl{% endif %};
+{%     if tls and site.http3 %}
+	listen {{ l }} quic{{ http3_reuseport }};
+{%     endif %}
+{%   endfor %}
+# hastls.n={{ hastls.n }} site.http2={{ site.http2 }} site.http3={{ site.http3 }}
+{%   if hastls.n > 0 %}
+{%     if site.http2 | bool %}
+	http2 on;
+{%     endif %}
+{%     if site.http3 | bool %}
+	http3 on;
+	add_header Alt-Svc 'h3="443"; ma=86400';
+{%     endif %}
+{%   endif %}
+{% else %}
+# site.listen_ips={{ site.listen_ips }}
+{%   if site.listen_ips | count > 0 %}
+{%     for ip in site.listen_ips %}
+	listen	{{ ip }}:{{ siteport }}{% if site.tls_cert %} ssl{% endif %};
+{%     if site.http2 | bool %}
+	http2 on;
+{%     endif %}
+{%     if site.http3 | bool %}
+	listen {{ ip }}:{{ siteport }} quic{{ http3_reuseport }};
+	http3 on;
+	add_header Alt-Svc 'h3=":443"; ma=86400';
+{%     endif %}
 {%       if not site.tls_only and siteport != "80" %}
-        listen 80;
+	listen  {{ ip }}:80;
 {%       endif %}
+{%     endfor %}
+{%   else %}
+        listen {{ siteport }}{% if site.tls_cert %} ssl{% if site.http2 %} http2{% endif %}{% endif %};
+{%     if not site.tls_only and siteport != "80" %}
+        listen 80;
 {%     endif %}
 {%   endif %}
 {% endif %}

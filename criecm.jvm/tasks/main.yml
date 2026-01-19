@@ -1,7 +1,7 @@
 ---
-- name: OS vars
-  include_vars: '{{ ansible_os_family }}.yml'
-  tags: jvm, vars
+#- name: OS vars
+#  include_vars: '{{ ansible_os_family }}.yml'
+#  tags: jvm, vars
 
 - name: default java config
   command: 'java -XshowSettings:properties -version'
@@ -46,7 +46,7 @@
 
 - name: set jre_dir fact
   set_fact:
-    jre_dir: '{{ jvm_jre_dir }}'
+    jre_dir: '{{ jvm_dir }}'
     cacheable: True
 
 - name: fact done

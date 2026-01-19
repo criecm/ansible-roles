@@ -7,9 +7,17 @@
       - default-jre
     state: present
 
+- name: list jdk names
+  command: 'update-java-alternatives -l'
+  register: debjavalist
+
+- name: set jvm_dir
+  set_fact:
+    jvm_dir: '{{ debjavalist.stdout_lines | select("match","java-(1\.)?"+jvm_java_version | string) | first | regex_replace("^.* ","") }}'
+
 - name: java_net opts
   lineinfile:
-    dest: '{{ jvm_jre_dir }}/conf/net.properties'
+    dest: '{{ jvm_dir }}/conf/net.properties'
     line: '{{ prop.key }}={{ prop.value }}'
     regex: '^{{ prop.key }}='
     insertafter: '{{ prop.key }} *='
@@ -24,5 +32,5 @@
   check_mode: False
 
 - name: set default java
-  command: 'update-java-alternatives -s {{ jvm_jre_dir }}'
-  when: javavers.stderr_lines | select("match","^ *java.specification.version") | first | regex_replace("^.*= *","") != jvm_java_version and jvm_set_default
+  command: 'update-java-alternatives -s {{ jvm_dir }}'
+  when: javavers.stderr_lines | select("match","^ *java.specification.version") | first | regex_replace("^.*= *","") != jvm_java_version | string and jvm_set_default

@@ -1,2 +1,0 @@
----
-jvm_jre_dir: '{{ jre_dir | default("/usr/lib/jvm/java-"+ jvm_java_version | string +"-openjdk-amd64") }}'

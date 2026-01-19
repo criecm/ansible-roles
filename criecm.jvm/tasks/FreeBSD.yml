@@ -13,9 +13,21 @@
   loop_control:
     loop_var: prop
 
+- name: get default java
+  command: java -XshowSettings:properties --version
+  register: javavers
+  changed_when: False
+  check_mode: False
+  environment:
+    JAVA_VERSION: '{{ jvm_java_version }}'
+
+- name: set jvm_dir
+  set_fact:
+    jvm_dir: '{{ javavers.stderr_lines | select("match","^ *java\.home =") | first | regex_replace("^.*= *","") }}'
+
 - name: java_net opts
   lineinfile:
-    dest: '{{ jvm_jre_dir }}/conf/net.properties'
+    dest: '{{ jvm_dir }}/conf/net.properties'
     line: '{{ prop.key }}={{ prop.value }}'
     regex: '^{{ prop.key }}='
     insertafter: '{{ prop.key }} *='
@@ -26,7 +38,7 @@
 - name: java_opts
   set_fact:
     this_jvm_java_opts: "{% for opt in jvm_java_opts | combine(jvm_ipv6_opts) | dict2items %} -D{{ opt.key }}={{ opt.value | regex_replace('\"','\\\"') }}{% endfor %}"
-    this_jvm_java_selector: '{{ jvm_jre_dir | regex_replace("^.*/","") | regex_replace("\.","_") }}_java'
+    this_jvm_java_selector: '{{ jvm_dir | regex_replace("^.*/","") | regex_replace("\.","_") }}_java'
 
 - name: set java opts for {{ freebsd_jdk_pkg }}
   lineinfile:

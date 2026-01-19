@@ -26,7 +26,7 @@
   with_first_found:
     - files:
         - '{{ ansible_os_family }}.yml'
-      errors: 'ignore'
+      skip: True
 
 - name: ldap.conf
   lineinfile:

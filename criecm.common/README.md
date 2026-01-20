@@ -27,8 +27,6 @@
     put your rc file in {{ playbook_dir }}/files/{{ root_shell }}rc
   * `backup_dir (files/backups/{{ inventory_hostname }})`
     copy/restore /root/ files from here if any
-  * `http_proxy ('')`
-    To set http_proxy and https_proxy global values (FreeBSD only)
 
 ### FreeBSD specific
 

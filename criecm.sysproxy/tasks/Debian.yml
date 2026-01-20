@@ -1,0 +1,40 @@
+---
+- name: stat /etc/environment.d
+  stat:
+    path: /etc/environment.d
+  register: statenvd
+- name: remove old block
+  blockinfile:
+    dest: '/etc/environment'
+    marker: '# {mark} PROXY ansible criecm.common'
+    state: absent
+  notify: restart connection
+- name: add PROXY lines to /etc/environment
+  blockinfile:
+    dest: '/etc/environment'
+    marker: '# {mark} PROXY ansible criecm'
+    block: |
+      export http_proxy="{{ http_proxy }}"
+      export https_proxy="{{ http_proxy }}"
+      export no_proxy="{{ no_proxy | default('localhost') }}"
+    state: '{% if http_proxy != "" %}present{% else %}absent{% endif %}'
+  notify: restart connection
+- name: add PROXY lines to /etc/environment.d/65-proxy.conf
+  copy:
+    dest: '/etc/environment.d/65-proxy.conf'
+    content: |
+      http_proxy="{{ http_proxy }}"
+      https_proxy="{{ http_proxy }}"
+      no_proxy="{{ no_proxy | default('localhost') }}"
+  notify:
+    - systemctl daemon-reload
+    - restart connection
+  when: statenvd.stat.exists and http_proxy != ""
+- name: delete /etc/environment.d/65-proxy.conf
+  file:
+    path: '/etc/environment.d/65-proxy.conf'
+    state: absent
+  when: http_proxy == ""
+  notify:
+    - systemctl daemon-reload
+    - restart connection

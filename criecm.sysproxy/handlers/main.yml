@@ -1,0 +1,11 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for criecm.sysproxy
+- name: mkdb login.conf
+  command: 'cap_mkdb /etc/login.conf'
+
+- name: systemctl daemon-reload
+  command: systemctl daemon-reload
+
+- name: restart connection
+  ansible.builtin.meta: reset_connection

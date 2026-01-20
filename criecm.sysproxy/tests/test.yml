@@ -1,0 +1,8 @@
+#SPDX-License-Identifier: MIT-0
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - criecm.sysproxy
+  vars:
+    http_proxy: 'http://[::1]:3128'

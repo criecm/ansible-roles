@@ -1,0 +1,10 @@
+---
+- name: http proxy
+  replace:
+    after: 'default:\\'
+    regexp: '^(?P<debut>\t:setenv=BLOCKSIZE=K)((,([nN][oO]|[hH][tT][tT][pP][sS]?)_[Pp][Rr][Oo][Xx][Yy]=([''"].*[''"]|[^,:]+))+)?(?P<reste>[^:]+)?:\\$'
+    replace: '\g<debut>{% if http_proxy != "" %},http_proxy={{ http_proxy | regex_replace(":","\\\\c") }},HTTPS_PROXY={{ http_proxy | regex_replace(":","\\\\c") }}{% if no_proxy | default("") != "" %},NO_PROXY=''{{ no_proxy | regex_replace(":","\\\\c") }}''{% endif %}{% endif %}\g<reste>:\\'
+    dest: /etc/login.conf
+  notify:
+    - mkdb login.conf
+    - restart connection

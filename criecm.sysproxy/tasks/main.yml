@@ -1,0 +1,14 @@
+---
+# tasks file for criecm.sysproxy
+#- name: exit if no http_proxy
+#  ansible.builtin.meta: end_role
+#  when: http_proxy == ""
+
+- name: os tasks
+  include_tasks: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+
+- name: flush handlers
+  ansible.builtin.meta: flush_handlers

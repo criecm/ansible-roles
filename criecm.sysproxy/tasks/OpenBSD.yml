@@ -1,0 +1,18 @@
+---
+- name: show
+  debug:
+    var: http_proxy
+
+- name: http proxy
+  ansible.builtin.lineinfile:
+    dest: /etc/login.conf
+    insertafter: 'default:\\'
+    line: '	:setenv={% if http_proxy != "" %}http_proxy={{ http_proxy | regex_replace(":","\\c") }},HTTPS_PROXY={{ http_proxy | regex_replace(":","\\c") }}{% if no_proxy | default("") != "" %},NO_PROXY={{ no_proxy | regex_replace(":","\\c") | regex_replace(",","\\,") }}{% endif %}{% endif %}:\'
+    regexp: '^	:setenv='
+#    regexp: '^	:setenv=(?P<debut>.*,)((([nN][oO]|[hH][tT][tT][pP][sS]?)_[Pp][Rr][Oo][Xx][Yy]=([''"].*[''"]|[^,:]+),?)*)?(?P<reste>,[^:]+)?:\\$'
+#    line: '	:setenv=\g<debut>{% if http_proxy != "" %}http_proxy={{ http_proxy | regex_replace(":","\\\\c") }},HTTPS_PROXY={{ http_proxy | regex_replace(":","\\\\c") }}{% if no_proxy | default("") != "" %},NO_PROXY=''{{ no_proxy | regex_replace(":","\\\\c") }}''{% endif %}{% endif %}\g<reste>:\\'
+#    backrefs: True
+    state: '{% if http_proxy != ""%}present{% else %}absent{% endif %}'
+  notify:
+    - mkdb login.conf
+    - restart connection

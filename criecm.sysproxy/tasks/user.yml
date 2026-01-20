@@ -1,0 +1,29 @@
+---
+# tasks file for criecm.syslog
+- name: os tasks
+  include_tasks: '{{ item }}'
+  with_first_found:
+    - files:
+        - '{{ ansible_os_family }}.yml'
+        skip: True
+
+- name: shells
+  ansible.builtin.command: 'which {{ shell }}'
+  register: whichshells
+  loop: '{{ users | selectattr("shell","defined") | map(attribute="shell") | unique }}'
+
+- name: install shells
+  ansible.builtin.package:
+    name: '{{ shell }}'
+  loop: '{{ whichshells.results | selectattr("rc","!=",0) | map(attribute="item") | unique }}'
+
+- name: shells
+  ansible.builtin.command: 'which {{ shell }}'
+  register: whichshells
+  loop: '{{ users | selectattr("shell","defined") | map(attribute="shell") | unique }}'
+
+- name: user {{ user.key }}
+  ansible.builtin.user:
+    name: '{{ user.key }}'
+    home: '{{ user.value["home"] | default(omit) }}'
+    shell: '{{ whichshells.results | selectattr("item","==",user.value["shell"]) | map(attribute="stdout") }}'

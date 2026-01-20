@@ -27,8 +27,8 @@ php_ini_vars:
   date.timezone: '{{ host_timezone | default("Europe/Paris") }}'
 
 php_cli_vars:
-  display_errors: "on"
-  display_startup_errors: "on"
+  display_errors: "On"
+  display_startup_errors: "On"
 
 php_maintainer_shell: /bin/sh
 

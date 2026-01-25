@@ -6,7 +6,7 @@ group = {{ site.group | default("_"+site.id) }}
 listen = {{ site.fcgisocket }}
 
 {% if site.fcgisocket is match("\/.*") %}
-listen.owner = {{ www_user }}
+listen.owner = root
 listen.group = {{ www_group }}
 listen.mode = 660
 {% else %}

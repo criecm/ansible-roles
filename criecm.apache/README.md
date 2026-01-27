@@ -81,6 +81,7 @@ Most of these are used in bundled site.conf.j2 template only, except `id`, `apac
 * `protocols (apache_protocols)`:
   you may override `Protocol` per vhost - see https://httpd.apache.org/docs/2.4/mod/core.html#protocols
 * `stickysession` name of session cookie for use with load-balancing
+* `failonstatus ([])` list of http status codes which mark a backend as failed - see Balancer Parameters in https://httpd.apache.org/docs/2.4/en/mod/mod_proxy.html#proxypass
 * `apache_rewrite_config (True)`:
   Set to false it will never modify existing config files
 * `override_site_config (apache_rewrite_config)`:

@@ -73,6 +73,9 @@ Protocols {{ site.protocols }}
 {%       endfor %}
     Require all granted
     ProxySet stickysession={{ site.stickysession | default(site.id+"B") }}
+{%       if site.failonstatus is defined %}
+    ProxySet failonstatus={{ site.failonstatus | join(",") }}
+{%       endif %}
   </Proxy>
 {%       set sitebackend = "balancer://"+site.id %}
 {%     else %}
@@ -125,6 +128,9 @@ Protocols {{ site.protocols }}
 
 {%       endfor %}
     ProxySet stickysession={{ site.id }}{{ prefix.path | regex_replace('/','_') }}B
+{%       if prefix.failonstatus is defined %}
+    ProxySet failonstatus={{ prefix.failonstatus | join(",") }}
+{%       endif %}
   </Proxy>
 
 {%     endif %}

@@ -77,6 +77,7 @@
         src: '{{ iocage_jail.authkeys | default("/root/.ssh/authorized_keys") }}'
         directory_mode: '0700'
         dest: '/iocage/jails/{{ iocage_jail.name }}/root/root/.ssh/authorized_keys'
+        force: no
     - name: restore ssh host keys
       copy:
         src: '{{ sshkey }}'
@@ -139,7 +140,8 @@
       notify: restart jail
       when: jail_has_nfs_mounts
   when: idmap_domain | default(False) and
-         iocage_jail.properties.release | default(iocage_release) | regex_replace("-[A-Z].*$","") is version_compare("13.3",">=")
+        iocage_jail.properties.release | default(iocage_release) | regex_replace("-[A-Z].*$","") is version_compare("13.3",">=") and
+        iocage_jail.properties.vnet | default(False) | bool
 
 - name: mkdir fstab mountpoints
   file:

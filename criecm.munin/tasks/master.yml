@@ -38,6 +38,7 @@
         IdentityFile /var/munin/.ssh/id_rsa
         ForwardX11 no
         StrictHostKeyChecking accept-new
+    force: no
 
 - name: munin-cgi tmp dir
   file:

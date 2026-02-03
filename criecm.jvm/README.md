@@ -19,6 +19,8 @@ FreeBSD & Debian, jdk8+
   On FreeBSD, adds java.net.preferIPv4Stack=false (java default, historically overriden in some openjdk versions)
 * `jvm_set_default (True)`
   On Debian, set the installed jvm as system default
+* `jvm_upgrade (True)`
+  Upgrade jvm to the latest minor by default
 
 ### http(s) proxy support
 

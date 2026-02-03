@@ -10,6 +10,14 @@
   failed_when: False
   register: curjavavers
 
+- name: set installed_java_version
+  set_fact:
+    installed_java_version: '{% if curjavavers.rc == 0 %}{{ curjavavers.stderr_lines | select("search","java.vm.specification.version") | first | regex_replace("^ *java.vm.specification.version *= *(1\.)?","") }}{% else %}{{ undef() }}{% endif %}'
+
+- name: set jvm_java_version
+  set_fact:
+    jvm_java_version: '{{ jvm_java_version | default(installed_java_version | default(jvm_default_java_version)) }}'
+
 - name: set proxy opts
   set_fact:
     jvm_proxy_opts:
@@ -44,7 +52,7 @@
     line: '{{ prop.key }}={{ prop.value }}'
     regex: '^{{ prop.key }}='
     insertafter: '{{ prop.key }} *='
-    state: '{% if prop.value != None and prop.value != "" %}present{% else %}absent{% endif %}'
+    state: '{% if prop.value != "" %}present{% else %}absent{% endif %}'
   loop: '{{ jvm_net_opts | combine(jvm_proxy_opts) | dict2items }}'
   loop_control:
     loop_var: prop
@@ -67,4 +75,5 @@
     block: |
       [jvm]
       version={{ jvm_role_version }}
+      java_version={{ jvm_java_version }}
     create: yes

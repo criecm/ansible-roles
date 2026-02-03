@@ -4,7 +4,8 @@
   pkgng:
     name:
       - '{{ freebsd_jdk_pkg }}'
-    state: present
+    state: '{% if jvm_upgrade | bool %}latest{% else %}present{% endif %}'
+  when: not installed_java_version | default(False) or installed_java_version != jvm_java_version or jvm_upgrade | bool
 
 - name: show java opts
   debug:

@@ -1,10 +1,11 @@
 ---
 # upgrade this to trigger re-install
-jvm_role_version: 1
+jvm_role_version: 2
 #https://github.com/magro/memcached-session-manager/wiki/SetupAndConfiguration
-jvm_java_version: 21
+jvm_default_java_version: 21
 freebsd_jdk_pkg: 'openjdk{{ jvm_java_version }}'
 debian_jdk_pkg: 'openjdk-{{ jvm_java_version }}-jre'
+jvm_upgrade: True
 jvm_http_proxy: ''
 jvm_no_proxy: 'localhost|127.*|[::1]'
 jvm_set_default: True

@@ -38,6 +38,17 @@
   include_tasks: '{{ ansible_os_family }}.yml'
   tags: jvm, pkg
 
+- name: java_net opts
+  lineinfile:
+    dest: '{{ jvm_dir }}/conf/net.properties'
+    line: '{{ prop.key }}={{ prop.value }}'
+    regex: '^{{ prop.key }}='
+    insertafter: '{{ prop.key }} *='
+    state: '{% if prop.value != None and prop.value != "" %}present{% else %}absent{% endif %}'
+  loop: '{{ jvm_net_opts | combine(jvm_proxy_opts) | dict2items }}'
+  loop_control:
+    loop_var: prop
+
 # x509 if needed
 - name: install x509 CA
   include_role:

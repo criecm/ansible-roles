@@ -25,17 +25,6 @@
   set_fact:
     jvm_dir: '{{ javavers.stderr_lines | select("match","^ *java\.home =") | first | regex_replace("^.*= *","") }}'
 
-- name: java_net opts
-  lineinfile:
-    dest: '{{ jvm_dir }}/conf/net.properties'
-    line: '{{ prop.key }}={{ prop.value }}'
-    regex: '^{{ prop.key }}='
-    insertafter: '{{ prop.key }} *='
-    state: '{% if prop.value != None and prop.value != "" %}present{% else %}absent{% endif %}'
-  loop: '{{ jvm_net_opts | combine(jvm_proxy_opts) | dict2items }}'
-  loop_control:
-    loop_var: prop
-
 - name: java_opts
   set_fact:
     this_jvm_java_opts: "{% for opt in jvm_java_opts | combine(jvm_ipv6_opts) | dict2items %} -D{{ opt.key }}={{ opt.value | regex_replace('\"','\\\"') }}{% endfor %}"

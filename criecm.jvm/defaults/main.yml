@@ -5,8 +5,8 @@ jvm_role_version: 1
 jvm_java_version: 21
 freebsd_jdk_pkg: 'openjdk{{ jvm_java_version }}'
 debian_jdk_pkg: 'openjdk-{{ jvm_java_version }}-jre'
-jvm_http_proxy:
-jvm_no_proxy:
+jvm_http_proxy: ''
+jvm_no_proxy: 'localhost|127.*|[::1]'
 jvm_set_default: True
 jvm_prefer_system_ipv6: True
 jvm_java_opts: {}

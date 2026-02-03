@@ -31,6 +31,7 @@
     line: '{{ prop.key }}={{ prop.value }}'
     regex: '^{{ prop.key }}='
     insertafter: '{{ prop.key }} *='
+    state: '{% if prop.value != None and prop.value != "" %}present{% else %}absent{% endif %}'
   loop: '{{ jvm_net_opts | combine(jvm_proxy_opts) | dict2items }}'
   loop_control:
     loop_var: prop

@@ -69,7 +69,6 @@
     - name: load kernel module
       community.general.modprobe:
         name: ptp_kvm
-        persistent: present
         state: present
     - name: add chrony config for PHC
       lineinfile:

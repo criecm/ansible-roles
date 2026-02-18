@@ -18,3 +18,4 @@ default_resolver_ipv4:
 default_resolver_ipv6:
   - '2620:119:35::35'
   - '2001:4860:4860::8844'
+default_properties: []

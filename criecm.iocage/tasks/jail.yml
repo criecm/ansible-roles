@@ -129,7 +129,7 @@
         - 'nfsuserd_enable="YES"'
         - 'nfsuserd_flags="-domain {{ idmap_domain }}"'
       notify: restart jail
-      when: jail_has_nfs_mounts
+      when: jail_has_nfs_mounts | bool
     - name: jail props needed
       iocage:
         name: '{{ jail.name }}'
@@ -138,7 +138,7 @@
           enforce_statfs: '1'
         state: set
       notify: restart jail
-      when: jail_has_nfs_mounts
+      when: jail_has_nfs_mounts | bool
   when: idmap_domain | default(False) and
         iocage_jail.properties.release | default(iocage_release) | regex_replace("-[A-Z].*$","") is version_compare("13.3",">=") and
         iocage_jail.properties.vnet | default(False) | bool

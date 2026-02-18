@@ -44,7 +44,7 @@
         register: clientidset
         failed_when: False
         changed_when: False
-        check_mtde: False
+        check_mode: False
       - name: fact grub nfs4_unique_id
         set_fact: 
           grub_nfs4_unique_id: '{% if clientidset.stdout_lines | count() > 0

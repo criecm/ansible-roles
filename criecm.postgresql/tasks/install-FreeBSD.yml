@@ -41,7 +41,7 @@
         :charset=UTF-8:\
         :tc=daemon:
 
-  when: pg_class | default(False)
+  when: 'pg_class != ""'
   register: loginconf
   notify: cap_mkdb login.conf
 

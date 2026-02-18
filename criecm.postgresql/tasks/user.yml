@@ -20,7 +20,7 @@
   become_user: '{{ pg_owner }}'
   become_method: su
 
-- name: 'create db {{ pg_user.db }}'
+- name: 'create db'
   postgresql_db:
     name: '{{ pg_user.db }}'
     owner: '{{ pg_user.name }}'

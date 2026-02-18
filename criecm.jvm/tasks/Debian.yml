@@ -11,6 +11,8 @@
 - name: list jdk names
   command: 'update-java-alternatives -l'
   register: debjavalist
+  check_mode: False
+  changed_when: False
 
 - name: set jvm_dir
   set_fact:

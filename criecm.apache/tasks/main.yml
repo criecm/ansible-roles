@@ -13,7 +13,7 @@
 - name: install and enable apache
   include_tasks: '{{ ansible_os_family }}.yml'
   tags: apache, pkg
-  when: do_sys
+  when: do_sys | bool
 
 - name: conf standard
   block:
@@ -86,7 +86,7 @@
         label: '{{ item }}'
       notify: reload apache
   tags: apache, config
-  when: do_sys
+  when: do_sys | bool
 
 - name: fact done
   blockinfile:
@@ -96,7 +96,7 @@
       [apache]
       version={{ apache_role_version }}
     create: yes
-  when: do_sys
+  when: do_sys | bool
 
 - name: sites
   include_tasks: site.yml
